@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 
 type Theme = 'light' | 'dark'
 
@@ -15,8 +15,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('dark')
   const [mounted, setMounted] = useState(false)
 
+  const applyTheme = useCallback((newTheme: Theme) => {
+    const root = document.documentElement
+    if (newTheme === 'dark') {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
+  }, [])
+
   // Run only on client after mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
 
     // Read from localStorage
@@ -29,20 +39,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         // Default to dark
         applyTheme('dark')
       }
-    } catch (e) {
+    } catch {
       // localStorage not available, use default
       applyTheme('dark')
     }
-  }, [])
-
-  const applyTheme = (newTheme: Theme) => {
-    const root = document.documentElement
-    if (newTheme === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-  }
+  }, [applyTheme])
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme)
@@ -51,14 +52,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Persist to localStorage
     try {
       localStorage.setItem('theme', newTheme)
-    } catch (e) {
+    } catch {
       // localStorage not available, silently fail
     }
   }
 
   // Don't render until mounted to avoid hydration mismatch
   if (!mounted) {
-    return <>{children}</>
+    return null
   }
 
   return (
