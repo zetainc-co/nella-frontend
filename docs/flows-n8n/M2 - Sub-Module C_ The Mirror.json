@@ -1,0 +1,72 @@
+{
+  "name": "M2 - Sub-Module C: The Mirror",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.agencianella.com/api/v1/accounts/1/conversations/{{ $json.body.conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"🤖 AI: {{ $json.body.content }}\",\n  \"message_type\": \"outgoing\",\n  \"private\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6ac31d5c-e9d3-47a5-b140-af6175d73fd4",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mirror",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "f13a3a8f-9e2c-4cb9-a1e8-fc178bea1ed3",
+      "name": "Webhook",
+      "webhookId": "4d88b544-0d29-48ca-ba82-ae84f111667e"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c4757973-ef6e-4fa0-8fbd-aa637920bbbe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec4e63bca4e09f099ec6f882fb9535cca5b57599cb594d54d83d116e2764f652"
+  },
+  "id": "zyJTsL0ulOMP4zdD",
+  "tags": []
+}

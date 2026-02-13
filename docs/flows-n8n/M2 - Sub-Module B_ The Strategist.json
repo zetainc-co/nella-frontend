@@ -1,0 +1,478 @@
+{
+  "name": "M2 - Sub-Module B: The Strategist",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cf4cd394-2ac8-4d8f-8c2f-8d86cbe9a426",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el nombre completo si existe, o \"Cliente\" si no.\nconst fullName = $('Start').item.json.name || \"Cliente\";\n\n// Dividir por espacios y tomar la primera parte\n// \"Gio Gómez\" -> [\"Gio\", \"Gómez\"] -> toma \"Gio\"\nconst firstName = fullName.trim().split(' ')[0];\n// Asegurar primera letra mayúscula\nconst formattedName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();\n\nreturn { json: { firstName: formattedName } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        0
+      ],
+      "id": "ca456e36-da3a-47a7-98d0-692fb694e132",
+      "name": "Name Cleaner1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT system_prompt FROM system_config ORDER BY id ASC LIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        368,
+        0
+      ],
+      "id": "af0ac2b9-6109-4dab-b1cc-c0ad78f2c362",
+      "name": "Fetch System Config1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Obtener la data original\nconst input = $input.item.json;\n\n// 2. BUSCADOR DE TESOROS (Adaptado a tu estructura exacta)\nlet rawText = null;\n\n// CASO PRIORITARIO: La estructura que salió en tu error (Output Array -> Content Array)\nif (Array.isArray(input.output) && input.output[0]?.content?.[0]?.text) {\n  rawText = input.output[0].content[0].text;\n}\n// CASO B: Estructura alternativa (Content como array directo)\nelse if (Array.isArray(input.content) && input.content[0]?.text) {\n  rawText = input.content[0].text;\n}\n// CASO C: Estructura estándar OpenAI/LangChain (Message object)\nelse if (input.message?.content) {\n  rawText = input.message.content;\n}\n// CASO D: Texto plano directo\nelse if (typeof input.output === 'string') {\n  rawText = input.output;\n}\n\n// Validación de seguridad final\nif (!rawText) {\n  // Si falla, devolvemos el error con la estructura para seguir depurando si fuera necesario\n  return { json: { error: \"No text found (Intento 3)\", structure_received: Object.keys(input) } };\n}\n\n// 3. LIMPIEZA Y PARSEO\n// Quitamos markdown ```json ... ``` y espacios\nconst cleanString = rawText\n  .replace(/```json/g, '')\n  .replace(/```/g, '')\n  .trim();\n\ntry {\n  const finalObj = JSON.parse(cleanString);\n  return { json: finalObj };\n} catch (e) {\n  return {\n    json: {\n      error: \"Parsing Error\",\n      raw_text: rawText\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        240
+      ],
+      "id": "4bf0c895-b816-4cee-bde1-45591faedc2c",
+      "name": "Parse AI Response1"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "conversations",
+          "mode": "list",
+          "cachedResultName": "conversations"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "contact_phone": "={{ $('Start').item.json.contact_phone }}",
+            "message_type": "text",
+            "body": "={{ $('Start').item.json.concatenated_text }}",
+            "direction": "incoming",
+            "metadata": "={{ {} }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_phone",
+              "displayName": "contact_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_type",
+              "displayName": "message_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "body",
+              "displayName": "body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cw_conversation_id",
+              "displayName": "cw_conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        192,
+        240
+      ],
+      "id": "744b66c3-cc26-4148-8dd8-de4acdb0340a",
+      "name": "DB: Save Incoming1",
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "conversations",
+          "mode": "list",
+          "cachedResultName": "conversations"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "contact_phone": "={{ $('Start').item.json.contact_phone }}",
+            "message_type": "text",
+            "body": "={{ $('Parse AI Response1').item.json.response_message }}",
+            "direction": "outgoing",
+            "metadata": "={{\n  {\n    \"model\": \"gpt-4o\",\n    \"usage\": $('Agente IA').item.json.usage || \"unknown\"\n  }\n}}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_phone",
+              "displayName": "contact_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_type",
+              "displayName": "message_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "body",
+              "displayName": "body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cw_conversation_id",
+              "displayName": "cw_conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        400,
+        240
+      ],
+      "id": "e842bba0-d322-4c9d-b01f-3355fdbace4f",
+      "name": "DB: Save Outgoing1",
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "06f71284-4cc9-4a1f-a10d-e25b35514ba5",
+              "name": "response_message",
+              "value": "={{ $('Parse AI Response1').item.json.response_message }}",
+              "type": "string"
+            },
+            {
+              "id": "aff18552-0062-417d-8586-d5d45360f786",
+              "name": "ai_clasificacion",
+              "value": "={{ $('Parse AI Response1').item.json.ai_clasificacion }}",
+              "type": "string"
+            },
+            {
+              "id": "64a4cc7b-a2c4-4e7c-8624-a1d229025dd4",
+              "name": "ai_etapa",
+              "value": "={{ $('Parse AI Response1').item.json.ai_etapa }}",
+              "type": "string"
+            },
+            {
+              "id": "1e280b06-5529-4676-81dd-c1550f63e946",
+              "name": "db_id",
+              "value": "={{ $('DB: Save Outgoing1').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "75e85c2e-65e8-4a38-9db9-0908db76272b",
+              "name": "ai_analisis",
+              "value": "={{ $('Parse AI Response1').item.json.ai_analisis }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        240
+      ],
+      "id": "574bdfe6-07b3-4e7f-b7ce-9a97a2fa6843",
+      "name": "Restore Output1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "={{ $('Fetch System Config1').item.json.system_prompt }}\n\n---\nINSTRUCCIONES DE SISTEMA Y FORMATO (ESTRICTO):\n\n1. PERSONALIZACIÓN DINÁMICA:\n   - Tu nombre es Gio.\n   - El cliente se llama: {{ $('Name Cleaner1').item.json.firstName }}.\n   - REGLA DE SALUDO: Si es el primer mensaje de la conversación, saluda usando \"Hola {{ $('Name Cleaner1').item.json.firstName }}\". Si ya estamos hablando, NO repitas el saludo.\n\n2. MEMORIA Y CONTEXTO:\n   - Contexto Histórico (Quién es): \"\"\" {{ $('Start').item.json.ai_summary || \"Cliente Nuevo\" }} \"\"\"\n   - Etapa Actual en CRM: \"\"\" {{ $('Start').item.json.lead_status || \"Diagnostico\" }} \"\"\"\n   - Conversación Actual (Qué dijo hoy): \"\"\" {{ $('Start').item.json.concatenated_text }} \"\"\"\n   - Analiza la conversación actual para determinar en qué fase del GUION DE VENTAS estás. No retrocedas fases si ya avanzaste.\n\n3. LÓGICA DE HANDOFF (AUTO-APAGADO):\n   Define \"handoff\": true SOLO si:\n   - El cliente dice explícitamente \"Ya agendé\", \"Listo\", \"Ya pagué\" (Etapa: Agendado).\n   - El cliente pide hablar con humano (Etapa: Soporte Humano).\n   - El cliente insulta, es competencia o dice explícitamente \"No tengo dinero\" (Etapa: Cierre Perdido).\n   - En cualquier otro caso (preguntas, dudas, negociación), \"handoff\": false.\n\n4. FORMATO DE SALIDA (JSON ÚNICAMENTE):\n   Tu respuesta debe ser un objeto JSON crudo. No uses Markdown. No uses ```json.\n   Estructura obligatoria:\n   {\n     \"ai_analisis\": \"Breve pensamiento sobre la intención del cliente\",\n     \"ai_clasificacion\": \"HOT LEAD | WARM LEAD | COLD LEAD | DESCARTADO\",\n     \"ai_etapa\": \"Diagnostico | Dolor | Solucion | Negociacion | Agendado | Cierre Ganado | Cierre Perdido | Soporte Humano\",\n     \"tiene_presupuesto\": true/false (Basado en la conversación),\n     \"handoff\": true/false,\n     \"response_message\": \"Tu respuesta de venta aquí siguiendo el GUION.\"\n   }"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        576,
+        0
+      ],
+      "id": "b940e83c-ffc1-427a-b26f-59c0f29677a3",
+      "name": "Agente IA",
+      "credentials": {
+        "openAiApi": {
+          "id": "To1qvTK0yoAOF9L2",
+          "name": "OpenAi"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Name Cleaner1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Name Cleaner1": {
+      "main": [
+        [
+          {
+            "node": "Fetch System Config1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch System Config1": {
+      "main": [
+        [
+          {
+            "node": "Agente IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response1": {
+      "main": [
+        [
+          {
+            "node": "DB: Save Incoming1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB: Save Incoming1": {
+      "main": [
+        [
+          {
+            "node": "DB: Save Outgoing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB: Save Outgoing1": {
+      "main": [
+        [
+          {
+            "node": "Restore Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente IA": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ea8a9373-1721-4f10-99a0-ecadf8a5672a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec4e63bca4e09f099ec6f882fb9535cca5b57599cb594d54d83d116e2764f652"
+  },
+  "id": "hyfRn33Wx9Fl2UkK",
+  "tags": []
+}

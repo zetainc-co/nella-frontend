@@ -1,0 +1,207 @@
+{
+  "name": "M2 - Sub-Module A: The Profiler",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM contacts \nWHERE phone::text LIKE '%{{ $('Start').item.json.contact_phone.toString().replace('+', '').trim() }}%'\nLIMIT 1;",
+        "options": {
+          "queryReplacement": "="
+        }
+      },
+      "id": "06bda711-801a-49cb-8c7b-9ca575024170",
+      "name": "Check Contact",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        -112,
+        32
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE contacts \nSET last_interaction_at = NOW() \nWHERE id = {{ $json.id }} \nRETURNING *;",
+        "options": {}
+      },
+      "id": "744a214c-2ef5-4c15-a364-80e7f4c10122",
+      "name": "Update Timestamp",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        384,
+        -80
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO contacts (phone, name, created_at, last_interaction_at, handoff_active)\nVALUES (\n  '{{ $('Start').item.json.contact_phone.toString().replace('+', '').trim() }}',\n  '{{ $('Start').item.json.contact_name || \"Cliente\" }}',\n  NOW(),\n  NOW(),\n  false\n)\nRETURNING *;",
+        "options": {}
+      },
+      "id": "9d932672-c164-434b-94b2-df93b492f227",
+      "name": "Create Contact",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        384,
+        128
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Datos que vienen de la Base de Datos (del nodo Update o Create)\nconst dbData = $input.item.json;\n\n// 2. Datos que venían del principio (El mensaje original)\n// Usamos $('Start') para \"viajar en el tiempo\" al primer nodo\nconst messageData = $('Start').item.json;\n\n// 3. Fusionamos todo en un solo objeto\nconst result = {\n  ...dbData,      // ID, Nombre, Lead Status...\n  ...messageData  // contact_phone, concatenated_text...\n};\n\nreturn { json: result };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        128
+      ],
+      "id": "f5a439cb-ab23-48fa-9766-e319eb28c3b8",
+      "name": "Format Output"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        32
+      ],
+      "id": "365b9135-ff02-4cde-9654-82cfd0d31af0",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "12f4edde-1e00-461f-b21f-9e0c9a402580",
+              "leftValue": "={{ $json.id !== undefined && $json.id !== null }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        80,
+        32
+      ],
+      "id": "96a0abd5-8a23-4a27-b14e-f8152d31abeb",
+      "name": "¿Existe?"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Check Contact": {
+      "main": [
+        [
+          {
+            "node": "¿Existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Timestamp": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Check Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Existe?": {
+      "main": [
+        [
+          {
+            "node": "Update Timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8b6b847a-512e-4ed6-8a08-b4ffcb7ce2b0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec4e63bca4e09f099ec6f882fb9535cca5b57599cb594d54d83d116e2764f652"
+  },
+  "id": "U8C8zNd2NBP2Un3I",
+  "tags": []
+}

@@ -1,0 +1,1586 @@
+{
+  "name": "M1.B - Worker",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 4
+            }
+          ]
+        }
+      },
+      "id": "b10761a7-c79d-4538-a6da-a8b5b282466b",
+      "name": "Cron (Cada 5s)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3296,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// PARSER V11 - Detección Inteligente (Mensajes vs Ecos)\nconst row = items[0].json;\nif (!row) return [];\n\nlet payload;\ntry {\n    payload = typeof row.raw_payload === 'string' ? JSON.parse(row.raw_payload) : row.raw_payload;\n} catch (e) {\n    // Si el JSON está roto, lo marcamos como IGNORADO para sacarlo de la cola y no trabar el flujo\n    return { json: { is_valid: false, status_to_save: 'IGNORED', error: \"JSON Parse Error\", db_id: row.id } };\n}\n\n// Navegación segura por el objeto de Meta\nlet entry = null;\nif (payload.entry) {\n    entry = payload.entry[0];\n} else if (payload.body && payload.body.entry) {\n    entry = payload.body.entry[0];\n}\n\nconst changes = entry ? entry.changes[0] : null;\nconst value = changes ? changes.value : null;\n\n// --- FILTRO DE CLASIFICACIÓN ---\n\n// 1. DETECCIÓN DE ECOS (Statuses: sent, delivered, read)\n// Si esto existe, NO es un mensaje de usuario. Es basura técnica.\nif (value && value.statuses) {\n    return {\n        json: {\n            is_valid: false,\n            db_id: row.id,\n            status_to_save: 'IGNORED', // <--- ESTO LIMPIA TU COLA PENDING\n            reason: \"Meta Receipt (Eco)\"\n        }\n    };\n}\n\n// 2. DETECCIÓN DE MENSAJES REALES\nconst message = value && value.messages ? value.messages[0] : null;\n\nif (!message) {\n  // Si no es status ni mensaje, es un evento desconocido. Lo ignoramos.\n  return { json: { is_valid: false, status_to_save: 'IGNORED', error: \"No message found\", db_id: row.id } };\n}\n\n// 3. EXTRACCIÓN DE DATOS (Solo si llegamos aquí es un mensaje real)\nconst contact = value && value.contacts ? value.contacts[0] : null;\n\n// Normalización de tipos\nlet finalType = message.type;\nif (finalType === 'voice') finalType = 'audio';\n\n// Retorno ÉXITO -> Esto activará al M2\nreturn {\n  json: {\n    is_valid: true,\n    db_id: row.id,\n    status_to_save: 'NORMALIZED', // <--- ESTO ES ORO PARA EL M2\n    wa_id: contact ? contact.wa_id : null,\n    name: contact && contact.profile ? contact.profile.name : \"Desconocido\",\n    msg_type: finalType,\n    msg_body: message.text ? message.text.body : null,\n    media_id: message[message.type] ? message[message.type].id : null,\n    timestamp: message.timestamp,\n    // Estructura lista para guardar en processed_json si lo necesitas\n    processing_results: {\n        contact_phone: contact ? contact.wa_id : null,\n        final_text: message.text ? message.text.body : null,\n        cw_contact_id: null // Se llenará después\n    }\n  }\n};"
+      },
+      "id": "c62e07ca-871e-4ad5-bc8c-e585e6b19995",
+      "name": "Extraer Datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        -2896,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $('Extraer Datos').item.json.is_valid }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "72755387-2059-480f-a257-5e283d3a9977",
+      "name": "Es Valido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -2480,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.agencianella.com/api/v1/accounts/1/conversations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contact_id",
+              "value": "={{ $('Normalizar Contacto').first().json.meta.sender.id }}"
+            },
+            {
+              "name": "inbox_id",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4cc50807-7b5c-4718-9584-814db349cdb3",
+      "name": "CW: Asegurar Hilo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2944,
+        1632
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Recuperamos los datos del presente (Viene de BUSCAR o de CREAR)\nconst cwInput = $input.all()[0].json;\n\n// 2. Recuperamos los datos del pasado (Nodo \"Extraer Datos\")\nconst wa = $items(\"Extraer Datos\")[0].json;\n\n// --- LÓGICA DE DETECCIÓN INTELIGENTE ---\nlet finalConvId;\nlet finalContactId;\nlet finalPhone;\n\n// CASO A: Viene del BUSCADOR (Es una lista dentro de payload)\n// Verificamos si existe 'payload' y si es una lista\nif (cwInput.data && cwInput.data.payload && Array.isArray(cwInput.data.payload)) {\n    finalConvId = cwInput.data.payload[0].id;\n    finalContactId = cwInput.data.payload[0].meta.sender.id;\n    finalPhone = cwInput.data.payload[0].meta.sender.phone_number;\n}\n// CASO B: Viene de CREAR (Es un objeto directo)\n// Verificamos si tiene un ID directo\nelse if (cwInput.id) {\n    finalConvId = cwInput.id;\n    finalContactId = cwInput.meta.sender.id;\n    finalPhone = cwInput.meta.sender.phone_number;\n}\n// CASO C: Fallback (Por si acaso)\nelse {\n    // Intentamos leerlo de la metadata si falló lo anterior\n    finalConvId = cwInput.payload ? cwInput.payload[0].id : null;\n}\n\nreturn {\n  json: {\n    // --- CONTEXTO CHATWOOT (Normalizado) ---\n    cw_conversation_id: finalConvId,\n    cw_contact_id: finalContactId,\n    cw_phone: finalPhone,\n\n    // --- CONTEXTO DEL MENSAJE (Original) ---\n    msg_type: wa.msg_type,\n    media_id: wa.media_id,\n    msg_body: wa.msg_body,\n    wa_id: wa.wa_id\n  }\n};"
+      },
+      "id": "7d6d1fca-6a8f-4f41-9a04-db0fccc50baf",
+      "name": "Fijar Contexto",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        -2464,
+        1520
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.msg_type }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "=audio"
+            },
+            {
+              "value2": "image",
+              "output": 1
+            },
+            {
+              "value2": "text",
+              "output": 2
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "0218d55a-ba83-48d7-898f-595f686f46ae",
+      "name": "Router Sentidos",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -2240,
+        1648
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://graph.facebook.com/v18.0/' + $json.media_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "4de02594-3ceb-4ca1-bb93-084021b48e2f",
+      "name": "Obtener URL (Media)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -4240,
+        2224
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "67jR0mACVXqBW93k",
+          "name": "Meta/WtSapp"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "2fca92a4-8bfe-4315-a5b6-56a52307eb39",
+      "name": "Descargar Media",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -4032,
+        2224
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "67jR0mACVXqBW93k",
+          "name": "Meta/WtSapp"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $('Fijar Contexto').first().json.msg_type }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "audio"
+            },
+            {
+              "value2": "image",
+              "output": 1
+            }
+          ]
+        },
+        "fallbackOutput": 2
+      },
+      "id": "e126ec31-5763-41f6-b77a-bc51791866ba",
+      "name": "Sub-Router Media",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -3808,
+        2192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://chat.agencianella.com/api/v1/accounts/1/conversations/' + $('Fijar Contexto').first().json.cw_conversation_id + '/messages' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "Archivo recibido:"
+            },
+            {
+              "name": "message_type",
+              "value": "incoming"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "attachments[]",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3c956012-08aa-42d0-a4e6-05c83b54b786",
+      "name": "CW: Subir Archivo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -3104,
+        2512
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://chat.agencianella.com/api/v1/accounts/1/conversations/' + $('Fijar Contexto').first().json.cw_conversation_id + '/messages' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "attachments[]",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "message_type",
+              "value": "incoming"
+            },
+            {
+              "name": "content",
+              "value": "Audio recibido:"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5c863db4-42f8-4b16-b367-8925b4c8e286",
+      "name": "CW: Subir Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -3664,
+        1984
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://chat.agencianella.com/api/v1/accounts/1/conversations/' + $('Fijar Contexto').first().json.cw_conversation_id + '/messages' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ '📝 Transcripción: ' + $json.text }}"
+            },
+            {
+              "name": "private",
+              "value": true
+            },
+            {
+              "name": "message_type",
+              "value": "incoming"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3aa76812-b9c8-4abe-b2e5-f78aede320f8",
+      "name": "CW: Nota Privada",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2544,
+        2000
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://chat.agencianella.com/api/v1/accounts/1/conversations/' + $('Fijar Contexto').first().json.cw_conversation_id + '/messages' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ \"📸 VENTA DETECTADA: \" + $json.vision_desc }}"
+            },
+            {
+              "name": "message_type",
+              "value": "incoming"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "attachments[]",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d77be25f-fdfc-4f10-a777-487b1753369b",
+      "name": "CW: Subir Venta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2272,
+        2320
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://chat.agencianella.com/api/v1/accounts/1/conversations/' + $('Fijar Contexto').first().json.cw_conversation_id + '/messages' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.msg_body }}"
+            },
+            {
+              "name": "message_type",
+              "value": "incoming"
+            },
+            {
+              "name": "private",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "08b0e513-7992-4bce-8ade-7b7dfe7c2119",
+      "name": "CW: Enviar Texto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1296,
+        1696
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM inbox_queue WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT 1;",
+        "additionalFields": {}
+      },
+      "id": "2ce3e4e1-5a7d-4f2a-9263-2ec2a74de354",
+      "name": "Leer Pendientes",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -3088,
+        1264
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "contacts",
+          "mode": "list",
+          "cachedResultName": "contacts"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phone": "={{ $('Extraer Datos').item.json.wa_id }}",
+            "name": "={{ $('Extraer Datos').item.json.name }}"
+          },
+          "matchingColumns": [
+            "phone"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2288,
+        1248
+      ],
+      "id": "cf063655-bc6e-410b-9234-38f5fae8b30e",
+      "name": "DB: Guardar Contacto",
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -3120,
+        2000
+      ],
+      "id": "cf125249-db67-43fb-a410-b75e0c3824a0",
+      "name": "Whisper",
+      "credentials": {
+        "openAiApi": {
+          "id": "To1qvTK0yoAOF9L2",
+          "name": "OpenAi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Traemos el Contexto Global\nconst context = $('Fijar Contexto').first().json;\n\n// 2. Variables por defecto\nlet finalBody = \"\";\nlet processingSource = \"unknown\";\nlet isSales = false;\nlet forceHandoff = false; // Nueva variable de control interno\n\n// 3. LÓGICA BLINDADA\n\n// CASO A: AUDIO 🎤\nif (context.msg_type === 'audio') {\n    try {\n        finalBody = $('Whisper').last().json.text;\n        processingSource = \"audio_transcription\";\n    } catch (e) {\n        finalBody = \"(Audio sin transcripción disponible)\";\n    }\n}\n\n// CASO B: IMAGEN 📸 (Tu lógica de Venta vs Ruido)\nelse if (context.msg_type === 'image') {\n    try {\n        // Buscamos la respuesta del nodo Code anterior o del IF\n        // Nota: Asegúrate de leer del nodo correcto según tu flujo\n        const visionData = $('Clasificar Imagen').last().json; \n        \n        if (visionData.vision_tag === 'VENTA') {\n             finalBody = \"📸 VENTA DETECTADA: \" + (visionData.vision_desc || \"Comprobante/Documento\");\n             isSales = true;\n             forceHandoff = true; // ¡Venta = Humano!\n        } else {\n             finalBody = \"🖼️ Imagen (Ruido): \" + (visionData.vision_desc || \"Meme/Irrelevante\");\n        }\n        processingSource = \"image_vision\";\n    } catch (e) {\n        finalBody = \"(Imagen sin análisis)\";\n    }\n}\n\n// CASO C: DOCUMENTOS Y VIDEO 📂🎥 (Ajuste Solicitado)\nelse if (context.msg_type === 'document' || context.msg_type === 'video') {\n    // Como ya pasaron por el nodo \"CW: Subir Archivo\", aquí solo registramos el hecho\n    const tipo = context.msg_type === 'video' ? '🎥 Video' : 'fyp Documento';\n    finalBody = `${tipo} recibido y transferido a agente.`;\n    \n    processingSource = \"media_handoff\";\n    forceHandoff = true; // Forzamos el handoff aquí también para la DB\n}\n\n// CASO D: TEXTO 📝\nelse if (context.msg_type === 'text') {\n    finalBody = context.msg_body; \n    processingSource = \"text_message\";\n}\n\n// CASO E: OTROS (Ubicación, Contactos, etc.)\nelse {\n    finalBody = \"Archivo: \" + context.msg_type;\n    processingSource = \"media_file\";\n    // Opcional: ¿Quieres handoff también para ubicaciones? Si sí, descomenta:\n    // forceHandoff = true; \n}\n\n// 4. Salida Estandarizada\nreturn {\n    json: {\n        process_status: 'PROCESSED',\n        final_text: finalBody,\n        source: processingSource,\n        is_sales_lead: isSales,\n        cw_conversation_id: context.cw_conversation_id,\n        cw_contact_id: context.cw_contact_id,\n        wa_phone: context.cw_phone,\n        // El handoff se activa si es venta, si es video/doc, o si forzamos manualmente\n        handoff_required: (forceHandoff || isSales)\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1312,
+        2320
+      ],
+      "id": "fcb1ee82-1492-4a07-9ddd-2f29f7da4ac6",
+      "name": "Consolidar Datos"
+    },
+    {
+      "parameters": {
+        "url": "https://chat.agencianella.com/api/v1/accounts/1/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ '+' + $json.phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2a588ff1-a30a-4b87-ae9d-ee750235b143",
+      "name": "CW: Buscar Contacto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -4256,
+        1552
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4124a48c-fe2b-4d9c-aef3-1c1c78a888c2",
+              "leftValue": "={{ $json.payload.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -4048,
+        1552
+      ],
+      "id": "465256ff-ec7f-4e0a-873e-8f13c1701c6b",
+      "name": "¿Existe Contacto?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.agencianella.com/api/v1/accounts/1/contacts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Extraer Datos').first().json.name !== \"Desconocido\" ? $('Extraer Datos').first().json.name : ('Cliente ' + $('Extraer Datos').first().json.wa_id) }}"
+            },
+            {
+              "name": "phone_number",
+              "value": "=+{{ $('Extraer Datos').first().json.wa_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bcf6ddbf-171b-424d-b00c-f83307dfe6e9",
+      "name": "CW: Crear Contacto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -3824,
+        1648
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all()[0].json;\n\n// Si es un array (vino de búsqueda), tomamos el primero. Si es objeto (vino de crear), lo usamos directo.\nconst contactData = Array.isArray(input.payload) ? input.payload[0] : input.payload.contact; \n// Nota: A veces Crear devuelve { payload: { contact: {...} } } verifica el output.\n// Si Chatwoot devuelve directo el objeto en crear, usa: input.payload;\n\nreturn {\n  json: {\n    meta: {\n        sender: {\n            id: contactData.id || contactData.payload.contact.id, // Ajuste de seguridad\n            phone_number: contactData.phone_number,\n            name: contactData.name\n        }\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3600,
+        1536
+      ],
+      "id": "b342f468-49a7-45c6-b013-d16452cba98e",
+      "name": "Normalizar Contacto"
+    },
+    {
+      "parameters": {
+        "url": "https://chat.agencianella.com/api/v1/accounts/1/conversations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "contact_id",
+              "value": "={{ $json.meta.sender.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3392,
+        1536
+      ],
+      "id": "b8421ba3-19a4-47c8-83fd-e3366927cbad",
+      "name": "CW: Buscar Conversacion",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "99f75867-db2f-46e2-bcd6-d24e8f304129",
+              "leftValue": "={{ $json.data.payload.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -3184,
+        1536
+      ],
+      "id": "d7f3cb5c-5879-408e-94a8-dabc407964c8",
+      "name": "¿Hay Hilo Abierto?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Recuperamos la respuesta de la IA (Vision)\nconst visionInput = $input.all()[0].json;\n\n// 2. RECUPERAMOS EL ARCHIVO PERDIDO 🕵️‍♂️\n// Buscamos la imagen en el nodo anterior a la Vision (tu Sub-Router)\n// Si cambiaste el nombre del nodo \"Sub-Router Media\", ajustalo aquí:\nconst binaryInput = $('Sub-Router Media').first().binary; \n\n// Navegamos hasta el texto de OpenAI\nconst content = visionInput.output?.[0]?.content?.[0]?.text || \"\";\n\nlet analysis;\ntry {\n    const clean = content.replace(/```json/g, \"\").replace(/```/g, \"\").trim();\n    analysis = JSON.parse(clean);\n} catch (e) {\n    analysis = { tag: \"RUIDO\", summary: \"Error de análisis\" };\n}\n\nreturn {\n    json: {\n        ...visionInput,\n        vision_tag: analysis.tag,\n        vision_desc: analysis.summary\n    },\n    // Aquí entregamos la imagen que rescatamos del pasado\n    binary: binaryInput \n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3120,
+        2208
+      ],
+      "id": "28437d86-594a-4e25-9fac-a6d97df0b78e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.vision_tag }}",
+              "value2": "=RUIDO"
+            }
+          ]
+        }
+      },
+      "id": "df99a02e-436f-45da-b470-142e19815e3b",
+      "name": "Clasificar Imagen",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -2544,
+        2208
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "inbox_queue",
+          "mode": "list",
+          "cachedResultName": "inbox_queue"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "IGNORED",
+            "id": "={{ $('Extraer Datos').first().json.db_id }}",
+            "updated_at": "={{ new Date().toISOString() }}",
+            "processed_json": "={{ { tag: $json.vision_tag, desc: $json.vision_desc, reason: \"Ruido detectado por IA\" } }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "raw_payload",
+              "displayName": "raw_payload",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_json",
+              "displayName": "processed_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2288,
+        2144
+      ],
+      "id": "68d13d07-f2e4-42ca-a29a-d5a363810ce3",
+      "name": "Fin Ruido",
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "type": "image",
+              "imageType": "base64"
+            },
+            {
+              "role": "system",
+              "content": "Eres un filtro de seguridad y clasificación para una IA de atención al cliente.\nTu única misión es analizar la imagen y etiquetarla en una de dos categorías.\n\nCATEGORÍA \"VENTA\":\n- Si la imagen es un Comprobante de Pago (voucher, transferencia).\n- Si es una Factura o Recibo.\n- Si es un Documento oficial o legal.\n- Si es una foto clara de un Producto o algo relevante para el negocio.\n\nCATEGORÍA \"RUIDO\":\n- Si es un meme, sticker o imagen de broma.\n- Si es una cadena de oraciones o saludos genéricos (\"Buenos días\").\n- Si es una selfie irrelevante, foto accidental (piso, techo) o borrosa.\n\nResponde ESTRICTAMENTE con este objeto JSON:\n{\n  \"tag\": \"VENTA\", // o \"RUIDO\"\n  \"summary\": \"Breve descripción de 5 palabras\"\n}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -3472,
+        2208
+      ],
+      "id": "db26df23-12b5-415f-85ac-617b075bbc96",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "To1qvTK0yoAOF9L2",
+          "name": "OpenAi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://chat.agencianella.com/api/v1/accounts/1/conversations/' + $('Fijar Contexto').first().json.cw_conversation_id + '/labels' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"requiere_atencion\"]\n}",
+        "options": {}
+      },
+      "id": "612de873-cfb1-4adb-8ad4-b6a022e13dcf",
+      "name": "CW: Etiquetar Handoff1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2080,
+        2320
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://chat.agencianella.com/api/v1/accounts/1/conversations/' + $('Fijar Contexto').first().json.cw_conversation_id + '/labels' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"requiere_atencion\"]\n}",
+        "options": {}
+      },
+      "id": "d4226565-cec8-4ad5-b356-257c5aa098fd",
+      "name": "CW: Etiquetar Handoff2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2576,
+        2512
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OG2XrBc64Mnh6VIF",
+          "name": "Autorización CW"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "inbox_queue",
+          "mode": "list",
+          "cachedResultName": "inbox_queue"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Leer Pendientes').first().json.id }}",
+            "status": "NORMALIZED",
+            "processed_json": "={{\n  JSON.stringify({\n    // 1. DATA CRUDA ORIGINAL\n    \"original_data\": $('Fijar Contexto').first().json,\n\n    // 2. RESULTADOS DEL PROCESAMIENTO\n    \"processing_results\": {\n      // IDENTIDAD (Lógica: Chatwoot -> O -> Data Original de WhatsApp -> O -> \"Cliente\")\n      \"contact_name\": $('Fijar Contexto').first().json.cw_contact_name || $('Leer Pendientes').first().json.raw_payload.body.entry[0].changes[0].value.contacts[0].profile.name || \"Cliente\",\n      \n      \"contact_phone\": $('Fijar Contexto').first().json.cw_phone,\n\n      // CONTENIDO UNIFICADO\n      \"final_text\": $json.final_text,\n      \"media_type\": $('Fijar Contexto').first().json.msg_type,\n\n      // INTELIGENCIA & CLASIFICACIÓN\n      \"image_classification\": $json.is_sales_lead ? \"VENTA\" : ($('Fijar Contexto').first().json.msg_type === 'image' ? \"RUIDO\" : null),\n      \n      // LÓGICA DE HANDOFF\n      \"handoff_needed\": $json.handoff_required,\n\n      // REFERENCIAS TÉCNICAS\n      \"chatwoot_conversation_id\": $json.cw_conversation_id,\n      \"cw_contact_id\": $json.cw_contact_id,\n      \"processed_at\": new Date().toISOString()\n    }\n  })\n}}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "raw_payload",
+              "displayName": "raw_payload",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_json",
+              "displayName": "processed_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1104,
+        2320
+      ],
+      "id": "500884b9-f224-4597-893f-8ea6c8b471f4",
+      "name": "Marcar Normalized",
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "inbox_queue",
+          "mode": "list",
+          "cachedResultName": "inbox_queue"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "={{ $json.status_to_save }}",
+            "id": "={{ $json.db_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "raw_payload",
+              "displayName": "raw_payload",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_json",
+              "displayName": "processed_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2688,
+        1264
+      ],
+      "id": "20685ab9-00f4-4af9-b6e0-ad29579bab87",
+      "name": "DB: Actualizar Status Queue",
+      "credentials": {
+        "postgres": {
+          "id": "Bfj1BkD8vty3mHgH",
+          "name": "Postgres Nella Local"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cron (Cada 5s)": {
+      "main": [
+        [
+          {
+            "node": "Leer Pendientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Datos": {
+      "main": [
+        [
+          {
+            "node": "DB: Actualizar Status Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es Valido?": {
+      "main": [
+        [
+          {
+            "node": "DB: Guardar Contacto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Asegurar Hilo": {
+      "main": [
+        [
+          {
+            "node": "Fijar Contexto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fijar Contexto": {
+      "main": [
+        [
+          {
+            "node": "Router Sentidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router Sentidos": {
+      "main": [
+        [
+          {
+            "node": "Obtener URL (Media)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obtener URL (Media)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CW: Enviar Texto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obtener URL (Media)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener URL (Media)": {
+      "main": [
+        [
+          {
+            "node": "Descargar Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Media": {
+      "main": [
+        [
+          {
+            "node": "Sub-Router Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sub-Router Media": {
+      "main": [
+        [
+          {
+            "node": "CW: Subir Audio",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Whisper",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CW: Subir Archivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Subir Archivo": {
+      "main": [
+        [
+          {
+            "node": "CW: Etiquetar Handoff2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Subir Audio": {
+      "main": [
+        []
+      ]
+    },
+    "CW: Nota Privada": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Subir Venta": {
+      "main": [
+        [
+          {
+            "node": "CW: Etiquetar Handoff1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Enviar Texto": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Pendientes": {
+      "main": [
+        [
+          {
+            "node": "Extraer Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB: Guardar Contacto": {
+      "main": [
+        [
+          {
+            "node": "CW: Buscar Contacto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Whisper": {
+      "main": [
+        [
+          {
+            "node": "CW: Nota Privada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar Datos": {
+      "main": [
+        [
+          {
+            "node": "Marcar Normalized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Buscar Contacto": {
+      "main": [
+        [
+          {
+            "node": "¿Existe Contacto?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Existe Contacto?": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Contacto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CW: Crear Contacto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Crear Contacto": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Contacto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Contacto": {
+      "main": [
+        [
+          {
+            "node": "CW: Buscar Conversacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Buscar Conversacion": {
+      "main": [
+        [
+          {
+            "node": "¿Hay Hilo Abierto?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Hay Hilo Abierto?": {
+      "main": [
+        [
+          {
+            "node": "Fijar Contexto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CW: Asegurar Hilo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Clasificar Imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clasificar Imagen": {
+      "main": [
+        [
+          {
+            "node": "Fin Ruido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CW: Subir Venta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Etiquetar Handoff1": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CW: Etiquetar Handoff2": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar Normalized": {
+      "main": [
+        []
+      ]
+    },
+    "DB: Actualizar Status Queue": {
+      "main": [
+        [
+          {
+            "node": "Es Valido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f4445daf-dfe5-4866-bb15-e84ce6487eaf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec4e63bca4e09f099ec6f882fb9535cca5b57599cb594d54d83d116e2764f652"
+  },
+  "id": "C3pTtHhmqBWDAjOX",
+  "tags": []
+}
