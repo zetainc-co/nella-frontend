@@ -174,33 +174,38 @@
     /* Subtle tech glow */
     border-color: rgba(206, 242, 93, 0.3);
   }
+}
 
-  /* Custom Scrollbar - Tech Design */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-  }
+/* Custom Scrollbar - Tech Design */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px !important;
+}
 
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 4px;
-  }
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(10, 10, 10, 0.3) !important;
+  border-radius: 4px !important;
+  margin: 8px 0 !important;
+}
 
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(206, 242, 93, 0.15);
-    border-radius: 4px;
-    transition: all 0.3s ease;
-  }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(206, 242, 93, 0.2) !important;
+  border-radius: 4px !important;
+  border: 2px solid rgba(10, 10, 10, 0.2) !important;
+}
 
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(206, 242, 93, 0.3);
-    box-shadow: 0 0 8px rgba(206, 242, 93, 0.2);
-  }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(206, 242, 93, 0.4) !important;
+  box-shadow: 0 0 12px rgba(206, 242, 93, 0.3) !important;
+}
 
-  /* Firefox scrollbar */
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(206, 242, 93, 0.15) rgba(255, 255, 255, 0.02);
-  }
+.custom-scrollbar::-webkit-scrollbar-thumb:active {
+  background: rgba(206, 242, 93, 0.6) !important;
+}
+
+/* Firefox scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(206, 242, 93, 0.2) rgba(10, 10, 10, 0.3) !important;
 }
 
 /* Auth Page Animations */
