@@ -44,7 +44,8 @@ export function CountryPhoneSelector({
   useEffect(() => {
     const e164 = `${selectedCountry.dialCode}${localNumber.replace(/\D/g, "")}`;
     onChange(e164);
-  }, [selectedCountry, localNumber, onChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCountry, localNumber]);
 
   const handleCountryChange = (countryCode: string) => {
     const country = LATAM_COUNTRIES.find((c) => c.code === countryCode);
