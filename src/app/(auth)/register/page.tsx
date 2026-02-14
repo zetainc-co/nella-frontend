@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { HudBackground, LoginHeader, TechnicalFooter } from '@/components/auth'
 import { RegistrationWizard } from '@/components/auth/registration-wizard'
 
@@ -16,6 +17,19 @@ export default function RegisterPage() {
         {/* Registration Wizard */}
         <div className="mt-8 flex justify-center">
           <RegistrationWizard />
+        </div>
+
+        {/* Login Link */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-muted-foreground">
+            ¿Ya tienes cuenta?{' '}
+            <Link
+              href="/login"
+              className="text-primary hover:text-primary/80 font-medium transition-colors"
+            >
+              Inicia sesión aquí
+            </Link>
+          </p>
         </div>
 
         <TechnicalFooter />
