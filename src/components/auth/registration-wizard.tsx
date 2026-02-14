@@ -36,71 +36,83 @@ export function RegistrationWizard() {
       )}
 
       {/* Glass Panel con el contenido del step */}
-      <div className="rounded-2xl border border-border/50 bg-card/50 p-8 shadow-lg backdrop-blur-sm">
+      <div className="rounded-2xl border border-border/50 bg-card/50 p-8 shadow-lg backdrop-blur-sm max-h-[calc(100vh-300px)] overflow-y-auto">
         {/* Step 1: Datos de Empresa */}
         {currentStep === 1 && (
-          <RegistrationStep1
-            initialData={formData}
-            onNext={(data) => {
-              updateStepData(1, data)
-              goToNextStep()
-            }}
-          />
+          <div className="animate-[fadeIn_0.3s_ease-in-out]">
+            <RegistrationStep1
+              initialData={formData}
+              onNext={(data) => {
+                updateStepData(1, data)
+                goToNextStep()
+              }}
+            />
+          </div>
         )}
 
         {/* Step 2: Datos del Admin */}
         {currentStep === 2 && (
-          <RegistrationStep2
-            initialData={formData}
-            onNext={(data) => {
-              updateStepData(2, data)
-              goToNextStep()
-            }}
-            onBack={goToPreviousStep}
-          />
+          <div className="animate-[fadeIn_0.3s_ease-in-out]">
+            <RegistrationStep2
+              initialData={formData}
+              onNext={(data) => {
+                updateStepData(2, data)
+                goToNextStep()
+              }}
+              onBack={goToPreviousStep}
+            />
+          </div>
         )}
 
         {/* Step 3: Configuración de Producto */}
         {currentStep === 3 && (
-          <RegistrationStep3
-            initialData={formData}
-            onNext={(data) => {
-              updateStepData(3, data)
-              goToNextStep()
-            }}
-            onBack={goToPreviousStep}
-          />
+          <div className="animate-[fadeIn_0.3s_ease-in-out]">
+            <RegistrationStep3
+              initialData={formData}
+              onNext={(data) => {
+                updateStepData(3, data)
+                goToNextStep()
+              }}
+              onBack={goToPreviousStep}
+            />
+          </div>
         )}
 
         {/* Step 4: Conexión WhatsApp */}
         {currentStep === 4 && (
-          <RegistrationStep4
-            initialData={formData}
-            onNext={(data) => {
-              updateStepData(4, data)
-              goToNextStep()
-            }}
-            onBack={goToPreviousStep}
-          />
+          <div className="animate-[fadeIn_0.3s_ease-in-out]">
+            <RegistrationStep4
+              initialData={formData}
+              onNext={(data) => {
+                updateStepData(4, data)
+                goToNextStep()
+              }}
+              onBack={goToPreviousStep}
+            />
+          </div>
         )}
 
         {/* Step 5: Resumen */}
         {currentStep === 5 && (
-          <RegistrationSummary
-            formData={formData}
-            onConfirm={confirmRegistration}
-            onBack={goToPreviousStep}
-            onEdit={(step) => goToStep(step as 1 | 2 | 3 | 4)}
-          />
+          <div className="animate-[fadeIn_0.3s_ease-in-out]">
+            <RegistrationSummary
+              formData={formData}
+              onConfirm={confirmRegistration}
+              onBack={goToPreviousStep}
+              onEdit={(step) => goToStep(step as 1 | 2 | 3 | 4)}
+            />
+          </div>
         )}
 
         {/* Step 6: Verificación de Email */}
         {currentStep === 6 && (
-          <EmailVerification
-            email={formData.email || ''}
-            onVerified={completeRegistration}
-            onResendCode={resendVerificationCode}
-          />
+          <div className="animate-[fadeIn_0.3s_ease-in-out]">
+            <EmailVerification
+              email={formData.email || ''}
+              onVerified={completeRegistration}
+              onResendCode={resendVerificationCode}
+            />
+          </div>
         )}
       </div>
 
