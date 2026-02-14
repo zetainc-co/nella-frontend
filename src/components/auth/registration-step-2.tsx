@@ -1,7 +1,7 @@
 // src/components/auth/registration-step-2.tsx
 'use client'
 
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useEffect } from 'react'
 import { step2Schema } from '@/lib/registration-validations'
@@ -11,6 +11,7 @@ import { RegistrationFormData } from '@/types'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { CountryPhoneSelector } from '@/components/auth/country-phone-selector'
 import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react'
 
 interface RegistrationStep2Props {
@@ -34,13 +35,14 @@ export function RegistrationStep2({
     watch,
     setError,
     clearErrors,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(step2Schema),
     defaultValues: {
       fullName: initialData.fullName || '',
       email: initialData.email || '',
-      phone: initialData.phone || '',
+      phone: initialData.phone || '+57',
       password: initialData.password || '',
       confirmPassword: initialData.password || '',
     },
@@ -140,21 +142,18 @@ export function RegistrationStep2({
         </div>
 
         {/* Teléfono */}
-        <div className="space-y-2">
-          <Label htmlFor="phone">
-            Teléfono <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="phone"
-            type="tel"
-            {...register('phone')}
-            placeholder="+57 300 123 4567"
-            className={errors.phone ? 'border-destructive' : ''}
-          />
-          {errors.phone && (
-            <p className="text-sm text-destructive">{errors.phone.message}</p>
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field }) => (
+            <CountryPhoneSelector
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.phone?.message}
+              label="Teléfono"
+            />
           )}
-        </div>
+        />
 
         {/* Contraseña */}
         <div className="space-y-2">

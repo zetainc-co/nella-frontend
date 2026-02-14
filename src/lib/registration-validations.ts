@@ -44,8 +44,7 @@ export const step2Schema = z.object({
     .toLowerCase(),
 
   phone: z.string()
-    .min(10, 'El teléfono debe tener al menos 10 dígitos')
-    .regex(/^[0-9+\s()-]+$/, 'Solo números y símbolos válidos'),
+    .regex(/^\+[1-9]\d{1,14}$/, 'Formato inválido. Debe ser +[código][número]'),
 
   password: z.string()
     .min(8, 'La contraseña debe tener al menos 8 caracteres')

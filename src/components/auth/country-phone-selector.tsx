@@ -17,12 +17,14 @@ interface CountryPhoneSelectorProps {
   value: string // E.164 completo: "+573001234567"
   onChange: (e164: string) => void
   error?: string
+  label?: string // Label personalizable
 }
 
 export function CountryPhoneSelector({
   value,
   onChange,
   error,
+  label = 'Número de WhatsApp Business',
 }: CountryPhoneSelectorProps) {
   const [selectedCountry, setSelectedCountry] = useState(LATAM_COUNTRIES[4]) // Colombia por defecto
   const [localNumber, setLocalNumber] = useState('')
@@ -59,7 +61,9 @@ export function CountryPhoneSelector({
 
   return (
     <div className="space-y-2">
-      <Label>Número de WhatsApp Business</Label>
+      <Label>
+        {label} <span className="text-destructive">*</span>
+      </Label>
 
       <div className="flex gap-2">
         {/* Selector de país */}
