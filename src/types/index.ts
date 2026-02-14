@@ -70,6 +70,7 @@ export interface Country {
   name: string
   dialCode: string
   flag: string
+  placeholder: string // Ejemplo de número local
 }
 
 export interface Industry {

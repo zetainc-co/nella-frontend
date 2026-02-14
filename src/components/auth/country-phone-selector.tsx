@@ -1,63 +1,63 @@
 // src/components/auth/country-phone-selector.tsx
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { LATAM_COUNTRIES } from '@/lib/countries-latam'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
+import { useState, useEffect } from "react";
+import { LATAM_COUNTRIES } from "@/lib/countries-latam";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 
 interface CountryPhoneSelectorProps {
-  value: string // E.164 completo: "+573001234567"
-  onChange: (e164: string) => void
-  error?: string
-  label?: string // Label personalizable
+  value: string; // E.164 completo: "+573001234567"
+  onChange: (e164: string) => void;
+  error?: string;
+  label?: string; // Label personalizable
 }
 
 export function CountryPhoneSelector({
   value,
   onChange,
   error,
-  label = 'Número de WhatsApp Business',
+  label = "Número de WhatsApp Business",
 }: CountryPhoneSelectorProps) {
-  const [selectedCountry, setSelectedCountry] = useState(LATAM_COUNTRIES[4]) // Colombia por defecto
-  const [localNumber, setLocalNumber] = useState('')
+  const [selectedCountry, setSelectedCountry] = useState(LATAM_COUNTRIES[4]); // Colombia por defecto
+  const [localNumber, setLocalNumber] = useState("");
 
   // Parsear el valor inicial
   useEffect(() => {
     if (value) {
-      const country = LATAM_COUNTRIES.find(c => value.startsWith(c.dialCode))
+      const country = LATAM_COUNTRIES.find((c) => value.startsWith(c.dialCode));
       if (country) {
-        setSelectedCountry(country)
-        setLocalNumber(value.slice(country.dialCode.length))
+        setSelectedCountry(country);
+        setLocalNumber(value.slice(country.dialCode.length));
       }
     }
-  }, [])
+  }, []);
 
   // Combinar y notificar cambios
   useEffect(() => {
-    const e164 = `${selectedCountry.dialCode}${localNumber.replace(/\D/g, '')}`
-    onChange(e164)
-  }, [selectedCountry, localNumber, onChange])
+    const e164 = `${selectedCountry.dialCode}${localNumber.replace(/\D/g, "")}`;
+    onChange(e164);
+  }, [selectedCountry, localNumber, onChange]);
 
   const handleCountryChange = (countryCode: string) => {
-    const country = LATAM_COUNTRIES.find(c => c.code === countryCode)
+    const country = LATAM_COUNTRIES.find((c) => c.code === countryCode);
     if (country) {
-      setSelectedCountry(country)
+      setSelectedCountry(country);
     }
-  }
+  };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Solo permitir dígitos
-    const digits = e.target.value.replace(/\D/g, '')
-    setLocalNumber(digits)
-  }
+    const digits = e.target.value.replace(/\D/g, "");
+    setLocalNumber(digits);
+  };
 
   return (
     <div className="space-y-2">
@@ -67,7 +67,10 @@ export function CountryPhoneSelector({
 
       <div className="flex gap-2">
         {/* Selector de país */}
-        <Select value={selectedCountry.code} onValueChange={handleCountryChange}>
+        <Select
+          value={selectedCountry.code}
+          onValueChange={handleCountryChange}
+        >
           <SelectTrigger className="w-[140px]">
             <SelectValue>
               <span className="flex items-center gap-2">
@@ -96,18 +99,17 @@ export function CountryPhoneSelector({
           type="tel"
           value={localNumber}
           onChange={handleNumberChange}
-          placeholder="300 123 4567"
+          placeholder={selectedCountry.placeholder}
           className="flex-1"
         />
       </div>
 
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       <p className="text-xs text-muted-foreground">
-        Formato E.164: {selectedCountry.dialCode}{localNumber || '...'}
+        País: {selectedCountry.name} - Código: {selectedCountry.dialCode}
+        {localNumber || "..."}
       </p>
     </div>
-  )
+  );
 }
