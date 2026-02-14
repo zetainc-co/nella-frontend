@@ -1,4 +1,4 @@
-import { LogIn, Sparkles } from 'lucide-react'
+import { LogIn } from 'lucide-react'
 
 interface LoginCardProps {
   email: string
@@ -8,8 +8,6 @@ interface LoginCardProps {
   loading: boolean
   message: { type: 'success' | 'error'; text: string } | null
   handleLogin: (e: React.FormEvent) => Promise<void>
-  handleSignUp: (e: React.FormEvent) => Promise<void>
-  testConnection: () => Promise<void>
 }
 
 export function LoginCard({
@@ -20,8 +18,6 @@ export function LoginCard({
   loading,
   message,
   handleLogin,
-  handleSignUp,
-  testConnection,
 }: LoginCardProps) {
   return (
     <div className="relative glass-panel rounded-2xl p-8 shadow-[0_0_60px_-10px_rgba(206,242,93,0.08)] hover:shadow-[0_0_80px_-10px_rgba(206,242,93,0.12)] transition-shadow duration-500">
@@ -72,42 +68,17 @@ export function LoginCard({
           />
         </div>
 
-        <div className="flex gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 py-3 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <LogIn className="size-4" />
-              {loading ? 'Cargando...' : 'Iniciar Sesión'}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSignUp}
-            disabled={loading}
-            className="flex-1 py-3 px-4 bg-accent hover:bg-accent/80 border border-border hover:border-primary/30 text-foreground font-medium rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Registrar
-          </button>
-        </div>
-      </form>
-
-      <div className="mt-6 pt-6 border-t border-border">
         <button
-          type="button"
-          onClick={testConnection}
+          type="submit"
           disabled={loading}
-          className="w-full py-3 px-4 bg-accent hover:bg-accent/80 border border-border hover:border-primary/30 text-muted-foreground hover:text-foreground font-medium rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="flex items-center justify-center gap-2">
-            <Sparkles className="size-4" />
-            Probar Conexión
+            <LogIn className="size-4" />
+            {loading ? 'Cargando...' : 'Iniciar Sesión'}
           </span>
         </button>
-      </div>
+      </form>
 
       {message && (
         <div
