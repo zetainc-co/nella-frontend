@@ -114,14 +114,14 @@ export async function validateWhatsAppToken(
   // Simular llamada a Meta API (2 segundos)
   await new Promise(resolve => setTimeout(resolve, 2000))
 
-  if (token.length < 200) {
+  if (!token || token.trim().length === 0) {
     return {
       valid: false,
-      message: 'El token es demasiado corto'
+      message: 'El token no puede estar vacío'
     }
   }
 
-  // En MVP, siempre retorna éxito
+  // En MVP, siempre retorna éxito si hay algún carácter
   return {
     valid: true,
     message: '✓ Token validado correctamente con Meta API'

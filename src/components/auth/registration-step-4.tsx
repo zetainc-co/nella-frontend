@@ -8,7 +8,7 @@ import { step4Schema } from '@/lib/registration-validations'
 import { validateWhatsAppToken, validateWhatsAppNumber } from '@/lib/registration-storage'
 import { RegistrationFormData } from '@/types'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { CountryPhoneSelector } from '@/components/auth/country-phone-selector'
 import { ChevronLeft, ChevronRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
@@ -165,11 +165,11 @@ export function RegistrationStep4({
           <Label htmlFor="whatsappToken">
             Token de acceso de WhatsApp Business <span className="text-destructive">*</span>
           </Label>
-          <Textarea
+          <Input
             id="whatsappToken"
+            type="password"
             {...register('whatsappToken')}
             placeholder="Pega aquí tu token de Meta API..."
-            rows={6}
             className={`font-mono text-xs ${errors.whatsappToken ? 'border-destructive' : ''}`}
           />
           {errors.whatsappToken && (
@@ -177,8 +177,7 @@ export function RegistrationStep4({
           )}
 
           <p className="text-xs text-muted-foreground">
-            El token debe tener entre 200-500 caracteres. Lo encuentras en tu
-            cuenta de{' '}
+            Lo encuentras en tu cuenta de{' '}
             <a
               href="https://business.facebook.com/"
               target="_blank"

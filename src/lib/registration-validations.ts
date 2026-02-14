@@ -85,8 +85,7 @@ export const step4Schema = z.object({
     .regex(/^\+[1-9]\d{1,14}$/, 'Formato inválido. Debe ser +[código][número]'),
 
   whatsappToken: z.string()
-    .min(200, 'El token debe tener al menos 200 caracteres')
-    .max(500, 'El token no debe exceder 500 caracteres')
+    .min(1, 'El token de acceso es requerido')
 })
 
 // Schema completo
