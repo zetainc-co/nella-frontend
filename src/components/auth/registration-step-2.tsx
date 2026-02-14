@@ -187,7 +187,7 @@ export function RegistrationStep2({
                 />
                 <div
                   className={`h-1 flex-1 rounded transition-colors ${
-                    passwordStrength >= 3 ? 'bg-primary' : 'bg-muted'
+                    passwordStrength >= 3 ? 'bg-green-500' : 'bg-muted'
                   }`}
                 />
               </div>
