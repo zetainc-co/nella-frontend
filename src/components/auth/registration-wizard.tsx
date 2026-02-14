@@ -36,7 +36,7 @@ export function RegistrationWizard() {
       )}
 
       {/* Glass Panel con el contenido del step */}
-      <div className="rounded-2xl border border-border/50 bg-card/50 p-8 shadow-lg backdrop-blur-sm max-h-[calc(100vh-300px)] overflow-y-auto">
+      <div className="rounded-2xl border border-border/50 bg-card/50 p-8 shadow-lg backdrop-blur-sm max-h-[calc(100vh-300px)] overflow-y-auto custom-scrollbar">
         {/* Step 1: Datos de Empresa */}
         {currentStep === 1 && (
           <div className="animate-[fadeIn_0.3s_ease-in-out]">
