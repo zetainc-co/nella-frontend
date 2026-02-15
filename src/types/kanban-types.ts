@@ -1,5 +1,4 @@
 // src/types/kanban-types.ts
-
 export type LeadStage = 'new' | 'contacted' | 'proposal' | 'closed'
 
 export type SourceChannel = 'instagram' | 'facebook' | 'tiktok' | 'whatsapp'
@@ -14,8 +13,8 @@ export interface Lead {
   source_channel: SourceChannel
   ai_summary: string
   assigned_to: string | null
-  created_at: string // ISO 8601
-  time_in_stage: string // "2 horas", "1 día"
+  created_at: string
+  time_in_stage: string
 }
 
 export interface KanbanFilters {
@@ -30,10 +29,10 @@ export interface KanbanUser {
   name: string
 }
 
-// ============================================
-// Component Props Types
-// ============================================
-
+export interface KanbanColumnConfig {
+  stage: LeadStage
+  title: string
+}
 export interface KanbanColumnProps {
   stage: LeadStage
   title: string
@@ -51,3 +50,7 @@ export interface LeadDetailsPanelProps {
   onClose: () => void
 }
 
+export interface LeadModalProps {
+  open: boolean
+  onClose: () => void
+}
