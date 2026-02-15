@@ -1,25 +1,12 @@
 'use client'
 
-import { useDraggable } from '@dnd-kit/core'
-import { Instagram, Facebook, Music, MessageCircle } from 'lucide-react'
-import type { LeadCardProps } from '@/types/kanban-types'
 import { cn } from '@/lib/utils'
-
-const channelIcons = {
-  instagram: Instagram,
-  facebook: Facebook,
-  tiktok: Music,
-  whatsapp: MessageCircle
-}
-
-const channelColors = {
-  instagram: 'text-pink-500',
-  facebook: 'text-blue-500',
-  tiktok: 'text-cyan-500',
-  whatsapp: 'text-green-500'
-}
+import { useDraggable } from '@dnd-kit/core'
+import { useKanbanConstants } from '@/hooks/kanban'
+import type { LeadCardProps } from '@/types/kanban-types'
 
 export function LeadCard({ lead, onClick }: LeadCardProps) {
+  const { getChannelIcon, getChannelColor } = useKanbanConstants()
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: lead.id,
     data: { lead }
@@ -31,7 +18,7 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
       }
     : undefined
 
-  const ChannelIcon = channelIcons[lead.source_channel]
+  const ChannelIcon = getChannelIcon(lead.source_channel)
 
   return (
     <div
@@ -50,7 +37,7 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
       {/* Header Compacto: Icono + Nombre + Fecha */}
       <div className="flex items-center gap-2 mb-2">
         {/* Icono de red social */}
-        <ChannelIcon className={cn('w-4 h-4 shrink-0', channelColors[lead.source_channel])} />
+        <ChannelIcon className={cn('w-4 h-4 shrink-0', getChannelColor(lead.source_channel))} />
 
         {/* Nombre o teléfono */}
         <h3 className="font-semibold text-foreground text-sm line-clamp-1 flex-1">

@@ -1,10 +1,10 @@
 'use client'
 
-import { useDroppable } from '@dnd-kit/core'
+import { cn } from '@/lib/utils'
 import { Inbox } from 'lucide-react'
 import { LeadCard } from './lead-card'
+import { useDroppable } from '@dnd-kit/core'
 import type { KanbanColumnProps } from '@/types/kanban-types'
-import { cn } from '@/lib/utils'
 
 export function KanbanColumn({ stage, title, leads, onLeadClick }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
@@ -19,7 +19,7 @@ export function KanbanColumn({ stage, title, leads, onLeadClick }: KanbanColumnP
       ref={setNodeRef}
       className={cn(
         'bg-card border rounded-lg p-4 mt-1 h-[600px]',
-        'w-full md:w-[280px] lg:w-[300px] xl:w-[350px]',
+        'w-full md:w-[280px] lg:w-[350px] 2xl:w-auto',
         'shrink-0 flex flex-col transition-all',
         isOver && 'ring-2 ring-primary-neon/30 bg-primary-neon/5'
       )}

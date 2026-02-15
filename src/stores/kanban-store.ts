@@ -1,13 +1,8 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
-import type { Lead, LeadStage, KanbanFilters, KanbanUser, SourceChannel } from '@/types/kanban-types'
-
-// ============================================
-// Mock Data - 12 Leads
-// ============================================
+import type { Lead, LeadStage, KanbanFilters, KanbanUser, SourceChannel, KanbanStore } from '@/types/kanban-types'
 
 const MOCK_LEADS: Lead[] = [
-  // Nuevo (3 leads)
   {
     id: '1',
     name: 'Juan Pérez',
@@ -101,8 +96,6 @@ const MOCK_LEADS: Lead[] = [
     created_at: '2026-02-13T18:00:00Z',
     time_in_stage: '16 horas'
   },
-
-  // Propuesta (3 leads)
   {
     id: '8',
     name: 'Roberto Gómez',
@@ -142,8 +135,6 @@ const MOCK_LEADS: Lead[] = [
     created_at: '2026-02-13T09:00:00Z',
     time_in_stage: '1 día'
   },
-
-  // Cierre (2 leads)
   {
     id: '11',
     name: 'Claudia Herrera',
@@ -172,35 +163,7 @@ const MOCK_LEADS: Lead[] = [
   }
 ]
 
-// ============================================
-// Store Interface
-// ============================================
-
-interface KanbanStore {
-  // Estado
-  leads: Lead[]
-  filters: KanbanFilters
-  selectedLeadId: string | null
-  currentUser: KanbanUser
-
-  // Acciones
-  moveLeadToStage: (leadId: string, newStage: LeadStage) => void
-  setSearchQuery: (query: string) => void
-  setChannelFilters: (channels: SourceChannel[]) => void
-  toggleOnlyMyLeads: () => void
-  setSelectedLead: (leadId: string | null) => void
-
-  // Selectores
-  getFilteredLeads: () => Lead[]
-  getLeadsByStage: (stage: LeadStage) => Lead[]
-}
-
-// ============================================
-// Store Implementation
-// ============================================
-
 export const useKanbanStore = create<KanbanStore>((set, get) => ({
-  // Estado inicial
   leads: MOCK_LEADS,
   filters: {
     searchQuery: '',
@@ -214,12 +177,10 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
     name: 'Usuario Demo'
   },
 
-  // Acción: Mover lead a nueva etapa
   moveLeadToStage: (leadId: string, newStage: LeadStage) => {
     const lead = get().leads.find(l => l.id === leadId)
     if (!lead) return
 
-    // Validación 1: No retroceder etapas
     const stageOrder: LeadStage[] = ['new', 'contacted', 'proposal', 'closed']
     const currentIndex = stageOrder.indexOf(lead.stage)
     const newIndex = stageOrder.indexOf(newStage)
@@ -229,13 +190,11 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
       return
     }
 
-    // Validación 2: Solo Admin puede cerrar
     if (newStage === 'closed' && get().currentUser.role !== 'admin') {
       toast.error('Solo administradores pueden cerrar leads')
       return
     }
 
-    // Actualizar estado
     set(state => ({
       leads: state.leads.map(l =>
         l.id === leadId
@@ -254,38 +213,32 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
     toast.success(`Lead movido a ${stageNames[newStage]}`)
   },
 
-  // Acción: Actualizar búsqueda
   setSearchQuery: (query: string) => {
     set(state => ({
       filters: { ...state.filters, searchQuery: query }
     }))
   },
 
-  // Acción: Actualizar filtro de canales
   setChannelFilters: (channels: SourceChannel[]) => {
     set(state => ({
       filters: { ...state.filters, channels }
     }))
   },
 
-  // Acción: Toggle "Solo mis leads"
   toggleOnlyMyLeads: () => {
     set(state => ({
       filters: { ...state.filters, onlyMyLeads: !state.filters.onlyMyLeads }
     }))
   },
 
-  // Acción: Seleccionar lead (para panel lateral)
   setSelectedLead: (leadId: string | null) => {
     set({ selectedLeadId: leadId })
   },
 
-  // Selector: Obtener leads filtrados
   getFilteredLeads: () => {
     const { leads, filters, currentUser } = get()
 
     return leads.filter(lead => {
-      // Filtro de búsqueda
       if (filters.searchQuery) {
         const query = filters.searchQuery.toLowerCase()
         const matchName = lead.name?.toLowerCase().includes(query)
@@ -293,12 +246,10 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
         if (!matchName && !matchPhone) return false
       }
 
-      // Filtro de canales
       if (filters.channels.length > 0) {
         if (!filters.channels.includes(lead.source_channel)) return false
       }
 
-      // Filtro "Solo mis leads"
       if (filters.onlyMyLeads) {
         if (lead.assigned_to !== currentUser.id) return false
       }
@@ -307,7 +258,6 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
     })
   },
 
-  // Selector: Obtener leads por etapa
   getLeadsByStage: (stage: LeadStage) => {
     return get().getFilteredLeads().filter(lead => lead.stage === stage)
   }

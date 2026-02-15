@@ -54,3 +54,23 @@ export interface LeadModalProps {
   open: boolean
   onClose: () => void
 }
+
+
+export interface KanbanStore {
+  // Estado
+  leads: Lead[]
+  filters: KanbanFilters
+  selectedLeadId: string | null
+  currentUser: KanbanUser
+
+  // Acciones
+  moveLeadToStage: (leadId: string, newStage: LeadStage) => void
+  setSearchQuery: (query: string) => void
+  setChannelFilters: (channels: SourceChannel[]) => void
+  toggleOnlyMyLeads: () => void
+  setSelectedLead: (leadId: string | null) => void
+
+  // Selectores
+  getFilteredLeads: () => Lead[]
+  getLeadsByStage: (stage: LeadStage) => Lead[]
+}

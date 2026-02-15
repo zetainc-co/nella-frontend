@@ -1,25 +1,25 @@
 'use client'
 
 import {
+  useSensor,
+  useSensors,
   DndContext,
   DragOverlay,
   PointerSensor,
-  useSensor,
-  useSensors
 } from '@dnd-kit/core'
-import { KanbanColumn } from './kanban-column'
-import { KanbanFilters } from './kanban-filters'
-import { LeadModal } from './lead-modal'
-import { KanbanSkeleton } from './kanban-skeleton'
-import { LeadCard } from './lead-card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  useKanbanDragDrop,
+  useKanbanData,
   useKanbanPanel,
   useKanbanLoading,
-  useKanbanData,
+  useKanbanDragDrop,
   useKanbanConstants
 } from '@/hooks/kanban'
+import { LeadCard } from './lead-card'
+import { LeadModal } from './lead-modal'
+import { KanbanColumn } from './kanban-column'
+import { KanbanFilters } from './kanban-filters'
+import { KanbanSkeleton } from './kanban-skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function KanbanBoard() {
   // Configurar sensores para distinguir entre click y drag

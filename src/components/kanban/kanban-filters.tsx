@@ -1,16 +1,17 @@
 'use client'
 
-import { Search } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import {
   Select,
-  SelectContent,
   SelectItem,
+  SelectValue,
+  SelectContent,
   SelectTrigger,
-  SelectValue
 } from '@/components/ui/select'
+import { Search } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
+import { useKanbanConstants } from '@/hooks/kanban'
 import { useKanbanStore } from '@/stores/kanban-store'
 import type { SourceChannel } from '@/types/kanban-types'
 
@@ -24,6 +25,7 @@ export function KanbanFilters() {
     getFilteredLeads
   } = useKanbanStore()
 
+  const { CHANNEL_LABELS } = useKanbanConstants()
   const filteredLeads = getFilteredLeads()
 
   return (
@@ -36,7 +38,7 @@ export function KanbanFilters() {
           placeholder="Buscar por nombre o teléfono..."
           value={filters.searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 focus:ring-[#CEF25D]"
+          className="pl-9 focus:ring-primary-neon"
         />
       </div>
 
@@ -56,10 +58,11 @@ export function KanbanFilters() {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Todos los canales</SelectItem>
-          <SelectItem value="instagram">Instagram</SelectItem>
-          <SelectItem value="facebook">Facebook</SelectItem>
-          <SelectItem value="tiktok">TikTok</SelectItem>
-          <SelectItem value="whatsapp">WhatsApp</SelectItem>
+          {Object.entries(CHANNEL_LABELS).map(([value, label]) => (
+            <SelectItem key={value} value={value}>
+              {label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
@@ -76,7 +79,7 @@ export function KanbanFilters() {
       </div>
 
       {/* Contador */}
-      <span className="text-sm text-muted-foreground whitespace-nowrap">
+      <span className="hidden lg:block text-sm text-muted-foreground whitespace-nowrap">
         Mostrando {filteredLeads.length} de {leads.length} leads
       </span>
     </div>

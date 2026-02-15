@@ -1,17 +1,17 @@
 'use client'
 
-import { Phone, Mail, Building2, Clock, Sparkles, ArrowRight } from 'lucide-react'
 import {
   Dialog,
-  DialogContent,
-  DialogHeader,
   DialogTitle,
+  DialogHeader,
+  DialogContent,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { useKanbanStore } from '@/stores/kanban-store'
-import { useKanbanConstants } from '@/hooks/kanban'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { useKanbanConstants } from '@/hooks/kanban'
+import { useKanbanStore } from '@/stores/kanban-store'
 import type { LeadModalProps } from '@/types/kanban-types'
+import { Phone, Mail, Building2, Clock, Sparkles, ArrowRight } from 'lucide-react'
 
 export function LeadModal({ open, onClose }: LeadModalProps) {
   const { selectedLeadId, leads } = useKanbanStore()

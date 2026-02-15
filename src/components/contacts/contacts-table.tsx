@@ -128,9 +128,6 @@ export function ContactsTable() {
                             <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 Fecha
                             </th>
-                            <th className="px-6 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                Acciones
-                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
@@ -184,11 +181,6 @@ export function ContactsTable() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className="text-sm text-muted-foreground">{contact.createdAt}</span>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="p-2 hover:bg-accent rounded-lg transition-colors opacity-0 group-hover:opacity-100">
-                                            <MoreVertical className="size-4 text-muted-foreground" />
-                                        </button>
                                     </td>
                                 </tr>
                             ))
