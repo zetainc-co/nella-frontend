@@ -8,13 +8,15 @@ import { LATAM_COUNTRIES, INDUSTRIES, COMPANY_SIZES } from '@/lib/countries-lata
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, Edit2, CheckCircle2 } from 'lucide-react'
+import { ChevronLeft, Edit2, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 
 interface RegistrationSummaryProps {
   formData: Partial<RegistrationFormData>
   onConfirm: (slug: string) => void
   onBack: () => void
   onEdit: (step: number) => void
+  isCreatingWorkflow?: boolean
+  workflowError?: string | null
 }
 
 export function RegistrationSummary({
@@ -22,6 +24,8 @@ export function RegistrationSummary({
   onConfirm,
   onBack,
   onEdit,
+  isCreatingWorkflow = false,
+  workflowError = null,
 }: RegistrationSummaryProps) {
   const [tenantSlug, setTenantSlug] = useState(
     generateSlug(formData.companyName || '')
@@ -243,15 +247,50 @@ export function RegistrationSummary({
         </p>
       </div>
 
+      {/* Error de workflow */}
+      {workflowError && (
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-semibold text-destructive">Error al crear workflow</p>
+              <p className="text-sm text-destructive/80 mt-1">{workflowError}</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Intenta nuevamente o contacta a soporte si el problema persiste.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Botones */}
       <div className="flex justify-between pt-4">
-        <Button type="button" variant="outline" onClick={onBack} className="gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          className="gap-2"
+          disabled={isCreatingWorkflow}
+        >
           <ChevronLeft className="h-4 w-4" />
           Anterior
         </Button>
-        <Button onClick={handleConfirm} className="gap-2">
-          Confirmar y crear cuenta
-          <CheckCircle2 className="h-4 w-4" />
+        <Button
+          onClick={handleConfirm}
+          className="gap-2"
+          disabled={isCreatingWorkflow}
+        >
+          {isCreatingWorkflow ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Creando workflow...
+            </>
+          ) : (
+            <>
+              Confirmar y crear cuenta
+              <CheckCircle2 className="h-4 w-4" />
+            </>
+          )}
         </Button>
       </div>
     </div>
