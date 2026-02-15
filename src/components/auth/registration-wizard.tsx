@@ -22,6 +22,8 @@ export function RegistrationWizard() {
     confirmRegistration,
     completeRegistration,
     resendVerificationCode,
+    isCreatingWorkflow,
+    workflowError,
   } = useRegistrationWizard()
 
   return (
@@ -100,6 +102,8 @@ export function RegistrationWizard() {
               onConfirm={confirmRegistration}
               onBack={goToPreviousStep}
               onEdit={(step) => goToStep(step as 1 | 2 | 3 | 4)}
+              isCreatingWorkflow={isCreatingWorkflow}
+              workflowError={workflowError}
             />
           </div>
         )}

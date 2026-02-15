@@ -12,6 +12,7 @@ import {
   createSession,
   markEmailAsVerified,
 } from '@/lib/registration-storage'
+import { workflowService } from '@/lib/workflows/workflow-service'
 
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 // Steps 1-4, Summary (5), EmailVerification (6)
 
@@ -22,6 +23,8 @@ export function useRegistrationWizard() {
   const [formData, setFormData] = useState<Partial<RegistrationFormData>>({})
   const [tenantSlug, setTenantSlug] = useState<string>('')
   const [userId, setUserId] = useState<string>('')
+  const [isCreatingWorkflow, setIsCreatingWorkflow] = useState(false)
+  const [workflowError, setWorkflowError] = useState<string | null>(null)
 
   // Cargar progreso guardado al montar
   useEffect(() => {
@@ -79,41 +82,93 @@ export function useRegistrationWizard() {
   }
 
   // Confirmar registro (desde Summary)
-  const confirmRegistration = (slug: string) => {
+  const confirmRegistration = async (slug: string) => {
     setTenantSlug(slug)
+    setIsCreatingWorkflow(true)
+    setWorkflowError(null)
 
-    // Crear usuario y tenant en localStorage
-    const { userId: newUserId, tenantId } = saveUserAndTenant(
-      {
-        email: formData.email!,
-        password: formData.password!,
-        fullName: formData.fullName!,
-        phone: formData.phone!,
-        tenantId: '', // Will be set by saveUserAndTenant
-        tenantSlug: slug,
-        role: 'admin',
-        emailVerified: false,
-      },
-      {
-        slug,
-        name: formData.companyName!,
-        industry: formData.industry!,
-        industryOther: formData.industryOther,
-        companySize: formData.companySize!,
-        country: formData.country!,
-        offeringType: formData.offeringType!,
-        description: formData.description,
-        priceRange: formData.priceRange,
-        idealCustomer: formData.idealCustomer,
-        whatsappNumber: formData.whatsappNumber!,
-        whatsappToken: formData.whatsappToken!,
+    try {
+      // Crear usuario y tenant en localStorage
+      const { userId: newUserId, tenantId } = saveUserAndTenant(
+        {
+          email: formData.email!,
+          password: formData.password!,
+          fullName: formData.fullName!,
+          phone: formData.phone!,
+          tenantId: '', // Will be set by saveUserAndTenant
+          tenantSlug: slug,
+          role: 'admin',
+          emailVerified: false,
+        },
+        {
+          slug,
+          name: formData.companyName!,
+          industry: formData.industry!,
+          industryOther: formData.industryOther,
+          companySize: formData.companySize!,
+          country: formData.country!,
+          offeringType: formData.offeringType!,
+          description: formData.description,
+          priceRange: formData.priceRange,
+          idealCustomer: formData.idealCustomer,
+          whatsappNumber: formData.whatsappNumber!,
+          whatsappToken: formData.whatsappToken!,
+        }
+      )
+
+      setUserId(newUserId)
+
+      // HU-014: Crear workflow automáticamente
+      console.log(`[HU-014] Creando workflow para tenant ${tenantId}...`)
+
+      const workflow = await workflowService.createWorkflowForTenant({
+        tenant_id: tenantId,
+        whatsapp_number: formData.whatsappNumber!,
+        whatsapp_token: formData.whatsappToken!,
+      })
+
+      // Validar que workflow está activo
+      if (workflow.status !== 'active') {
+        throw new Error('Workflow creado pero no está activo')
       }
-    )
 
-    setUserId(newUserId)
+      console.log(`[HU-014] ✅ Workflow creado: ${workflow.n8n_workflow_id}`)
 
-    // Ir a step de verificación
-    goToNextStep()
+      // Guardar n8n_workflow_id en el tenant
+      const tenants = JSON.parse(localStorage.getItem('nella_tenants') || '[]')
+      const tenantIndex = tenants.findIndex((t: any) => t.id === tenantId)
+      if (tenantIndex !== -1) {
+        tenants[tenantIndex].n8n_workflow_id = workflow.n8n_workflow_id
+        localStorage.setItem('nella_tenants', JSON.stringify(tenants))
+      }
+
+      setIsCreatingWorkflow(false)
+
+      // Ir a step de verificación
+      goToNextStep()
+    } catch (error) {
+      console.error('[HU-014] ❌ Error creando workflow:', error)
+
+      // Rollback: eliminar usuario y tenant
+      const users = JSON.parse(localStorage.getItem('nella_users') || '[]')
+      const tenants = JSON.parse(localStorage.getItem('nella_tenants') || '[]')
+
+      localStorage.setItem(
+        'nella_users',
+        JSON.stringify(users.filter((u: User) => u.id !== userId))
+      )
+      localStorage.setItem(
+        'nella_tenants',
+        JSON.stringify(tenants.filter((t: any) => t.slug !== slug))
+      )
+
+      setIsCreatingWorkflow(false)
+      setWorkflowError(
+        error instanceof Error
+          ? error.message
+          : 'Error al crear workflow. Por favor intenta nuevamente.'
+      )
+    }
   }
 
   // Verificar email y completar registro
@@ -151,6 +206,8 @@ export function useRegistrationWizard() {
     completedSteps,
     formData,
     tenantSlug,
+    isCreatingWorkflow,
+    workflowError,
 
     // Navegación
     goToNextStep,
