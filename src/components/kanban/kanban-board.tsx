@@ -1,6 +1,12 @@
 'use client'
 
-import { DndContext, DragOverlay } from '@dnd-kit/core'
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core'
 import { KanbanColumn } from './kanban-column'
 import { KanbanFilters } from './kanban-filters'
 import { LeadModal } from './lead-modal'
@@ -16,6 +22,15 @@ import {
 } from '@/hooks/kanban'
 
 export function KanbanBoard() {
+  // Configurar sensores para distinguir entre click y drag
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Requiere mover 8px antes de iniciar drag
+      },
+    })
+  )
+
   // Hooks personalizados
   const isLoading = useKanbanLoading()
   const { filteredLeads, getStageCount, getLeadsForStage } = useKanbanData()
@@ -34,7 +49,7 @@ export function KanbanBoard() {
 
       {/* Desktop/Tablet: Drag and Drop Kanban */}
       <div className="hidden md:block">
-        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div className="flex overflow-x-auto snap-x snap-mandatory 2xl:grid 2xl:grid-cols-4 gap-4 custom-scrollbar pb-4">
             {KANBAN_COLUMNS.map(({ stage, title }) => (
               <KanbanColumn
