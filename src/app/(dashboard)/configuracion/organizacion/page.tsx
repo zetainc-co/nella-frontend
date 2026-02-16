@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { HudCorners } from '@/components/ui/hud-corners'
 
 export default function OrganizacionPage() {
   const [org, setOrg] = useState(mockOrganization)
@@ -29,36 +28,35 @@ export default function OrganizacionPage() {
       </div>
 
       {/* Datos de la Empresa */}
-      <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-        <HudCorners />
-        <h2 className="text-lg font-bold text-white mb-6">Datos de la Empresa</h2>
+      <div className="auth-card p-6">
+        <h2 className="text-lg font-bold text-foreground mb-6">Datos de la Empresa</h2>
 
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-gray-400">Nombre de la Empresa</Label>
+              <Label>Nombre de la Empresa</Label>
               <Input
                 value={org.name}
                 onChange={(e) => setOrg({ ...org, name: e.target.value })}
-                className="bg-black/20 border-primary/20 text-white"
+                className="auth-input"
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-400">NIT / ID Fiscal</Label>
+              <Label>NIT / ID Fiscal</Label>
               <Input
                 value={org.nit}
                 onChange={(e) => setOrg({ ...org, nit: e.target.value })}
-                className="bg-black/20 border-primary/20 text-white"
+                className="auth-input"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-gray-400">Industria</Label>
+              <Label>Industria</Label>
               <Select value={org.industry} onValueChange={(value) => setOrg({ ...org, industry: value })}>
-                <SelectTrigger className="bg-black/20 border-primary/20 text-white">
+                <SelectTrigger className="auth-input">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -71,26 +69,26 @@ export default function OrganizacionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-400">Teléfono</Label>
+              <Label>Teléfono</Label>
               <Input
                 value={org.phone}
                 onChange={(e) => setOrg({ ...org, phone: e.target.value })}
-                className="bg-black/20 border-primary/20 text-white"
+                className="auth-input"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-400">Dirección</Label>
+            <Label>Dirección</Label>
             <Input
               value={org.address}
               onChange={(e) => setOrg({ ...org, address: e.target.value })}
-              className="bg-black/20 border-primary/20 text-white"
+              className="auth-input"
             />
           </div>
 
           <div className="flex justify-end pt-4">
-            <Button className="bg-[#9EFF00] text-black hover:bg-[#8FEE00]">
+            <Button className="btn-primary">
               Guardar Cambios
             </Button>
           </div>
