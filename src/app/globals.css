@@ -170,6 +170,34 @@
     /* Subtle tech glow */
     border-color: rgba(206, 242, 93, 0.3);
   }
+
+  /* Tech Input Styles - Centralized */
+  .tech-input {
+    @apply w-full px-4 py-3 bg-background border border-border rounded-lg;
+    @apply text-foreground placeholder-muted-foreground/50;
+    @apply focus:outline-none focus:border-primary/50 focus:bg-accent;
+    @apply transition-all duration-300;
+  }
+
+  .tech-select {
+    @apply w-full px-4 py-3 bg-background border border-border rounded-lg;
+    @apply text-foreground;
+    @apply focus:outline-none focus:border-primary/50 focus:bg-accent;
+    @apply transition-all duration-300;
+    @apply cursor-pointer;
+  }
+
+  .tech-textarea {
+    @apply w-full px-4 py-3 bg-background border border-border rounded-lg;
+    @apply text-foreground placeholder-muted-foreground/50;
+    @apply focus:outline-none focus:border-primary/50 focus:bg-accent;
+    @apply transition-all duration-300;
+    @apply resize-none;
+  }
+
+  .tech-label {
+    @apply block text-sm font-medium text-muted-foreground mb-2;
+  }
 }
 
 /* Custom Scrollbar - Tech Design */

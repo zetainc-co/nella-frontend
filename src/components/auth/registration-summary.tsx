@@ -5,8 +5,6 @@ import { useState } from 'react'
 import { RegistrationFormData } from '@/types'
 import { generateSlug } from '@/lib/registration-storage'
 import { LATAM_COUNTRIES, INDUSTRIES, COMPANY_SIZES } from '@/lib/countries-latam'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, Edit2, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 
@@ -227,13 +225,14 @@ export function RegistrationSummary({
 
         {isEditingSlug ? (
           <div className="space-y-2">
-            <Label htmlFor="tenantSlug">Slug (solo letras minúsculas, números y guiones)</Label>
-            <Input
+            <label htmlFor="tenantSlug" className="tech-label">Slug (solo letras minúsculas, números y guiones)</label>
+            <input
               id="tenantSlug"
+              type="text"
               value={tenantSlug}
               onChange={handleSlugChange}
               placeholder="mi-empresa"
-              className="font-mono"
+              className="tech-input font-mono"
             />
           </div>
         ) : (

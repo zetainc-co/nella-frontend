@@ -7,8 +7,6 @@ import { useState } from 'react'
 import { step4Schema } from '@/lib/registration-validations'
 import { validateWhatsAppToken, validateWhatsAppNumber } from '@/lib/registration-storage'
 import { RegistrationFormData } from '@/types'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { CountryPhoneSelector } from '@/components/auth/country-phone-selector'
 import { ChevronLeft, ChevronRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
@@ -162,15 +160,15 @@ export function RegistrationStep4({
 
         {/* Token de WhatsApp */}
         <div className="space-y-2">
-          <Label htmlFor="whatsappToken">
+          <label htmlFor="whatsappToken" className="tech-label">
             Token de acceso de WhatsApp Business <span className="text-destructive">*</span>
-          </Label>
-          <Input
+          </label>
+          <input
             id="whatsappToken"
             type="password"
             {...register('whatsappToken')}
             placeholder="Pega aquí tu token de Meta API..."
-            className={`font-mono text-xs ${errors.whatsappToken ? 'border-destructive' : ''}`}
+            className={`tech-input font-mono text-xs ${errors.whatsappToken ? 'border-destructive' : ''}`}
           />
           {errors.whatsappToken && (
             <p className="text-sm text-destructive">{errors.whatsappToken.message}</p>

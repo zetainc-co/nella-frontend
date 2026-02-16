@@ -6,8 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { step1Schema } from '@/lib/registration-validations'
 import { LATAM_COUNTRIES, INDUSTRIES, COMPANY_SIZES } from '@/lib/countries-latam'
 import { RegistrationFormData } from '@/types'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -56,14 +54,15 @@ export function RegistrationStep1({
       <div className="space-y-4">
         {/* Nombre de Empresa */}
         <div className="space-y-2">
-          <Label htmlFor="companyName">
+          <label htmlFor="companyName" className="tech-label">
             Nombre de la empresa <span className="text-destructive">*</span>
-          </Label>
-          <Input
+          </label>
+          <input
             id="companyName"
+            type="text"
             {...register('companyName')}
             placeholder="Mi Empresa S.A."
-            className={errors.companyName ? 'border-destructive' : ''}
+            className={`tech-input ${errors.companyName ? 'border-destructive' : ''}`}
           />
           {errors.companyName && (
             <p className="text-sm text-destructive">{errors.companyName.message}</p>
@@ -72,14 +71,14 @@ export function RegistrationStep1({
 
         {/* Industria */}
         <div className="space-y-2">
-          <Label htmlFor="industry">
+          <label htmlFor="industry" className="tech-label">
             Industria / Sector <span className="text-destructive">*</span>
-          </Label>
+          </label>
           <Select
             value={watch('industry')}
             onValueChange={(value) => setValue('industry', value)}
           >
-            <SelectTrigger className={errors.industry ? 'border-destructive' : ''}>
+            <SelectTrigger className={`tech-select ${errors.industry ? 'border-destructive' : ''}`}>
               <SelectValue placeholder="Selecciona tu industria" />
             </SelectTrigger>
             <SelectContent>
@@ -98,14 +97,15 @@ export function RegistrationStep1({
         {/* Campo "Otro" condicional */}
         {showOtherIndustry && (
           <div className="space-y-2">
-            <Label htmlFor="industryOther">
+            <label htmlFor="industryOther" className="tech-label">
               Especifica tu industria <span className="text-destructive">*</span>
-            </Label>
-            <Input
+            </label>
+            <input
               id="industryOther"
+              type="text"
               {...register('industryOther')}
               placeholder="Ej: Consultoría financiera"
-              className={errors.industryOther ? 'border-destructive' : ''}
+              className={`tech-input ${errors.industryOther ? 'border-destructive' : ''}`}
             />
             {errors.industryOther && (
               <p className="text-sm text-destructive">{errors.industryOther.message}</p>
@@ -115,14 +115,14 @@ export function RegistrationStep1({
 
         {/* Tamaño de Empresa */}
         <div className="space-y-2">
-          <Label htmlFor="companySize">
+          <label htmlFor="companySize" className="tech-label">
             Tamaño de la empresa <span className="text-destructive">*</span>
-          </Label>
+          </label>
           <Select
             value={watch('companySize')}
             onValueChange={(value) => setValue('companySize', value as '1-10' | '11-50' | '51-200' | '200+')}
           >
-            <SelectTrigger className={errors.companySize ? 'border-destructive' : ''}>
+            <SelectTrigger className={`tech-select ${errors.companySize ? 'border-destructive' : ''}`}>
               <SelectValue placeholder="Selecciona el tamaño" />
             </SelectTrigger>
             <SelectContent>
@@ -140,14 +140,14 @@ export function RegistrationStep1({
 
         {/* País */}
         <div className="space-y-2">
-          <Label htmlFor="country">
+          <label htmlFor="country" className="tech-label">
             País <span className="text-destructive">*</span>
-          </Label>
+          </label>
           <Select
             value={watch('country')}
             onValueChange={(value) => setValue('country', value)}
           >
-            <SelectTrigger className={errors.country ? 'border-destructive' : ''}>
+            <SelectTrigger className={`tech-select ${errors.country ? 'border-destructive' : ''}`}>
               <SelectValue placeholder="Selecciona tu país" />
             </SelectTrigger>
             <SelectContent>

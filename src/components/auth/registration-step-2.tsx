@@ -8,8 +8,6 @@ import { step2Schema } from '@/lib/registration-validations'
 import { validateEmailUnique } from '@/lib/registration-storage'
 import { calculatePasswordStrength } from '@/lib/registration-validations'
 import { RegistrationFormData } from '@/types'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { CountryPhoneSelector } from '@/components/auth/country-phone-selector'
 import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react'
@@ -97,14 +95,15 @@ export function RegistrationStep2({
       <div className="space-y-4">
         {/* Nombre Completo */}
         <div className="space-y-2">
-          <Label htmlFor="fullName">
+          <label htmlFor="fullName" className="tech-label">
             Nombre completo <span className="text-destructive">*</span>
-          </Label>
-          <Input
+          </label>
+          <input
             id="fullName"
+            type="text"
             {...register('fullName')}
             placeholder="Juan Pérez"
-            className={errors.fullName ? 'border-destructive' : ''}
+            className={`tech-input ${errors.fullName ? 'border-destructive' : ''}`}
           />
           {errors.fullName && (
             <p className="text-sm text-destructive">{errors.fullName.message}</p>
@@ -113,17 +112,17 @@ export function RegistrationStep2({
 
         {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email">
+          <label htmlFor="email" className="tech-label">
             Email corporativo <span className="text-destructive">*</span>
-          </Label>
+          </label>
           <div className="relative">
-            <Input
+            <input
               id="email"
               type="email"
               {...register('email')}
               onBlur={handleEmailBlur}
               placeholder="juan@miempresa.com"
-              className={errors.email ? 'border-destructive' : ''}
+              className={`tech-input ${errors.email ? 'border-destructive' : ''}`}
             />
             {isValidatingEmail && (
               <div className="absolute right-3 top-3">
@@ -157,15 +156,15 @@ export function RegistrationStep2({
 
         {/* Contraseña */}
         <div className="space-y-2">
-          <Label htmlFor="password">
+          <label htmlFor="password" className="tech-label">
             Contraseña <span className="text-destructive">*</span>
-          </Label>
-          <Input
+          </label>
+          <input
             id="password"
             type="password"
             {...register('password')}
             placeholder="••••••••"
-            className={errors.password ? 'border-destructive' : ''}
+            className={`tech-input ${errors.password ? 'border-destructive' : ''}`}
           />
           {errors.password && (
             <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -202,15 +201,15 @@ export function RegistrationStep2({
 
         {/* Confirmar Contraseña */}
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">
+          <label htmlFor="confirmPassword" className="tech-label">
             Confirmar contraseña <span className="text-destructive">*</span>
-          </Label>
-          <Input
+          </label>
+          <input
             id="confirmPassword"
             type="password"
             {...register('confirmPassword')}
             placeholder="••••••••"
-            className={errors.confirmPassword ? 'border-destructive' : ''}
+            className={`tech-input ${errors.confirmPassword ? 'border-destructive' : ''}`}
           />
           {errors.confirmPassword && (
             <p className="text-sm text-destructive">
