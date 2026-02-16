@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -9,7 +9,10 @@ import {
   Layers,
   MessageSquare,
   Settings,
-  LogOut
+  LogOut,
+  Workflow,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 
@@ -20,8 +23,27 @@ const navigation = [
   { name: 'Chat', href: '/chat', icon: MessageSquare },
 ]
 
+const workflowsSubmenu = [
+  { name: 'Panel de Control', href: '/workflows' },
+  { name: 'Gestión', href: '/workflows/gestion' },
+  { name: 'Credenciales', href: '/workflows/credenciales' },
+  { name: 'Administración', href: '/workflows/administracion', adminOnly: true },
+]
+
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
+  const [workflowsOpen, setWorkflowsOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    // Auto-expand if on workflows route
+    if (pathname.startsWith('/workflows')) {
+      setWorkflowsOpen(true)
+    }
+    // Check admin status
+    const userRole = localStorage.getItem('user_role')
+    setIsAdmin(userRole === 'admin')
+  }, [pathname])
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -57,6 +79,58 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </Link>
             )
           })}
+
+          {/* Workflows with Submenu */}
+          <div>
+            <button
+              onClick={() => setWorkflowsOpen(!workflowsOpen)}
+              className={`flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                pathname.startsWith('/workflows')
+                  ? 'bg-primary/10 text-primary border border-primary/20'
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Workflow className="size-5" />
+                Workflows
+              </div>
+              {workflowsOpen ? (
+                <ChevronDown className="size-4" />
+              ) : (
+                <ChevronRight className="size-4" />
+              )}
+            </button>
+
+            {/* Submenu */}
+            {workflowsOpen && (
+              <div className="ml-4 mt-1 space-y-1 border-l border-border pl-4">
+                {workflowsSubmenu.map((item) => {
+                  // Skip admin-only items if not admin
+                  if (item.adminOnly && !isAdmin) return null
+
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
+                        isActive
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                      }`}
+                    >
+                      {item.name}
+                      {item.adminOnly && (
+                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/10 text-yellow-500 font-mono">
+                          ADMIN
+                        </span>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Footer */}
