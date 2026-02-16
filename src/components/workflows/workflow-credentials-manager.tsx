@@ -66,16 +66,30 @@ export function WorkflowCredentialsManager({
   // Validating per credential
   const [validatingField, setValidatingField] = useState<string | null>(null)
 
-  // Sync credentials to form data
+  // Sync credentials to form data (only on initial load or when credentials actually change)
   useEffect(() => {
     if (credentials) {
-      setFormData({
-        whatsapp_token: credentials.whatsapp_token || '',
-        openai_api_key: credentials.openai_api_key || '',
-        anthropic_api_key: credentials.anthropic_api_key || ''
+      setFormData(prev => {
+        // Only update if values actually changed
+        const newWhatsapp = credentials.whatsapp_token || ''
+        const newOpenAI = credentials.openai_api_key || ''
+        const newAnthropic = credentials.anthropic_api_key || ''
+
+        if (
+          prev.whatsapp_token !== newWhatsapp ||
+          prev.openai_api_key !== newOpenAI ||
+          prev.anthropic_api_key !== newAnthropic
+        ) {
+          return {
+            whatsapp_token: newWhatsapp,
+            openai_api_key: newOpenAI,
+            anthropic_api_key: newAnthropic
+          }
+        }
+        return prev
       })
     }
-  }, [credentials])
+  }, [credentials?.whatsapp_token, credentials?.openai_api_key, credentials?.anthropic_api_key])
 
   // Handle input changes
   const handleInputChange = (field: keyof WorkflowCredentials, value: string) => {
@@ -130,8 +144,9 @@ export function WorkflowCredentialsManager({
 
   // Check if form has unsaved changes
   const hasChanges = () => {
+    if (!credentials) return false
     return (
-      formData.whatsapp_token !== credentials.whatsapp_token ||
+      formData.whatsapp_token !== (credentials.whatsapp_token || '') ||
       formData.openai_api_key !== (credentials.openai_api_key || '') ||
       formData.anthropic_api_key !== (credentials.anthropic_api_key || '')
     )
