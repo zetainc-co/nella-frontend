@@ -1,4 +1,4 @@
-// src/app/(dashboard)/workflows/page.tsx
+// src/app/(dashboard)/configuracion/workflows/page.tsx
 "use client"
 
 import { useState, useEffect } from 'react'
@@ -109,7 +109,7 @@ export default function PanelDeControlPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* Gestión */}
             <QuickAccessCard
-              href="/workflows/gestion"
+              href="/configuracion/workflows/gestion"
               icon={<Settings className="h-6 w-6" />}
               title="Gestión"
               description="Configuración y estado del workflow individual"
@@ -118,12 +118,12 @@ export default function PanelDeControlPage() {
               iconColor="text-primary"
             />
 
-            {/* Credenciales */}
+            {/* Credenciales → Conexiones */}
             <QuickAccessCard
-              href="/workflows/credenciales"
+              href="/configuracion/conexiones"
               icon={<Key className="h-6 w-6" />}
-              title="Credenciales"
-              description="Gestión de claves y tokens de API"
+              title="Conexiones"
+              description="Gestión de integraciones y credenciales"
               iconBg="bg-blue-500/10"
               iconBorder="border-blue-500/40"
               iconColor="text-blue-500"
@@ -132,7 +132,7 @@ export default function PanelDeControlPage() {
             {/* Administración - Solo para admins */}
             {isAdmin && (
               <QuickAccessCard
-                href="/workflows/administracion"
+                href="/configuracion/administracion"
                 icon={<Shield className="h-6 w-6" />}
                 title="Administración"
                 description="Herramientas administrativas y migraciones"
@@ -161,7 +161,7 @@ export default function PanelDeControlPage() {
                 </div>
               </div>
 
-              <Link href="/workflows/gestion">
+              <Link href="/configuracion/workflows/gestion">
                 <Button variant="outline" size="sm" className="gap-2">
                   Ver Detalles
                   <ArrowRight className="h-4 w-4" />

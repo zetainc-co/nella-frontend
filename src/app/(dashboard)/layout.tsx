@@ -10,9 +10,14 @@ import {
   MessageSquare,
   Settings,
   LogOut,
-  Workflow,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  User,
+  Building,
+  Workflow,
+  Link as LinkIcon,
+  CreditCard,
+  Shield
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/shared/theme-toggle/theme-toggle'
 
@@ -23,22 +28,33 @@ const navigation = [
   { name: 'Chat', href: '/chat', icon: MessageSquare },
 ]
 
-const workflowsSubmenu = [
-  { name: 'Panel de Control', href: '/workflows' },
-  { name: 'Gestión', href: '/workflows/gestion' },
-  { name: 'Credenciales', href: '/workflows/credenciales' },
-  { name: 'Administración', href: '/workflows/administracion', adminOnly: true },
+const settingsSubmenu = [
+  { name: 'Mi Perfil', href: '/configuracion/perfil', icon: User },
+  { name: 'Organización', href: '/configuracion/organizacion', icon: Building },
+  {
+    name: 'Workflows',
+    href: '/configuracion/workflows',
+    icon: Workflow,
+    submenu: [
+      { name: 'Panel de Control', href: '/configuracion/workflows' },
+      { name: 'Gestión', href: '/configuracion/workflows/gestion' }
+    ]
+  },
+  { name: 'Conexiones', href: '/configuracion/conexiones', icon: LinkIcon },
+  { name: 'Equipo y Permisos', href: '/configuracion/equipo', icon: Users },
+  { name: 'Facturación', href: '/configuracion/facturacion', icon: CreditCard },
+  { name: 'Administración', href: '/configuracion/administracion', icon: Shield, adminOnly: true },
 ]
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  const [workflowsOpen, setWorkflowsOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
-    // Auto-expand if on workflows route
-    if (pathname.startsWith('/workflows')) {
-      setWorkflowsOpen(true)
+    // Auto-expand if on configuracion route
+    if (pathname.startsWith('/configuracion')) {
+      setSettingsOpen(true)
     }
     // Check admin status
     const userRole = localStorage.getItem('user_role')
@@ -79,39 +95,41 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </Link>
             )
           })}
+        </nav>
 
-          {/* Workflows with Submenu */}
-          <div>
-            <button
-              onClick={() => setWorkflowsOpen(!workflowsOpen)}
-              className={`flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                pathname.startsWith('/workflows')
-                  ? 'bg-primary/10 text-primary border border-primary/20'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Workflow className="size-5" />
-                Workflows
-              </div>
-              {workflowsOpen ? (
-                <ChevronDown className="size-4" />
-              ) : (
-                <ChevronRight className="size-4" />
-              )}
-            </button>
+        {/* Footer */}
+        <div className="p-4 border-t border-border space-y-1">
+          <button
+            onClick={() => setSettingsOpen(!settingsOpen)}
+            className={`flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+              pathname.startsWith('/configuracion')
+                ? 'bg-primary/10 text-primary border border-primary/20'
+                : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Settings className="size-5" />
+              Configuración
+            </div>
+            {settingsOpen ? (
+              <ChevronDown className="size-4" />
+            ) : (
+              <ChevronRight className="size-4" />
+            )}
+          </button>
 
-            {/* Submenu */}
-            {workflowsOpen && (
-              <div className="ml-4 mt-1 space-y-1 border-l border-border pl-4">
-                {workflowsSubmenu.map((item) => {
-                  // Skip admin-only items if not admin
-                  if (item.adminOnly && !isAdmin) return null
+          {/* Submenu */}
+          {settingsOpen && (
+            <div className="ml-4 mt-1 space-y-1 border-l border-border pl-4">
+              {settingsSubmenu.map((item) => {
+                if (item.adminOnly && !isAdmin) return null
 
-                  const isActive = pathname === item.href
-                  return (
+                const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+                const Icon = item.icon
+
+                return (
+                  <div key={item.name}>
                     <Link
-                      key={item.name}
                       href={item.href}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                         isActive
@@ -119,6 +137,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                           : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                       }`}
                     >
+                      <Icon className="size-4" />
                       {item.name}
                       {item.adminOnly && (
                         <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/10 text-yellow-500 font-mono">
@@ -126,19 +145,34 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                         </span>
                       )}
                     </Link>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </nav>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-border space-y-1">
-          <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all w-full text-left">
-            <Settings className="size-5" />
-            Configuración
-          </button>
+                    {/* Nested submenu for Workflows */}
+                    {item.submenu && isActive && (
+                      <div className="ml-6 mt-1 space-y-1">
+                        {item.submenu.map((subitem: any) => {
+                          const subIsActive = pathname === subitem.href
+                          return (
+                            <Link
+                              key={subitem.name}
+                              href={subitem.href}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${
+                                subIsActive
+                                  ? 'bg-primary/10 text-primary font-medium'
+                                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                              }`}
+                            >
+                              {subitem.name}
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
           <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-destructive transition-all w-full text-left">
             <LogOut className="size-5" />
             Cerrar Sesión
