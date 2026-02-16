@@ -45,24 +45,24 @@ export function LoginCard({
       {/* Form Content */}
       <form onSubmit={handleLogin} className="space-y-6">
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-muted-foreground mb-2">Email</label>
+          <label className="tech-label">Email</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:bg-accent transition-all duration-300"
+            className="tech-input"
             placeholder="tu@email.com"
             required
           />
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-muted-foreground mb-2">Password</label>
+          <label className="tech-label">Password</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:bg-accent transition-all duration-300"
+            className="tech-input"
             placeholder="••••••••"
             required
           />
