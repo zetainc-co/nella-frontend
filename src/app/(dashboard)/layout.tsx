@@ -9,7 +9,8 @@ import {
   Layers,
   MessageSquare,
   Settings,
-  LogOut
+  LogOut,
+  ExternalLink
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/shared/theme-toggle/theme-toggle'
 
@@ -22,6 +23,30 @@ const navigation = [
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
+
+  const handleOpenChatwoot = () => {
+    const chatwootUrl = process.env.NEXT_PUBLIC_CHATWOOT_URL || 'http://localhost:3001'
+
+    // Validate URL to prevent XSS
+    try {
+      const url = new URL(chatwootUrl)
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        console.error('Invalid Chatwoot URL protocol:', url.protocol)
+        return
+      }
+    } catch (error) {
+      console.error('Invalid Chatwoot URL:', error)
+      return
+    }
+
+    // TODO: SSO Implementation
+    // Cuando se implemente SSO con Chatwoot:
+    // 1. Llamar a /api/chatwoot/auth para generar token SSO
+    // 2. Agregar el token como query param: `${chatwootUrl}/app/login?sso_token=${token}`
+    // 3. Documentación: https://www.chatwoot.com/docs/product/channels/live-chat/sdk/setup#identity-validation
+
+    window.open(chatwootUrl, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -61,6 +86,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Footer */}
         <div className="p-4 border-t border-border space-y-1">
+          {/* CRM Button */}
+          <button
+            onClick={handleOpenChatwoot}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all w-full text-left"
+          >
+            <ExternalLink className="size-5" />
+            Ir al CRM
+          </button>
+
           <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all w-full text-left">
             <Settings className="size-5" />
             Configuración
