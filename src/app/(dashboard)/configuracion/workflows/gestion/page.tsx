@@ -3,8 +3,6 @@
 
 import { useState } from 'react'
 import { useWorkflow } from '@/hooks/useWorkflow'
-import { HudBackground } from '@/components/auth/hud-background'
-import { HudCorners } from '@/components/ui/hud-corners'
 import { WorkflowStatusBadge } from '@/components/workflows/workflow-status-badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -108,9 +106,8 @@ export default function GestionPage() {
 
   if (isLoading) {
     return (
-      <div className="relative min-h-screen bg-background overflow-hidden">
-        <HudBackground />
-        <div className="relative z-10 flex min-h-screen items-center justify-center">
+      <div className="container mx-auto px-6 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex items-center gap-3 text-primary">
             <Loader2 className="h-6 w-6 animate-spin" />
             <span className="font-mono">Cargando workflow...</span>
@@ -122,16 +119,14 @@ export default function GestionPage() {
 
   if (error || !workflow) {
     return (
-      <div className="relative min-h-screen bg-background overflow-hidden">
-        <HudBackground />
-        <div className="relative z-10 flex min-h-screen items-center justify-center">
-          <div className="relative border border-red-500/20 bg-red-500/5 p-6 backdrop-blur-sm max-w-md">
-            <HudCorners />
+      <div className="container mx-auto px-6 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="auth-card p-6 max-w-md">
             <div className="flex items-center gap-3 text-red-500">
               <AlertCircle className="h-6 w-6" />
               <div>
                 <h3 className="font-bold">Error al cargar workflow</h3>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   {error?.message || 'No se pudo cargar la información del workflow'}
                 </p>
               </div>
@@ -143,13 +138,10 @@ export default function GestionPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-background overflow-hidden">
-      <HudBackground />
-
-      <div className="relative z-10 container mx-auto px-6 py-8 space-y-6">
+    <div className="container mx-auto px-6 py-8 space-y-6">
         {/* Header */}
-        <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-          <HudCorners />
+        <div className="auth-card p-6">
+          
 
           <div className="flex items-center justify-between mb-4">
             <Link href="/configuracion/workflows">
@@ -167,8 +159,8 @@ export default function GestionPage() {
                 <Settings className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Gestión de Workflow</h1>
-                <p className="text-sm text-gray-400">
+                <h1 className="text-2xl font-bold text-foreground">Gestión de Workflow</h1>
+                <p className="text-sm text-muted-foreground">
                   Configuración y administración del workflow individual
                 </p>
               </div>
@@ -215,14 +207,14 @@ export default function GestionPage() {
         </div>
 
         {/* Workflow Info Card */}
-        <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-          <HudCorners />
+        <div className="auth-card p-6">
+          
 
           <div className="mb-6 flex items-center gap-3">
             <Activity className="h-6 w-6 text-primary" />
             <div>
-              <h3 className="text-lg font-bold text-white">Información del Workflow</h3>
-              <p className="text-sm text-gray-400">
+              <h3 className="text-lg font-bold text-foreground">Información del Workflow</h3>
+              <p className="text-sm text-muted-foreground">
                 Detalles de configuración y estado actual
               </p>
             </div>
@@ -231,38 +223,38 @@ export default function GestionPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* Workflow Name */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <Workflow className="h-4 w-4" />
                 <span className="text-sm">Nombre del Workflow</span>
               </div>
-              <p className="text-white font-medium">{workflow.workflow_name}</p>
+              <p className="text-foreground font-medium">{workflow.workflow_name}</p>
             </div>
 
             {/* N8n ID */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <Hash className="h-4 w-4" />
                 <span className="text-sm">N8n Workflow ID</span>
               </div>
-              <p className="text-white font-mono">{workflow.n8n_workflow_id}</p>
+              <p className="text-foreground font-mono">{workflow.n8n_workflow_id}</p>
             </div>
 
             {/* Template Version */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <Package className="h-4 w-4" />
                 <span className="text-sm">Versión del Template</span>
               </div>
-              <p className="text-white font-mono">{workflow.template_version}</p>
+              <p className="text-foreground font-mono">{workflow.template_version}</p>
             </div>
 
             {/* Created At */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar className="h-4 w-4" />
                 <span className="text-sm">Fecha de Creación</span>
               </div>
-              <p className="text-white">
+              <p className="text-foreground">
                 {new Date(workflow.created_at).toLocaleDateString('es-ES', {
                   year: 'numeric',
                   month: 'long',
@@ -273,11 +265,11 @@ export default function GestionPage() {
 
             {/* Updated At */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar className="h-4 w-4" />
                 <span className="text-sm">Última Actualización</span>
               </div>
-              <p className="text-white">
+              <p className="text-foreground">
                 {new Date(workflow.updated_at).toLocaleDateString('es-ES', {
                   year: 'numeric',
                   month: 'long',
@@ -289,15 +281,15 @@ export default function GestionPage() {
         </div>
 
         {/* Configuration Card */}
-        <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-          <HudCorners />
+        <div className="auth-card p-6">
+          
 
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Settings className="h-6 w-6 text-primary" />
               <div>
-                <h3 className="text-lg font-bold text-white">Configuración</h3>
-                <p className="text-sm text-gray-400">
+                <h3 className="text-lg font-bold text-foreground">Configuración</h3>
+                <p className="text-sm text-muted-foreground">
                   Parámetros del workflow
                 </p>
               </div>
@@ -318,16 +310,16 @@ export default function GestionPage() {
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {workflow.config && Object.entries(workflow.config).map(([key, value]) => (
                   <div key={key} className="space-y-2">
-                    <label className="text-sm text-gray-400">{key}</label>
+                    <label className="text-sm text-muted-foreground">{key}</label>
                     <input
                       type="text"
                       defaultValue={typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                      className="w-full rounded border border-primary/20 bg-black/40 px-3 py-2 text-white font-mono text-sm focus:border-primary focus:outline-none"
+                      className="w-full rounded border border-border bg-card px-3 py-2 text-foreground font-mono text-sm focus:border-primary focus:outline-none"
                     />
                   </div>
                 ))}
               </div>
-              <div className="flex gap-3 pt-4 border-t border-primary/20">
+              <div className="flex gap-3 pt-4 border-t border-border">
                 <Button variant="outline" className="flex-1">
                   Cancelar
                 </Button>
@@ -341,8 +333,8 @@ export default function GestionPage() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {workflow.config && Object.entries(workflow.config).map(([key, value]) => (
                 <div key={key} className="space-y-2">
-                  <span className="text-sm text-gray-400">{key}</span>
-                  <p className="text-white font-mono text-sm">
+                  <span className="text-sm text-muted-foreground">{key}</span>
+                  <p className="text-foreground font-mono text-sm">
                     {typeof value === 'object' ? JSON.stringify(value) : String(value)}
                   </p>
                 </div>
@@ -352,15 +344,15 @@ export default function GestionPage() {
         </div>
 
         {/* Execution Logs */}
-        <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-          <HudCorners />
+        <div className="auth-card p-6">
+          
 
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <FileText className="h-6 w-6 text-primary" />
               <div>
-                <h3 className="text-lg font-bold text-white">Logs de Ejecución</h3>
-                <p className="text-sm text-gray-400">
+                <h3 className="text-lg font-bold text-foreground">Logs de Ejecución</h3>
+                <p className="text-sm text-muted-foreground">
                   Historial de ejecuciones del workflow
                 </p>
               </div>
@@ -396,8 +388,8 @@ export default function GestionPage() {
 
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-gray-400 font-mono">{log.timestamp}</span>
-                      <div className="flex gap-3 text-xs text-gray-400">
+                      <span className="text-xs text-muted-foreground font-mono">{log.timestamp}</span>
+                      <div className="flex gap-3 text-xs text-muted-foreground">
                         <span>Duración: {log.duration}</span>
                         <span>Triggers: {log.triggers}</span>
                       </div>
@@ -413,7 +405,7 @@ export default function GestionPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-muted-foreground">
               <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="text-sm">Haz clic en "Cargar Logs" para ver el historial de ejecuciones</p>
             </div>
@@ -423,17 +415,16 @@ export default function GestionPage() {
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div className="relative max-w-md w-full mx-4 border border-red-500/30 bg-black/90 p-6 backdrop-blur-sm">
-              <HudCorners />
+            <div className="auth-card max-w-md w-full mx-4 p-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Trash2 className="h-6 w-6 text-red-500" />
-                  <h3 className="text-lg font-bold text-white">Eliminar Workflow</h3>
+                  <h3 className="text-lg font-bold text-foreground">Eliminar Workflow</h3>
                 </div>
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-foreground">
                   ¿Estás seguro de que deseas eliminar el workflow <strong className="text-primary">{workflow.workflow_name}</strong>?
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-muted-foreground">
                   Esta acción es irreversible. El workflow será eliminado de N8n y todos los datos asociados se perderán.
                 </p>
                 <div className="flex gap-3">
@@ -455,7 +446,6 @@ export default function GestionPage() {
             </div>
           </div>
         )}
-      </div>
     </div>
   )
 }
