@@ -1,4 +1,4 @@
-// src/app/(dashboard)/workflows/administracion/page.tsx
+// src/app/(dashboard)/configuracion/administracion/page.tsx
 "use client"
 
 import { useState, useEffect } from 'react'
@@ -30,7 +30,7 @@ export default function AdministracionPage() {
     // Verificar si el usuario es admin
     const userRole = localStorage.getItem('user_role')
     if (userRole !== 'admin') {
-      router.push('/workflows')
+      router.push('/configuracion/workflows')
     } else {
       setIsAdmin(true)
     }
@@ -50,7 +50,7 @@ export default function AdministracionPage() {
           <HudCorners />
 
           <div className="mb-4">
-            <Link href="/workflows">
+            <Link href="/configuracion/workflows">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Volver al Panel

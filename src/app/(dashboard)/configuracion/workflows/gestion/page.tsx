@@ -1,4 +1,4 @@
-// src/app/(dashboard)/workflows/gestion/page.tsx
+// src/app/(dashboard)/configuracion/workflows/gestion/page.tsx
 "use client"
 
 import { useState } from 'react'
@@ -152,7 +152,7 @@ export default function GestionPage() {
           <HudCorners />
 
           <div className="flex items-center justify-between mb-4">
-            <Link href="/workflows">
+            <Link href="/configuracion/workflows">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Volver al Panel
