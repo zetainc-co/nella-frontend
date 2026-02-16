@@ -4,7 +4,6 @@
 import { mockConnections } from '@/lib/mock-data/settings'
 import { Button } from '@/components/ui/button'
 import { MessageCircle, Instagram, Facebook, Calendar, CheckCircle2, Circle } from 'lucide-react'
-import { HudCorners } from '@/components/ui/hud-corners'
 
 const iconMap = {
   whatsapp: MessageCircle,
@@ -38,12 +37,7 @@ export default function ConexionesPage() {
           const colorClass = colorMap[connection.icon as keyof typeof colorMap]
 
           return (
-            <div
-              key={connection.id}
-              className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm"
-            >
-              <HudCorners />
-
+            <div key={connection.id} className="auth-card p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-4">
                   <div className={`flex h-12 w-12 items-center justify-center rounded-lg border ${colorClass}`}>
@@ -51,8 +45,8 @@ export default function ConexionesPage() {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-bold text-white">{connection.name}</h3>
-                    <p className="text-sm text-gray-400 mt-1">{connection.description}</p>
+                    <h3 className="text-lg font-bold text-foreground">{connection.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{connection.description}</p>
                   </div>
                 </div>
               </div>
@@ -65,14 +59,14 @@ export default function ConexionesPage() {
                   </div>
 
                   {connection.phone && (
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span>📱</span>
                       <span>{connection.phone}</span>
                     </div>
                   )}
 
                   {connection.token && (
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span>🔑</span>
                       <span>Token: {connection.token}</span>
                     </div>
@@ -80,7 +74,9 @@ export default function ConexionesPage() {
 
                   {connection.note && (
                     <div className="mt-4 p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
-                      <p className="text-xs text-gray-400"><span className="font-semibold text-blue-400">Nota:</span> {connection.note}</p>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-semibold text-blue-400">Nota:</span> {connection.note}
+                      </p>
                     </div>
                   )}
 
@@ -94,11 +90,11 @@ export default function ConexionesPage() {
               ) : (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Circle className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-500">No conectado</span>
+                    <Circle className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">No conectado</span>
                   </div>
 
-                  <Button className="bg-[#9EFF00] text-black hover:bg-[#8FEE00]">
+                  <Button className="btn-primary">
                     {connection.id === 'calendar' ? 'Conectar con Google' : 'Conectar'}
                   </Button>
                 </div>

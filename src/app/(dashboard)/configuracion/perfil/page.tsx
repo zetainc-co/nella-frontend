@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Bell, Volume2, Lock } from 'lucide-react'
-import { HudCorners } from '@/components/ui/hud-corners'
 
 export default function MiPerfilPage() {
   const [profile, setProfile] = useState(mockUserProfile)
@@ -24,85 +23,81 @@ export default function MiPerfilPage() {
       </div>
 
       {/* Foto de Perfil */}
-      <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-        <HudCorners />
-        <h2 className="text-lg font-bold text-white mb-4">Foto de Perfil</h2>
+      <div className="auth-card p-6">
+        <h2 className="text-lg font-bold text-foreground mb-4">Foto de Perfil</h2>
 
         <div className="flex items-center gap-6">
           <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-primary/40 bg-primary/10 text-2xl font-bold text-primary">
             {profile.avatar}
           </div>
           <div>
-            <p className="text-sm text-white mb-1">Actualiza tu foto de perfil</p>
-            <p className="text-xs text-gray-400">JPG, PNG o GIF. Máximo 2MB</p>
+            <p className="text-sm text-foreground mb-1">Actualiza tu foto de perfil</p>
+            <p className="text-xs text-muted-foreground">JPG, PNG o GIF. Máximo 2MB</p>
           </div>
         </div>
       </div>
 
       {/* Información Personal */}
-      <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-        <HudCorners />
-
+      <div className="auth-card p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-white">Información Personal</h2>
+          <h2 className="text-lg font-bold text-foreground">Información Personal</h2>
           <Button variant="outline" size="sm">Editar</Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-gray-400">Nombre Completo</Label>
+            <Label>Nombre Completo</Label>
             <Input
               value={profile.name}
               onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-              className="bg-black/20 border-primary/20 text-white"
+              className="auth-input"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-400">Correo Electrónico</Label>
+            <Label>Correo Electrónico</Label>
             <Input
               value={profile.email}
               onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-              className="bg-black/20 border-primary/20 text-white"
+              className="auth-input"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-400">Cargo / Rol</Label>
+            <Label>Cargo / Rol</Label>
             <Input
               value={profile.role}
               onChange={(e) => setProfile({ ...profile, role: e.target.value })}
-              className="bg-black/20 border-primary/20 text-white"
+              className="auth-input"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-400">Contraseña</Label>
+            <Label>Contraseña</Label>
             <div className="relative">
               <Input
                 type="password"
                 value="••••••••"
                 disabled
-                className="bg-black/20 border-primary/20 text-white"
+                className="auth-input"
               />
-              <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Preferencias */}
-      <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-        <HudCorners />
-        <h2 className="text-lg font-bold text-white mb-6">Preferencias</h2>
+      <div className="auth-card p-6">
+        <h2 className="text-lg font-bold text-foreground mb-6">Preferencias</h2>
 
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Bell className="h-5 w-5 text-primary" />
               <div>
-                <p className="text-sm font-medium text-white">Notificaciones de escritorio</p>
-                <p className="text-xs text-gray-400">Recibe alertas en tu navegador</p>
+                <p className="text-sm font-medium text-foreground">Notificaciones de escritorio</p>
+                <p className="text-xs text-muted-foreground">Recibe alertas en tu navegador</p>
               </div>
             </div>
             <Switch
@@ -115,8 +110,8 @@ export default function MiPerfilPage() {
             <div className="flex items-center gap-3">
               <Volume2 className="h-5 w-5 text-primary" />
               <div>
-                <p className="text-sm font-medium text-white">Sonidos de chat</p>
-                <p className="text-xs text-gray-400">Reproduce sonido al recibir mensajes</p>
+                <p className="text-sm font-medium text-foreground">Sonidos de chat</p>
+                <p className="text-xs text-muted-foreground">Reproduce sonido al recibir mensajes</p>
               </div>
             </div>
             <Switch
@@ -129,7 +124,7 @@ export default function MiPerfilPage() {
 
       {/* Guardar */}
       <div className="flex justify-end">
-        <Button className="bg-[#9EFF00] text-black hover:bg-[#8FEE00]">
+        <Button className="btn-primary">
           Guardar Cambios
         </Button>
       </div>

@@ -4,7 +4,6 @@
 import { mockTeam, mockBilling } from '@/lib/mock-data/settings'
 import { Button } from '@/components/ui/button'
 import { UserPlus, Trash2 } from 'lucide-react'
-import { HudCorners } from '@/components/ui/hud-corners'
 
 export default function EquipoPage() {
   const licensePercentage = (mockBilling.licenses.used / mockBilling.licenses.total) * 100
@@ -20,24 +19,23 @@ export default function EquipoPage() {
       </div>
 
       {/* Licencias Usadas */}
-      <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-        <HudCorners />
-        <h2 className="text-lg font-bold text-white mb-4">Licencias Usadas</h2>
+      <div className="auth-card p-6">
+        <h2 className="text-lg font-bold text-foreground mb-4">Licencias Usadas</h2>
 
         <div className="space-y-3">
-          <p className="text-sm text-gray-400">
-            Estás usando <span className="text-white font-semibold">{mockBilling.licenses.used}</span> de{' '}
-            <span className="text-white font-semibold">{mockBilling.licenses.total}</span> licencias disponibles
+          <p className="text-sm text-muted-foreground">
+            Estás usando <span className="text-foreground font-semibold">{mockBilling.licenses.used}</span> de{' '}
+            <span className="text-foreground font-semibold">{mockBilling.licenses.total}</span> licencias disponibles
           </p>
 
-          <div className="relative w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div className="relative w-full h-2 bg-muted/30 rounded-full overflow-hidden">
             <div
-              className="absolute h-full bg-[#9EFF00] transition-all"
+              className="absolute h-full bg-primary transition-all"
               style={{ width: `${licensePercentage}%` }}
             />
           </div>
 
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>{mockBilling.licenses.used}/{mockBilling.licenses.total}</span>
             <span>{licensePercentage.toFixed(0)}% usado</span>
           </div>
@@ -45,12 +43,10 @@ export default function EquipoPage() {
       </div>
 
       {/* Miembros del Equipo */}
-      <div className="relative border border-primary/20 bg-black/40 p-6 backdrop-blur-sm">
-        <HudCorners />
-
+      <div className="auth-card p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-white">Miembros del Equipo</h2>
-          <Button className="gap-2 bg-[#9EFF00] text-black hover:bg-[#8FEE00]">
+          <h2 className="text-lg font-bold text-foreground">Miembros del Equipo</h2>
+          <Button className="btn-primary gap-2">
             <UserPlus className="h-4 w-4" />
             Invitar Miembro
           </Button>
@@ -60,7 +56,7 @@ export default function EquipoPage() {
           {mockTeam.map((member) => (
             <div
               key={member.id}
-              className="flex items-center justify-between p-4 rounded-lg border border-primary/10 bg-black/20 hover:bg-black/30 transition-all"
+              className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent transition-all"
             >
               <div className="flex items-center gap-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary/40 bg-primary/10 text-sm font-bold text-primary">
@@ -68,8 +64,8 @@ export default function EquipoPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold text-white">{member.name}</p>
-                  <p className="text-xs text-gray-400">{member.email}</p>
+                  <p className="text-sm font-semibold text-foreground">{member.name}</p>
+                  <p className="text-xs text-muted-foreground">{member.email}</p>
                 </div>
               </div>
 
