@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Users,
   Layers,
+  CalendarDays,
   MessageSquare,
   Settings,
   LogOut,
