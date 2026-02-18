@@ -1,17 +1,15 @@
 // src/components/auth/registration-step-4.tsx
 'use client'
 
+import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
 import { step4Schema } from '@/lib/registration-validations'
-import { validateWhatsAppToken, validateWhatsAppNumber } from '@/lib/registration-storage'
 import { RegistrationFormData } from '@/types'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { CountryPhoneSelector } from '@/components/auth/country-phone-selector'
-import { ChevronLeft, ChevronRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, CheckCircle2, MessageSquare } from 'lucide-react'
 
 interface RegistrationStep4Props {
   initialData: Partial<RegistrationFormData>
@@ -19,85 +17,70 @@ interface RegistrationStep4Props {
   onBack: () => void
 }
 
-export function RegistrationStep4({
-  initialData,
-  onNext,
-  onBack,
-}: RegistrationStep4Props) {
-  const [isValidatingToken, setIsValidatingToken] = useState(false)
-  const [isValidatingNumber, setIsValidatingNumber] = useState(false)
-  const [tokenValidation, setTokenValidation] = useState<{ valid: boolean; message: string } | null>(null)
-  const [numberValidation, setNumberValidation] = useState<{ valid: boolean; message: string } | null>(null)
+const OTP_CODE_DEV = '000000'
+
+export function RegistrationStep4({ initialData, onNext, onBack }: RegistrationStep4Props) {
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpVerified, setOtpVerified] = useState(false)
+  const [isSending, setIsSending] = useState(false)
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [otpCode, setOtpCode] = useState(['', '', '', '', '', ''])
+  const [otpError, setOtpError] = useState<string | null>(null)
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const {
-    register,
     handleSubmit,
     watch,
     setValue,
-    setError,
-    clearErrors,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(step4Schema),
     defaultValues: {
       whatsappNumber: initialData.whatsappNumber || '',
-      whatsappToken: initialData.whatsappToken || '',
     },
   })
 
   const whatsappNumber = watch('whatsappNumber')
-  const whatsappToken = watch('whatsappToken')
 
-  // Validar número de WhatsApp
-  const handleValidateNumber = async () => {
-    if (!whatsappNumber || errors.whatsappNumber) return
+  const handleSendOtp = async () => {
+    if (!whatsappNumber) return
+    setIsSending(true)
+    // Mock: simular envío de OTP via WhatsApp
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    setOtpSent(true)
+    setIsSending(false)
+    setTimeout(() => inputRefs.current[0]?.focus(), 100)
+  }
 
-    setIsValidatingNumber(true)
-    setNumberValidation(null)
-
-    try {
-      const result = await validateWhatsAppNumber(whatsappNumber)
-      setNumberValidation(result)
-
-      if (!result.valid) {
-        setError('whatsappNumber', {
-          type: 'manual',
-          message: result.message,
-        })
-      } else {
-        clearErrors('whatsappNumber')
-      }
-    } catch (error) {
-      console.error('Error validando número:', error)
-    } finally {
-      setIsValidatingNumber(false)
+  const handleOtpChange = (index: number, value: string) => {
+    if (value && !/^\d$/.test(value)) return
+    const newCode = [...otpCode]
+    newCode[index] = value
+    setOtpCode(newCode)
+    setOtpError(null)
+    if (value && index < 5) inputRefs.current[index + 1]?.focus()
+    if (newCode.every(d => d !== '') && newCode.join('').length === 6) {
+      verifyOtp(newCode.join(''))
     }
   }
 
-  // Validar token de WhatsApp
-  const handleValidateToken = async () => {
-    if (!whatsappToken || errors.whatsappToken || !whatsappNumber) return
-
-    setIsValidatingToken(true)
-    setTokenValidation(null)
-
-    try {
-      const result = await validateWhatsAppToken(whatsappToken, whatsappNumber)
-      setTokenValidation(result)
-
-      if (!result.valid) {
-        setError('whatsappToken', {
-          type: 'manual',
-          message: result.message,
-        })
-      } else {
-        clearErrors('whatsappToken')
-      }
-    } catch (error) {
-      console.error('Error validando token:', error)
-    } finally {
-      setIsValidatingToken(false)
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus()
     }
+  }
+
+  const verifyOtp = async (code: string) => {
+    setIsVerifying(true)
+    await new Promise(resolve => setTimeout(resolve, 800))
+    if (code === OTP_CODE_DEV) {
+      setOtpVerified(true)
+    } else {
+      setOtpError('Código incorrecto. Código de desarrollo: 000000')
+      setOtpCode(['', '', '', '', '', ''])
+      setTimeout(() => inputRefs.current[0]?.focus(), 100)
+    }
+    setIsVerifying(false)
   }
 
   const onSubmit = handleSubmit((data) => {
@@ -106,126 +89,86 @@ export function RegistrationStep4({
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      <div className="space-y-4">
-        {/* Información */}
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
-          <p className="text-sm text-blue-900 dark:text-blue-100">
-            <strong>Importante:</strong> Nella se conecta a tu cuenta de WhatsApp Business via Meta API.
-            Necesitarás tu número de teléfono y un token de acceso.
-          </p>
-        </div>
-
-        {/* Número de WhatsApp */}
-        <div className="space-y-2">
-          <CountryPhoneSelector
-            value={whatsappNumber}
-            onChange={(value) => setValue('whatsappNumber', value)}
-            error={errors.whatsappNumber?.message}
-          />
-
-          {/* Botón de validación */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleValidateNumber}
-            disabled={isValidatingNumber || !whatsappNumber}
-            className="w-full gap-2"
-          >
-            {isValidatingNumber ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Validando número...
-              </>
-            ) : (
-              'Validar número'
-            )}
-          </Button>
-
-          {/* Resultado de validación */}
-          {numberValidation && (
-            <div
-              className={`flex items-center gap-2 rounded-lg p-3 ${
-                numberValidation.valid
-                  ? 'bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100'
-                  : 'bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100'
-              }`}
-            >
-              {numberValidation.valid ? (
-                <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-              ) : (
-                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-              )}
-              <p className="text-sm">{numberValidation.message}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Token de WhatsApp */}
-        <div className="space-y-2">
-          <Label htmlFor="whatsappToken">
-            Token de acceso de WhatsApp Business <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="whatsappToken"
-            type="password"
-            {...register('whatsappToken')}
-            placeholder="Pega aquí tu token de Meta API..."
-            className={`font-mono text-xs ${errors.whatsappToken ? 'border-destructive' : ''}`}
-          />
-          {errors.whatsappToken && (
-            <p className="text-sm text-destructive">{errors.whatsappToken.message}</p>
-          )}
-
-          <p className="text-xs text-muted-foreground">
-            Lo encuentras en tu cuenta de{' '}
-            <a
-              href="https://business.facebook.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              Meta Business Suite
-            </a>
-            .
-          </p>
-
-          {/* Botón de validación */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleValidateToken}
-            disabled={isValidatingToken || !whatsappToken || !numberValidation?.valid}
-            className="w-full gap-2"
-          >
-            {isValidatingToken ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Validando token...
-              </>
-            ) : (
-              'Validar token con Meta API'
-            )}
-          </Button>
-
-          {/* Resultado de validación */}
-          {tokenValidation && (
-            <div
-              className={`flex items-center gap-2 rounded-lg p-3 ${
-                tokenValidation.valid
-                  ? 'bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100'
-                  : 'bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100'
-              }`}
-            >
-              {tokenValidation.valid ? (
-                <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-              ) : (
-                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-              )}
-              <p className="text-sm">{tokenValidation.message}</p>
-            </div>
-          )}
-        </div>
+      <div className="space-y-2">
+        <h3 className="font-semibold text-lg">WhatsApp Business</h3>
+        <p className="text-sm text-muted-foreground">
+          Ingresa el número de WhatsApp Business de tu empresa. Te enviaremos un código para verificarlo.
+        </p>
       </div>
+
+      {/* Número WhatsApp */}
+      <div className="space-y-3">
+        <CountryPhoneSelector
+          value={whatsappNumber}
+          onChange={(value) => setValue('whatsappNumber', value)}
+          error={errors.whatsappNumber?.message}
+          label="Número WhatsApp Business"
+        />
+
+        {!otpSent && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleSendOtp}
+            disabled={isSending || !whatsappNumber || !!errors.whatsappNumber}
+            className="w-full gap-2"
+          >
+            {isSending ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> Enviando código...</>
+            ) : (
+              <><MessageSquare className="h-4 w-4" /> Enviar código de verificación</>
+            )}
+          </Button>
+        )}
+      </div>
+
+      {/* OTP Input */}
+      {otpSent && !otpVerified && (
+        <div className="space-y-4">
+          <p className="text-sm text-center text-muted-foreground">
+            Código enviado a <span className="font-medium text-foreground">{whatsappNumber}</span>
+          </p>
+          <div className="flex justify-center gap-2">
+            {otpCode.map((digit, index) => (
+              <Input
+                key={index}
+                ref={el => { inputRefs.current[index] = el }}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={e => handleOtpChange(index, e.target.value)}
+                onKeyDown={e => handleOtpKeyDown(index, e)}
+                disabled={isVerifying}
+                className="h-12 w-10 text-center text-lg font-bold"
+              />
+            ))}
+          </div>
+          {isVerifying && (
+            <div className="flex justify-center gap-2 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Verificando...</span>
+            </div>
+          )}
+          {otpError && <p className="text-sm text-center text-destructive">{otpError}</p>}
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950">
+            <p className="text-xs text-blue-900 dark:text-blue-100 text-center">
+              Código de desarrollo: <span className="font-mono font-bold">000000</span>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Número verificado */}
+      {otpVerified && (
+        <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950">
+          <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+          <div>
+            <p className="font-medium text-green-900 dark:text-green-100">Número verificado</p>
+            <p className="text-sm text-green-700 dark:text-green-300">{whatsappNumber}</p>
+          </div>
+        </div>
+      )}
 
       {/* Botones */}
       <div className="flex justify-between pt-4">
@@ -233,11 +176,7 @@ export function RegistrationStep4({
           <ChevronLeft className="h-4 w-4" />
           Anterior
         </Button>
-        <Button
-          type="submit"
-          className="gap-2"
-          disabled={!tokenValidation?.valid || !numberValidation?.valid}
-        >
+        <Button type="submit" className="gap-2" disabled={!otpVerified}>
           Siguiente
           <ChevronRight className="h-4 w-4" />
         </Button>
