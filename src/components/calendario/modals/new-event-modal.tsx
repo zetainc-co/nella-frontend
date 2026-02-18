@@ -1,7 +1,7 @@
 // src/components/calendario/modals/new-event-modal.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Sparkles } from 'lucide-react'
 import {
   Dialog,
@@ -55,23 +55,17 @@ export function NewEventModal({ open, onClose, initialDate, initialTime }: NewEv
   const [title, setTitle] = useState('')
   const [project, setProject] = useState<ProjectName>('NellaSales')
   const [client, setClient] = useState('')
-  const [date, setDate] = useState(getTodayISO())
-  const [startTime, setStartTime] = useState('09:00')
-  const [endTime, setEndTime] = useState('10:00')
+  const [date, setDate] = useState(() => initialDate ?? getTodayISO())
+  const [startTime, setStartTime] = useState(() => initialTime ?? '09:00')
+  const [endTime, setEndTime] = useState(() =>
+    initialTime ? incrementHour(initialTime) : '10:00'
+  )
   const [location, setLocation] = useState('')
   const [videoCallLink, setVideoCallLink] = useState('')
   const [confirmationStatus, setConfirmationStatus] = useState<ConfirmationStatus>('pending')
   const [leadStage, setLeadStage] = useState('')
   const [hasBudget, setHasBudget] = useState<'approved' | 'pending'>('pending')
   const [notes, setNotes] = useState('')
-
-  useEffect(() => {
-    if (open) {
-      setDate(initialDate ?? getTodayISO())
-      setStartTime(initialTime ?? '09:00')
-      setEndTime(initialTime ? incrementHour(initialTime) : '10:00')
-    }
-  }, [open, initialDate, initialTime])
 
   function handleSubmit() {
     if (!title.trim() || !client.trim()) return
@@ -107,7 +101,7 @@ export function NewEventModal({ open, onClose, initialDate, initialTime }: NewEv
     'w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50'
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog key={`${initialDate}-${initialTime}`} open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-1">
