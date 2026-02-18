@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { ReactNode, useState, useEffect } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import React, { ReactNode, useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -17,49 +17,54 @@ import {
   Workflow,
   Link as LinkIcon,
   CreditCard,
-  Shield
-} from 'lucide-react'
-import { ThemeToggle } from '@/components/shared/theme-toggle/theme-toggle'
+  Shield,
+} from "lucide-react";
+import { ThemeToggle } from "@/components/shared/theme-toggle/theme-toggle";
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Contactos', href: '/contacts', icon: Users },
-  { name: 'Kanban', href: '/kanban', icon: Layers },
-  { name: 'Chat', href: '/chat', icon: MessageSquare },
-]
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Contactos", href: "/contacts", icon: Users },
+  { name: "Kanban", href: "/kanban", icon: Layers },
+  { name: "Chat", href: "/chat", icon: MessageSquare },
+];
 
-const settingsSubmenu = [
-  { name: 'Mi Perfil', href: '/configuracion/perfil', icon: User },
-  { name: 'Organización', href: '/configuracion/organizacion', icon: Building },
+type SettingsItem = {
+  name: string;
+  href: string;
+  icon: React.ForwardRefExoticComponent<any>;
+  adminOnly?: boolean;
+  submenu?: { name: string; href: string }[];
+};
+
+const settingsSubmenu: SettingsItem[] = [
+  { name: "Mi Perfil", href: "/configuracion/perfil", icon: User },
+  { name: "Organización", href: "/configuracion/organizacion", icon: Building },
+  //{ name: "Workflows", href: "/configuracion/workflows", icon: Workflow },
+  { name: "Conexiones", href: "/configuracion/conexiones", icon: LinkIcon },
+  { name: "Equipo y Permisos", href: "/configuracion/equipo", icon: Users },
+  { name: "Facturación", href: "/configuracion/facturacion", icon: CreditCard },
   {
-    name: 'Workflows',
-    href: '/configuracion/workflows',
-    icon: Workflow,
-    submenu: [
-      { name: 'Panel de Control', href: '/configuracion/workflows' },
-      { name: 'Gestión', href: '/configuracion/workflows/gestion' }
-    ]
+    name: "Administración",
+    href: "/configuracion/administracion",
+    icon: Shield,
+    adminOnly: true,
   },
-  { name: 'Conexiones', href: '/configuracion/conexiones', icon: LinkIcon },
-  { name: 'Equipo y Permisos', href: '/configuracion/equipo', icon: Users },
-  { name: 'Facturación', href: '/configuracion/facturacion', icon: CreditCard },
-  { name: 'Administración', href: '/configuracion/administracion', icon: Shield, adminOnly: true },
-]
+];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const pathname = usePathname()
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
+  const pathname = usePathname();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     // Auto-expand if on configuracion route
-    if (pathname.startsWith('/configuracion')) {
-      setSettingsOpen(true)
+    if (pathname.startsWith("/configuracion")) {
+      setSettingsOpen(true);
     }
     // Check admin status
-    const userRole = localStorage.getItem('user_role')
-    setIsAdmin(userRole === 'admin')
-  }, [pathname])
+    const userRole = localStorage.getItem("user_role");
+    setIsAdmin(userRole === "admin");
+  }, [pathname]);
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -79,21 +84,21 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href;
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                   isActive
-                    ? 'bg-primary/10 text-primary border border-primary/20'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 }`}
               >
                 <item.icon className="size-5" />
                 {item.name}
               </Link>
-            )
+            );
           })}
         </nav>
 
@@ -102,9 +107,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <button
             onClick={() => setSettingsOpen(!settingsOpen)}
             className={`flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-              pathname.startsWith('/configuracion')
-                ? 'bg-primary/10 text-primary border border-primary/20'
-                : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+              pathname.startsWith("/configuracion")
+                ? "bg-primary/10 text-primary border border-primary/20"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
             }`}
           >
             <div className="flex items-center gap-3">
@@ -122,10 +127,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           {settingsOpen && (
             <div className="ml-4 mt-1 space-y-1 border-l border-border pl-4">
               {settingsSubmenu.map((item) => {
-                if (item.adminOnly && !isAdmin) return null
+                if (item.adminOnly && !isAdmin) return null;
 
-                const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-                const Icon = item.icon
+                const isActive =
+                  pathname === item.href ||
+                  pathname.startsWith(item.href + "/");
+                const Icon = item.icon;
 
                 return (
                   <div key={item.name}>
@@ -133,8 +140,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                       href={item.href}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                         isActive
-                          ? 'bg-primary/10 text-primary font-medium'
-                          : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                          ? "bg-primary/10 text-primary font-medium"
+                          : "text-muted-foreground hover:bg-accent hover:text-foreground"
                       }`}
                     >
                       <Icon className="size-4" />
@@ -146,29 +153,29 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                       )}
                     </Link>
 
-                    {/* Nested submenu for Workflows */}
+                    {/* Nested submenu */}
                     {item.submenu && isActive && (
                       <div className="ml-6 mt-1 space-y-1">
                         {item.submenu.map((subitem: any) => {
-                          const subIsActive = pathname === subitem.href
+                          const subIsActive = pathname === subitem.href;
                           return (
                             <Link
                               key={subitem.name}
                               href={subitem.href}
                               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${
                                 subIsActive
-                                  ? 'bg-primary/10 text-primary font-medium'
-                                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                                  ? "bg-primary/10 text-primary font-medium"
+                                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
                               }`}
                             >
                               {subitem.name}
                             </Link>
-                          )
+                          );
                         })}
                       </div>
                     )}
                   </div>
-                )
+                );
               })}
             </div>
           )}
@@ -181,9 +188,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-background">
-        {children}
-      </main>
+      <main className="flex-1 overflow-auto bg-background">{children}</main>
     </div>
-  )
+  );
 }

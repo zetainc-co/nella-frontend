@@ -1,37 +1,54 @@
 // src/app/(dashboard)/configuracion/layout.tsx
-"use client"
+"use client";
 
-import { ReactNode } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import React, { ReactNode } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   User,
   Building,
-  Workflow,
+  //Workflow,
   Link as LinkIcon,
   Users,
   CreditCard,
   Shield,
-  ChevronRight
-} from 'lucide-react'
+  ChevronRight,
+} from "lucide-react";
 
-const settingsNav = [
-  { name: 'Mi Perfil', href: '/configuracion/perfil', icon: User },
-  { name: 'Organización', href: '/configuracion/organizacion', icon: Building },
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ForwardRefExoticComponent<any>;
+  adminOnly?: boolean;
+  submenu?: { name: string; href: string }[];
+};
+
+const settingsNav: NavItem[] = [
+  { name: "Mi Perfil", href: "/configuracion/perfil", icon: User },
+  { name: "Organización", href: "/configuracion/organizacion", icon: Building },
+  //{
+  //name: 'Workflows',
+  //href: '/configuracion/workflows',
+  //icon: Workflow,
+  //submenu: [{ name: 'Gestión', href: '/configuracion/workflows/gestion' }]
+  //},
+  { name: "Conexiones", href: "/configuracion/conexiones", icon: LinkIcon },
+  { name: "Equipo y Permisos", href: "/configuracion/equipo", icon: Users },
+  { name: "Facturación", href: "/configuracion/facturacion", icon: CreditCard },
   {
-    name: 'Workflows',
-    href: '/configuracion/workflows',
-    icon: Workflow,
-    submenu: [{ name: 'Gestión', href: '/configuracion/workflows/gestion' }]
+    name: "Administración",
+    href: "/configuracion/administracion",
+    icon: Shield,
+    adminOnly: true,
   },
-  { name: 'Conexiones', href: '/configuracion/conexiones', icon: LinkIcon },
-  { name: 'Equipo y Permisos', href: '/configuracion/equipo', icon: Users },
-  { name: 'Facturación', href: '/configuracion/facturacion', icon: CreditCard },
-  { name: 'Administración', href: '/configuracion/administracion', icon: Shield, adminOnly: true }
-]
+];
 
-export default function ConfiguracionLayout({ children }: { children: ReactNode }) {
-  const pathname = usePathname()
+export default function ConfiguracionLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const pathname = usePathname();
 
   return (
     <div className="flex h-full">
@@ -46,8 +63,9 @@ export default function ConfiguracionLayout({ children }: { children: ReactNode 
 
         <nav className="p-4 space-y-1">
           {settingsNav.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-            const Icon = item.icon
+            const isActive =
+              pathname === item.href || pathname.startsWith(item.href + "/");
+            const Icon = item.icon;
 
             return (
               <div key={item.name}>
@@ -55,8 +73,8 @@ export default function ConfiguracionLayout({ children }: { children: ReactNode 
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                     isActive
-                      ? 'bg-primary/10 text-primary border border-primary/20'
-                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   }`}
                 >
                   <Icon className="size-5" />
@@ -73,33 +91,31 @@ export default function ConfiguracionLayout({ children }: { children: ReactNode 
                 {item.submenu && isActive && (
                   <div className="ml-8 mt-1 space-y-1">
                     {item.submenu.map((subitem) => {
-                      const subIsActive = pathname === subitem.href
+                      const subIsActive = pathname === subitem.href;
                       return (
                         <Link
                           key={subitem.name}
                           href={subitem.href}
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                             subIsActive
-                              ? 'bg-primary/10 text-primary font-medium'
-                              : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                              ? "bg-primary/10 text-primary font-medium"
+                              : "text-muted-foreground hover:bg-accent hover:text-foreground"
                           }`}
                         >
                           {subitem.name}
                         </Link>
-                      )
+                      );
                     })}
                   </div>
                 )}
               </div>
-            )
+            );
           })}
         </nav>
       </aside>
 
       {/* Content */}
-      <main className="flex-1 overflow-y-auto bg-background">
-        {children}
-      </main>
+      <main className="flex-1 overflow-y-auto bg-background">{children}</main>
     </div>
-  )
+  );
 }
