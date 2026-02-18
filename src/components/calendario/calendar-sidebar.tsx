@@ -1,0 +1,20 @@
+// src/components/calendario/calendar-sidebar.tsx
+import { MiniCalendar } from './mini-calendar'
+import { ProjectFilters } from './project-filters'
+import { UpcomingEvents } from './upcoming-events'
+
+export function CalendarSidebar() {
+  return (
+    <div className="flex flex-col h-full overflow-y-auto divide-y divide-border">
+      <div>
+        <MiniCalendar />
+      </div>
+      <div>
+        <ProjectFilters />
+      </div>
+      <div>
+        <UpcomingEvents />
+      </div>
+    </div>
+  )
+}
