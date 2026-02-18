@@ -5,9 +5,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { step3Schema } from '@/lib/registration-validations'
 import { RegistrationFormData } from '@/types'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -49,9 +46,9 @@ export function RegistrationStep3({
       <div className="space-y-4">
         {/* Tipo de Oferta */}
         <div className="space-y-2">
-          <Label>
+          <label className="tech-label">
             ¿Qué vendes? <span className="text-destructive">*</span>
-          </Label>
+          </label>
           <div className="flex gap-4">
             <button
               type="button"
@@ -89,15 +86,15 @@ export function RegistrationStep3({
 
         {/* Descripción */}
         <div className="space-y-2">
-          <Label htmlFor="description">
+          <label htmlFor="description" className="tech-label">
             Descripción de lo que ofreces <span className="text-muted-foreground">(Opcional)</span>
-          </Label>
-          <Textarea
+          </label>
+          <textarea
             id="description"
             {...register('description')}
             placeholder="Ej: Cursos de marketing digital, consultoría SEO..."
             rows={4}
-            className={errors.description ? 'border-destructive' : ''}
+            className={`tech-textarea ${errors.description ? 'border-destructive' : ''}`}
           />
           {errors.description && (
             <p className="text-sm text-destructive">{errors.description.message}</p>
@@ -109,14 +106,15 @@ export function RegistrationStep3({
 
         {/* Rango de Precio */}
         <div className="space-y-2">
-          <Label htmlFor="priceRange">
+          <label htmlFor="priceRange" className="tech-label">
             Rango de precio <span className="text-muted-foreground">(Opcional)</span>
-          </Label>
-          <Input
+          </label>
+          <input
             id="priceRange"
+            type="text"
             {...register('priceRange')}
             placeholder="Ej: $50 - $500 USD, $100.000 - $1M COP"
-            className={errors.priceRange ? 'border-destructive' : ''}
+            className={`tech-input ${errors.priceRange ? 'border-destructive' : ''}`}
           />
           {errors.priceRange && (
             <p className="text-sm text-destructive">{errors.priceRange.message}</p>
@@ -125,15 +123,15 @@ export function RegistrationStep3({
 
         {/* Cliente Ideal */}
         <div className="space-y-2">
-          <Label htmlFor="idealCustomer">
+          <label htmlFor="idealCustomer" className="tech-label">
             Describe tu cliente ideal <span className="text-muted-foreground">(Opcional)</span>
-          </Label>
-          <Textarea
+          </label>
+          <textarea
             id="idealCustomer"
             {...register('idealCustomer')}
             placeholder="Ej: Empresas B2B de 10-50 empleados en LATAM interesadas en automatización..."
             rows={4}
-            className={errors.idealCustomer ? 'border-destructive' : ''}
+            className={`tech-textarea ${errors.idealCustomer ? 'border-destructive' : ''}`}
           />
           {errors.idealCustomer && (
             <p className="text-sm text-destructive">{errors.idealCustomer.message}</p>

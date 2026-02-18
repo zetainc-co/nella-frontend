@@ -3,14 +3,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { RegistrationFormData, User } from '@/types'
+import { RegistrationFormData } from '@/types'
 import {
   saveRegistrationProgress,
   loadRegistrationProgress,
   clearRegistrationProgress,
-  saveUserAndTenant,
-  createSession,
-  markEmailAsVerified,
 } from '@/lib/registration-storage'
 
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 // Steps 1-4, Summary (5), EmailVerification (6)
@@ -20,8 +17,8 @@ export function useRegistrationWizard() {
   const [currentStep, setCurrentStep] = useState<WizardStep>(1)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [formData, setFormData] = useState<Partial<RegistrationFormData>>({})
-  const [tenantSlug, setTenantSlug] = useState<string>('')
-  const [userId, setUserId] = useState<string>('')
+  const [isCreatingWorkflow, setIsCreatingWorkflow] = useState(false)
+  const [workflowError, setWorkflowError] = useState<string | null>(null)
 
   // Cargar progreso guardado al montar
   useEffect(() => {
@@ -78,71 +75,69 @@ export function useRegistrationWizard() {
     }
   }
 
-  // Confirmar registro (desde Summary)
-  const confirmRegistration = (slug: string) => {
-    setTenantSlug(slug)
+  // Confirmar registro (desde Summary) — llama al backend real
+  const confirmRegistration = async () => {
+    setIsCreatingWorkflow(true)
+    setWorkflowError(null)
 
-    // Crear usuario y tenant en localStorage
-    const { userId: newUserId, tenantId } = saveUserAndTenant(
-      {
-        email: formData.email!,
-        password: formData.password!,
-        fullName: formData.fullName!,
-        phone: formData.phone!,
-        tenantId: '', // Will be set by saveUserAndTenant
-        tenantSlug: slug,
-        role: 'admin',
-        emailVerified: false,
-      },
-      {
-        slug,
-        name: formData.companyName!,
-        industry: formData.industry!,
+    try {
+      const payload = {
+        companyName: formData.companyName,
+        industry: formData.industry,
         industryOther: formData.industryOther,
-        companySize: formData.companySize!,
-        country: formData.country!,
-        offeringType: formData.offeringType!,
+        companySize: formData.companySize,
+        country: formData.country,
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        offeringType: formData.offeringType,
         description: formData.description,
         priceRange: formData.priceRange,
         idealCustomer: formData.idealCustomer,
-        whatsappNumber: formData.whatsappNumber!,
-        whatsappToken: formData.whatsappToken!,
+        whatsappNumber: formData.whatsappNumber,
       }
-    )
 
-    setUserId(newUserId)
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
 
-    // Ir a step de verificación
-    goToNextStep()
-  }
+      const result = await response.json()
 
-  // Verificar email y completar registro
-  const completeRegistration = () => {
-    if (!userId) return
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al crear la organización')
+      }
 
-    // Marcar email como verificado
-    markEmailAsVerified(userId)
-
-    // Obtener usuario actualizado
-    const users: User[] = JSON.parse(localStorage.getItem('nella_users') || '[]')
-    const user = users.find(u => u.id === userId)
-
-    if (user) {
-      // Crear sesión
-      createSession(user)
-
-      // Limpiar progreso del wizard
+      setIsCreatingWorkflow(false)
       clearRegistrationProgress()
 
-      // Redirigir al dashboard
-      router.push('/dashboard')
+      // Redirect to global login (base domain, no subdomain)
+      const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost'
+      const port = window.location.port
+      const portSuffix = port ? `:${port}` : ''
+      window.location.href = `http://${appDomain}${portSuffix}/login`
+    } catch (error) {
+      setIsCreatingWorkflow(false)
+      setWorkflowError(
+        error instanceof Error
+          ? error.message
+          : 'Error al crear la organización. Verifica tu conexión e intenta nuevamente.'
+      )
     }
+  }
+
+  // completeRegistration ya no es necesaria — el backend activa el tenant directamente
+  // Se mantiene por compatibilidad pero no se usa en el flujo principal
+  const completeRegistration = () => {
+    clearRegistrationProgress()
+    router.push('/dashboard')
   }
 
   // Reenviar código (simulado)
   const resendVerificationCode = () => {
     console.log('Código de verificación reenviado a:', formData.email)
-    // En producción: llamar a API para reenviar email
   }
 
   return {
@@ -150,7 +145,8 @@ export function useRegistrationWizard() {
     currentStep,
     completedSteps,
     formData,
-    tenantSlug,
+    isCreatingWorkflow,
+    workflowError,
 
     // Navegación
     goToNextStep,
