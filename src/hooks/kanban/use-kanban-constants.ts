@@ -9,9 +9,9 @@ import type { LeadStage, SourceChannel, KanbanColumnConfig } from '@/types/kanba
 
 const STAGE_LABELS: Record<LeadStage, string> = {
   new: 'Nuevo',
-  contacted: 'Contactado',
-  proposal: 'En Propuesta',
-  closed: 'Cierre'
+  contacted: 'Calificado',
+  proposal: 'Negociación',
+  closed: 'Cerrado'
 }
 
 const STAGE_ORDER: LeadStage[] = ['new', 'contacted', 'proposal', 'closed']
@@ -39,9 +39,9 @@ const CHANNEL_LABELS: Record<SourceChannel, string> = {
 
 const KANBAN_COLUMNS: KanbanColumnConfig[] = [
   { stage: 'new', title: 'Nuevo' },
-  { stage: 'contacted', title: 'Contactado' },
-  { stage: 'proposal', title: 'En Propuesta' },
-  { stage: 'closed', title: 'Cierre' }
+  { stage: 'contacted', title: 'Calificado' },
+  { stage: 'proposal', title: 'Negociación' },
+  { stage: 'closed', title: 'Cerrado' }
 ]
 
 /**

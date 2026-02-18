@@ -2,13 +2,13 @@ import { KanbanBoard } from '@/components/kanban/kanban-board'
 
 export default function KanbanPage() {
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-[#000000] p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Pipeline de Ventas
+        <h1 className="text-3xl font-bold tracking-tight text-white">
+          Tablero Kanban
         </h1>
-        <p className="text-muted-foreground text-sm">
-          Gestiona tus leads visualmente con nuestro sistema de Kanban.
+        <p className="text-gray-400 text-sm mt-1">
+          Gestiona tu pipeline de ventas con IA
         </p>
       </div>
 

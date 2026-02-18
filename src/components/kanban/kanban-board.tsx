@@ -9,13 +9,11 @@ import {
 } from '@dnd-kit/core'
 import {
   useKanbanData,
-  useKanbanPanel,
   useKanbanLoading,
   useKanbanDragDrop,
   useKanbanConstants
 } from '@/hooks/kanban'
 import { LeadCard } from './lead-card'
-import { LeadModal } from './lead-modal'
 import { KanbanColumn } from './kanban-column'
 import { KanbanFilters } from './kanban-filters'
 import { KanbanSkeleton } from './kanban-skeleton'
@@ -35,7 +33,6 @@ export function KanbanBoard() {
   const isLoading = useKanbanLoading()
   const { filteredLeads, getStageCount, getLeadsForStage } = useKanbanData()
   const { activeLead, handleDragStart, handleDragEnd } = useKanbanDragDrop()
-  const { isPanelOpen, openPanel, closePanel } = useKanbanPanel()
   const { KANBAN_COLUMNS } = useKanbanConstants()
 
   if (isLoading) {
@@ -57,7 +54,7 @@ export function KanbanBoard() {
                 stage={stage}
                 title={title}
                 leads={filteredLeads}
-                onLeadClick={openPanel}
+                onLeadClick={() => {}}
               />
             ))}
           </div>
@@ -97,7 +94,7 @@ export function KanbanBoard() {
                     <LeadCard
                       key={lead.id}
                       lead={lead}
-                      onClick={() => openPanel(lead.id)}
+                      onClick={() => {}}
                     />
                   ))
                 )}
@@ -106,9 +103,6 @@ export function KanbanBoard() {
           })}
         </Tabs>
       </div>
-
-      {/* Panel lateral */}
-      <LeadModal open={isPanelOpen} onClose={closePanel} />
     </div>
   )
 }

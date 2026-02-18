@@ -3,6 +3,8 @@ export type LeadStage = 'new' | 'contacted' | 'proposal' | 'closed'
 
 export type SourceChannel = 'instagram' | 'facebook' | 'tiktok' | 'whatsapp'
 
+export type LeadProbability = 'high' | 'medium' | 'low'
+
 export interface Lead {
   id: string
   name: string | null
@@ -15,11 +17,14 @@ export interface Lead {
   assigned_to: string | null
   created_at: string
   time_in_stage: string
+  probability?: number // Porcentaje de probabilidad de cierre (0-100)
+  probability_label?: LeadProbability // 'high', 'medium', 'low'
 }
 
 export interface KanbanFilters {
   searchQuery: string
   channels: SourceChannel[]
+  assignedTo: string | null // ID del vendedor seleccionado
   onlyMyLeads: boolean
 }
 
@@ -62,11 +67,13 @@ export interface KanbanStore {
   filters: KanbanFilters
   selectedLeadId: string | null
   currentUser: KanbanUser
+  salesAgents: KanbanUser[] // Lista de vendedores
 
   // Acciones
   moveLeadToStage: (leadId: string, newStage: LeadStage) => void
   setSearchQuery: (query: string) => void
   setChannelFilters: (channels: SourceChannel[]) => void
+  setAssignedToFilter: (userId: string | null) => void
   toggleOnlyMyLeads: () => void
   setSelectedLead: (leadId: string | null) => void
 

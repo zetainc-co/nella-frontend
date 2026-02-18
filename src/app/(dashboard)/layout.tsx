@@ -9,15 +9,17 @@ import {
   Layers,
   MessageSquare,
   Settings,
-  LogOut
+  LogOut,
+  Calendar
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/shared/theme-toggle/theme-toggle'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Contactos', href: '/contacts', icon: Users },
-  { name: 'Kanban', href: '/kanban', icon: Layers },
+  { name: 'Traiding', href: '/kanban', icon: Layers },
   { name: 'Chat', href: '/chat', icon: MessageSquare },
+  { name: 'Calendario', href: '/calendar', icon: Calendar },
+  { name: 'Contactos', href: '/contacts', icon: Users },
 ]
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {

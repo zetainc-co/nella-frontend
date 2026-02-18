@@ -1,9 +1,5 @@
 'use client'
 
-// DEPRECATED: This component has been replaced by LeadModal (lead-modal.tsx)
-// which uses Dialog instead of Sheet for a Trello-style centered modal UX.
-// This file is kept temporarily for potential rollback. Remove in future PR.
-
 import {
   Sheet,
   SheetTitle,
