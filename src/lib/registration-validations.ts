@@ -13,7 +13,7 @@ export const step1Schema = z.object({
 
   industryOther: z.string().optional(),
 
-  companySize: z.enum(['1-10', '11-50', '51-200', '200+'], {
+  companySize: z.enum(['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'], {
     message: 'Selecciona el tamaño de tu empresa'
   }),
 
@@ -79,13 +79,12 @@ export const step3Schema = z.object({
     .optional()
 })
 
-// Step 4: Conexión WhatsApp
+// Step 4: Verificación WhatsApp Business
 export const step4Schema = z.object({
   whatsappNumber: z.string()
-    .regex(/^\+[1-9]\d{1,14}$/, 'Formato inválido. Debe ser +[código][número]'),
-
-  whatsappToken: z.string()
-    .min(1, 'El token de acceso es requerido')
+    .min(1, 'El número de WhatsApp es requerido')
+    .regex(/^\+[1-9]\d{1,14}$/, 'Formato E.164 requerido (ej: +573001234567)')
+  // whatsappToken ELIMINADO — integración Meta API diferida
 })
 
 // Schema completo
