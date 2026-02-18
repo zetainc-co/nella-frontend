@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Users,
   Layers,
+  CalendarDays,
   MessageSquare,
   Settings,
   LogOut
@@ -17,6 +18,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Contactos', href: '/contacts', icon: Users },
   { name: 'Kanban', href: '/kanban', icon: Layers },
+  { name: 'Calendario', href: '/calendario', icon: CalendarDays },
   { name: 'Chat', href: '/chat', icon: MessageSquare },
 ]
 
