@@ -6,18 +6,10 @@ export async function POST(request: NextRequest) {
   try {
     const { email, password, tenantSlug } = await request.json()
 
-    // If tenantSlug is present (subdomain login), use tenant-specific endpoint
-    // Otherwise, use global-login which searches all active tenant schemas
-    const isGlobal = !tenantSlug
-
-    const backendUrl = isGlobal
-      ? `${BACKEND_URL}/auth/global-login`
-      : `${BACKEND_URL}/auth/login`
-
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    if (!isGlobal) headers['X-Tenant-Id'] = tenantSlug
+    if (tenantSlug) headers['X-Tenant-Id'] = tenantSlug
 
-    const response = await fetch(backendUrl, {
+    const response = await fetch(`${BACKEND_URL}/auth/login`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ email, password }),
