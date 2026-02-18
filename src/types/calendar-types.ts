@@ -5,6 +5,7 @@ export type CalendarLayer = 'my-agenda' | 'team-agenda' | 'ai-appointments'
 export type ConfirmationStatus = 'confirmed' | 'pending' | 'cancelled'
 export type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab' | 'dom'
 export type BlockDuration = 15 | 30 | 60
+export type LeadStage = 'new' | 'contacted' | 'proposal' | 'closed'
 
 export interface CalendarEvent {
   id: string
@@ -18,7 +19,7 @@ export interface CalendarEvent {
   videoCallLink?: string
   confirmationStatus: ConfirmationStatus
   layer: CalendarLayer
-  leadStage?: 'new' | 'contacted' | 'proposal' | 'closed'
+  leadStage?: LeadStage
   hasBudget?: 'approved' | 'pending'
   notes?: string
 }
@@ -44,7 +45,7 @@ export interface NewEventFormData {
   location?: string
   videoCallLink?: string
   confirmationStatus: ConfirmationStatus
-  leadStage?: string
+  leadStage?: LeadStage
   hasBudget?: 'approved' | 'pending'
   notes?: string
 }
