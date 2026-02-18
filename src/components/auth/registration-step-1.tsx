@@ -1,11 +1,13 @@
 // src/components/auth/registration-step-1.tsx
 'use client'
 
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { step1Schema } from '@/lib/registration-validations'
 import { LATAM_COUNTRIES, INDUSTRIES, COMPANY_SIZES } from '@/lib/countries-latam'
-import { RegistrationFormData } from '@/types'
+import type { RegistrationFormData } from '@/types'
+import type { CompanySize } from '@/types/auth-types'
 import {
   Select,
   SelectContent,
@@ -13,8 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface RegistrationStep1Props {
   initialData: Partial<RegistrationFormData>
@@ -37,12 +41,13 @@ export function RegistrationStep1({
       companyName: initialData.companyName || '',
       industry: initialData.industry || '',
       industryOther: initialData.industryOther || '',
-      companySize: initialData.companySize as '1-10' | '11-50' | '51-200' | '200+' | undefined,
+      companySize: initialData.companySize as CompanySize | undefined,
       country: initialData.country || '',
     },
   })
 
   const industry = watch('industry')
+  const companySize = watch('companySize')
   const showOtherIndustry = industry === 'other'
 
   const onSubmit = handleSubmit((data) => {
@@ -50,126 +55,146 @@ export function RegistrationStep1({
   })
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      <div className="space-y-4">
-        {/* Nombre de Empresa */}
-        <div className="space-y-2">
-          <label htmlFor="companyName" className="tech-label">
-            Nombre de la empresa <span className="text-destructive">*</span>
-          </label>
-          <input
-            id="companyName"
-            type="text"
-            {...register('companyName')}
-            placeholder="Mi Empresa S.A."
-            className={`tech-input ${errors.companyName ? 'border-destructive' : ''}`}
-          />
-          {errors.companyName && (
-            <p className="text-sm text-destructive">{errors.companyName.message}</p>
-          )}
-        </div>
+    <form onSubmit={onSubmit} className="space-y-5">
+      {/* Section title */}
+      <h2 className="text-lg font-semibold text-white mb-1">Información de la Empresa</h2>
 
-        {/* Industria */}
-        <div className="space-y-2">
-          <label htmlFor="industry" className="tech-label">
-            Industria / Sector <span className="text-destructive">*</span>
-          </label>
-          <Select
-            value={watch('industry')}
-            onValueChange={(value) => setValue('industry', value)}
-          >
-            <SelectTrigger className={`tech-select ${errors.industry ? 'border-destructive' : ''}`}>
-              <SelectValue placeholder="Selecciona tu industria" />
-            </SelectTrigger>
-            <SelectContent>
-              {INDUSTRIES.map((ind) => (
-                <SelectItem key={ind.value} value={ind.value}>
-                  {ind.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.industry && (
-            <p className="text-sm text-destructive">{errors.industry.message}</p>
-          )}
-        </div>
-
-        {/* Campo "Otro" condicional */}
-        {showOtherIndustry && (
-          <div className="space-y-2">
-            <label htmlFor="industryOther" className="tech-label">
-              Especifica tu industria <span className="text-destructive">*</span>
-            </label>
-            <input
-              id="industryOther"
-              type="text"
-              {...register('industryOther')}
-              placeholder="Ej: Consultoría financiera"
-              className={`tech-input ${errors.industryOther ? 'border-destructive' : ''}`}
-            />
-            {errors.industryOther && (
-              <p className="text-sm text-destructive">{errors.industryOther.message}</p>
-            )}
-          </div>
+      {/* Nombre de Empresa */}
+      <div className="space-y-1.5">
+        <label htmlFor="companyName" className="tech-label">
+          Nombre de la empresa <span className="text-destructive">*</span>
+        </label>
+        <Input
+          id="companyName"
+          type="text"
+          {...register('companyName')}
+          placeholder="Mi Empresa S.A."
+          className={cn('auth-input', errors.companyName && 'border-destructive')}
+        />
+        {errors.companyName && (
+          <p className="text-xs text-destructive">{errors.companyName.message}</p>
         )}
-
-        {/* Tamaño de Empresa */}
-        <div className="space-y-2">
-          <label htmlFor="companySize" className="tech-label">
-            Tamaño de la empresa <span className="text-destructive">*</span>
-          </label>
-          <Select
-            value={watch('companySize')}
-            onValueChange={(value) => setValue('companySize', value as '1-10' | '11-50' | '51-200' | '200+')}
-          >
-            <SelectTrigger className={`tech-select ${errors.companySize ? 'border-destructive' : ''}`}>
-              <SelectValue placeholder="Selecciona el tamaño" />
-            </SelectTrigger>
-            <SelectContent>
-              {COMPANY_SIZES.map((size) => (
-                <SelectItem key={size.value} value={size.value}>
-                  {size.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.companySize && (
-            <p className="text-sm text-destructive">{errors.companySize.message}</p>
-          )}
-        </div>
-
-        {/* País */}
-        <div className="space-y-2">
-          <label htmlFor="country" className="tech-label">
-            País <span className="text-destructive">*</span>
-          </label>
-          <Select
-            value={watch('country')}
-            onValueChange={(value) => setValue('country', value)}
-          >
-            <SelectTrigger className={`tech-select ${errors.country ? 'border-destructive' : ''}`}>
-              <SelectValue placeholder="Selecciona tu país" />
-            </SelectTrigger>
-            <SelectContent>
-              {LATAM_COUNTRIES.map((country) => (
-                <SelectItem key={country.code} value={country.code}>
-                  <span className="flex items-center gap-2">
-                    <span>{country.flag}</span>
-                    <span>{country.name}</span>
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.country && (
-            <p className="text-sm text-destructive">{errors.country.message}</p>
-          )}
-        </div>
       </div>
 
-      {/* Botón Siguiente */}
-      <div className="flex justify-end pt-4">
-        <Button type="submit" className="gap-2">
+      {/* Industria */}
+      <div className="space-y-1.5">
+        <label className="tech-label">
+          Industria / Sector <span className="text-destructive">*</span>
+        </label>
+        <Select
+          value={watch('industry')}
+          onValueChange={(value) => setValue('industry', value)}
+        >
+          <SelectTrigger className={cn('tech-select', errors.industry && 'border-destructive')}>
+            <SelectValue placeholder="Selecciona tu industria" />
+          </SelectTrigger>
+          <SelectContent>
+            {INDUSTRIES.map((ind) => (
+              <SelectItem key={ind.value} value={ind.value}>
+                {ind.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors.industry && (
+          <p className="text-xs text-destructive">{errors.industry.message}</p>
+        )}
+      </div>
+
+      {/* Campo "Otro" condicional */}
+      {showOtherIndustry && (
+        <div className="space-y-1.5">
+          <label htmlFor="industryOther" className="tech-label">
+            Especifica tu industria <span className="text-destructive">*</span>
+          </label>
+          <Input
+            id="industryOther"
+            type="text"
+            {...register('industryOther')}
+            placeholder="Ej: Consultoría financiera"
+            className={cn('auth-input', errors.industryOther && 'border-destructive')}
+          />
+          {errors.industryOther && (
+            <p className="text-xs text-destructive">{errors.industryOther.message}</p>
+          )}
+        </div>
+      )}
+
+      {/* Tamaño de Empresa — Pill Buttons */}
+      <div className="space-y-1.5">
+        <label className="tech-label">
+          Tamaño de la empresa <span className="text-destructive">*</span>
+        </label>
+        <div className="grid grid-cols-3 gap-2">
+          {COMPANY_SIZES.map((size) => {
+            const isSelected = companySize === size.value
+            return (
+              <button
+                key={size.value}
+                type="button"
+                onClick={() => setValue('companySize', size.value as CompanySize)}
+                className={cn(
+                  'rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                  isSelected
+                    ? 'text-[#0a1015]'
+                    : 'text-white/50 hover:text-white/80'
+                )}
+                style={
+                  isSelected
+                    ? { background: '#9EFF00', boxShadow: '0 0 14px rgba(158,255,0,0.35)' }
+                    : { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }
+                }
+              >
+                {size.label}
+              </button>
+            )
+          })}
+        </div>
+        {errors.companySize && (
+          <p className="text-xs text-destructive">{errors.companySize.message}</p>
+        )}
+      </div>
+
+      {/* País */}
+      <div className="space-y-1.5">
+        <label className="tech-label">
+          País <span className="text-destructive">*</span>
+        </label>
+        <Select
+          value={watch('country')}
+          onValueChange={(value) => setValue('country', value)}
+        >
+          <SelectTrigger className={cn('tech-select', errors.country && 'border-destructive')}>
+            <SelectValue placeholder="Selecciona tu país" />
+          </SelectTrigger>
+          <SelectContent>
+            {LATAM_COUNTRIES.map((country) => (
+              <SelectItem key={country.code} value={country.code}>
+                <span className="flex items-center gap-2">
+                  <span>{country.flag}</span>
+                  <span>{country.name}</span>
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors.country && (
+          <p className="text-xs text-destructive">{errors.country.message}</p>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center justify-between pt-2">
+        <Link
+          href="/login"
+          className="text-sm transition-colors"
+          style={{ color: 'rgba(240,244,255,0.35)' }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'rgba(240,244,255,0.6)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(240,244,255,0.35)' }}
+        >
+          ← Volver al login
+        </Link>
+        <Button type="submit" className="btn-primary w-auto px-6 gap-1.5">
           Siguiente
           <ChevronRight className="h-4 w-4" />
         </Button>

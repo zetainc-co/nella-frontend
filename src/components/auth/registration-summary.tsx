@@ -1,20 +1,29 @@
 // src/components/auth/registration-summary.tsx
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { RegistrationFormData } from '@/types'
-import { generateSlug } from '@/lib/registration-storage'
-import { LATAM_COUNTRIES, INDUSTRIES, COMPANY_SIZES } from '@/lib/countries-latam'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, Edit2, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
+import { RegistrationFormData } from "@/types";
+import { generateSlug } from "@/lib/registration-storage";
+import {
+  LATAM_COUNTRIES,
+  INDUSTRIES,
+  COMPANY_SIZES,
+} from "@/lib/countries-latam";
+import { Button } from "@/components/ui/button";
+import {
+  ChevronLeft,
+  Edit2,
+  CheckCircle2,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 
 interface RegistrationSummaryProps {
-  formData: Partial<RegistrationFormData>
-  onConfirm: (slug: string) => void
-  onBack: () => void
-  onEdit: (step: number) => void
-  isCreatingWorkflow?: boolean
-  workflowError?: string | null
+  formData: Partial<RegistrationFormData>;
+  onConfirm: () => void;
+  onBack: () => void;
+  onEdit: (step: number) => void;
+  isCreatingWorkflow?: boolean;
+  workflowError?: string | null;
 }
 
 export function RegistrationSummary({
@@ -25,43 +34,24 @@ export function RegistrationSummary({
   isCreatingWorkflow = false,
   workflowError = null,
 }: RegistrationSummaryProps) {
-  const [tenantSlug, setTenantSlug] = useState(
-    generateSlug(formData.companyName || '')
-  )
-  const [isEditingSlug, setIsEditingSlug] = useState(false)
+  const tenantSlug = generateSlug(formData.companyName || "");
 
   // Obtener labels de datos
   const getCountryName = (code: string) => {
-    return LATAM_COUNTRIES.find(c => c.code === code)?.name || code
-  }
+    return LATAM_COUNTRIES.find((c) => c.code === code)?.name || code;
+  };
 
   const getIndustryLabel = (value: string) => {
-    return INDUSTRIES.find(i => i.value === value)?.label || value
-  }
+    return INDUSTRIES.find((i) => i.value === value)?.label || value;
+  };
 
   const getCompanySizeLabel = (value: string) => {
-    return COMPANY_SIZES.find(s => s.value === value)?.label || value
-  }
-
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Solo permitir caracteres válidos para slug
-    const value = e.target.value
-      .toLowerCase()
-      .replace(/[^a-z0-9-]/g, '')
-      .replace(/^-+|-+$/g, '') // Quitar guiones al inicio y final
-      .replace(/-+/g, '-') // Múltiples guiones a uno solo
-
-    setTenantSlug(value)
-  }
+    return COMPANY_SIZES.find((s) => s.value === value)?.label || value;
+  };
 
   const handleConfirm = () => {
-    if (!tenantSlug || tenantSlug.length < 3) {
-      alert('El slug debe tener al menos 3 caracteres')
-      return
-    }
-
-    onConfirm(tenantSlug)
-  }
+    onConfirm();
+  };
 
   return (
     <div className="space-y-6">
@@ -96,18 +86,22 @@ export function RegistrationSummary({
           <div className="flex justify-between">
             <span className="text-muted-foreground">Industria:</span>
             <span className="font-medium">
-              {formData.industry === 'other'
+              {formData.industry === "other"
                 ? formData.industryOther
-                : getIndustryLabel(formData.industry || '')}
+                : getIndustryLabel(formData.industry || "")}
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Tamaño:</span>
-            <span className="font-medium">{getCompanySizeLabel(formData.companySize || '')}</span>
+            <span className="font-medium">
+              {getCompanySizeLabel(formData.companySize || "")}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">País:</span>
-            <span className="font-medium">{getCountryName(formData.country || '')}</span>
+            <span className="font-medium">
+              {getCountryName(formData.country || "")}
+            </span>
           </div>
         </div>
       </div>
@@ -162,7 +156,7 @@ export function RegistrationSummary({
           <div className="flex justify-between">
             <span className="text-muted-foreground">Tipo:</span>
             <span className="font-medium">
-              {formData.offeringType === 'product' ? 'Producto' : 'Servicio'}
+              {formData.offeringType === "product" ? "Producto" : "Servicio"}
             </span>
           </div>
           {formData.description && (
@@ -202,45 +196,18 @@ export function RegistrationSummary({
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-green-500" />
-            <span className="text-muted-foreground">Token configurado y validado</span>
+            <span className="text-muted-foreground">Número verificado</span>
           </div>
         </div>
       </div>
 
-      {/* Slug del Tenant */}
-      <div className="space-y-3 rounded-lg border border-primary/50 bg-primary/5 p-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">URL de tu workspace</h3>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsEditingSlug(!isEditingSlug)}
-            className="gap-1"
-          >
-            <Edit2 className="h-3 w-3" />
-            {isEditingSlug ? 'Listo' : 'Editar'}
-          </Button>
+      {/* Slug del Tenant — generado automáticamente por el backend */}
+      {/*
+      //<div className="space-y-3 rounded-lg border border-primary/50 bg-primary/5 p-4">
+        <h3 className="font-semibold">URL de tu workspace</h3>
+        <div className="rounded bg-background p-3 font-mono text-sm">
+          nella.app/<span className="font-bold text-primary">{tenantSlug}</span>
         </div>
-
-        {isEditingSlug ? (
-          <div className="space-y-2">
-            <label htmlFor="tenantSlug" className="tech-label">Slug (solo letras minúsculas, números y guiones)</label>
-            <input
-              id="tenantSlug"
-              type="text"
-              value={tenantSlug}
-              onChange={handleSlugChange}
-              placeholder="mi-empresa"
-              className="tech-input font-mono"
-            />
-          </div>
-        ) : (
-          <div className="rounded bg-background p-3 font-mono text-sm">
-            nella.app/<span className="font-bold text-primary">{tenantSlug}</span>
-          </div>
-        )}
-
         <p className="text-xs text-muted-foreground">
           Esta será la URL de acceso a tu panel de Nella
         </p>
@@ -252,8 +219,12 @@ export function RegistrationSummary({
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="font-semibold text-destructive">Error al crear workflow</p>
-              <p className="text-sm text-destructive/80 mt-1">{workflowError}</p>
+              <p className="font-semibold text-destructive">
+                Error al crear workflow
+              </p>
+              <p className="text-sm text-destructive/80 mt-1">
+                {workflowError}
+              </p>
               <p className="text-xs text-muted-foreground mt-2">
                 Intenta nuevamente o contacta a soporte si el problema persiste.
               </p>
@@ -282,7 +253,7 @@ export function RegistrationSummary({
           {isCreatingWorkflow ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Creando workflow...
+              Creando cuenta...
             </>
           ) : (
             <>
@@ -293,5 +264,5 @@ export function RegistrationSummary({
         </Button>
       </div>
     </div>
-  )
+  );
 }

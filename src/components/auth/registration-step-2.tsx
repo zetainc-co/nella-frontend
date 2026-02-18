@@ -5,12 +5,11 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useEffect } from 'react'
 import { step2Schema } from '@/lib/registration-validations'
-import { validateEmailUnique } from '@/lib/registration-storage'
 import { calculatePasswordStrength } from '@/lib/registration-validations'
 import { RegistrationFormData } from '@/types'
 import { Button } from '@/components/ui/button'
 import { CountryPhoneSelector } from '@/components/auth/country-phone-selector'
-import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface RegistrationStep2Props {
   initialData: Partial<RegistrationFormData>
@@ -23,16 +22,12 @@ export function RegistrationStep2({
   onNext,
   onBack,
 }: RegistrationStep2Props) {
-  const [isValidatingEmail, setIsValidatingEmail] = useState(false)
-  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null)
   const [passwordStrength, setPasswordStrength] = useState(0)
 
   const {
     register,
     handleSubmit,
     watch,
-    setError,
-    clearErrors,
     control,
     formState: { errors },
   } = useForm({
@@ -47,7 +42,6 @@ export function RegistrationStep2({
   })
 
   const password = watch('password')
-  const email = watch('email')
 
   // Calcular fuerza de contraseña
   useEffect(() => {
@@ -57,32 +51,6 @@ export function RegistrationStep2({
       setPasswordStrength(0)
     }
   }, [password])
-
-  // Validar email único al perder foco
-  const handleEmailBlur = async () => {
-    if (!email || errors.email) return
-
-    setIsValidatingEmail(true)
-    setEmailAvailable(null)
-
-    try {
-      const isUnique = await validateEmailUnique(email)
-      setEmailAvailable(isUnique)
-
-      if (!isUnique) {
-        setError('email', {
-          type: 'manual',
-          message: 'Este email ya está registrado',
-        })
-      } else {
-        clearErrors('email')
-      }
-    } catch (error) {
-      console.error('Error validando email:', error)
-    } finally {
-      setIsValidatingEmail(false)
-    }
-  }
 
   const onSubmit = handleSubmit((data) => {
     // Remover confirmPassword antes de guardar
@@ -115,26 +83,13 @@ export function RegistrationStep2({
           <label htmlFor="email" className="tech-label">
             Email corporativo <span className="text-destructive">*</span>
           </label>
-          <div className="relative">
-            <input
-              id="email"
-              type="email"
-              {...register('email')}
-              onBlur={handleEmailBlur}
-              placeholder="juan@miempresa.com"
-              className={`tech-input ${errors.email ? 'border-destructive' : ''}`}
-            />
-            {isValidatingEmail && (
-              <div className="absolute right-3 top-3">
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              </div>
-            )}
-            {!isValidatingEmail && emailAvailable === true && (
-              <div className="absolute right-3 top-3">
-                <Check className="h-4 w-4 text-primary" />
-              </div>
-            )}
-          </div>
+          <input
+            id="email"
+            type="email"
+            {...register('email')}
+            placeholder="juan@miempresa.com"
+            className={`tech-input ${errors.email ? 'border-destructive' : ''}`}
+          />
           {errors.email && (
             <p className="text-sm text-destructive">{errors.email.message}</p>
           )}
