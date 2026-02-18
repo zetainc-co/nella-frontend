@@ -108,7 +108,7 @@ interface CalendarStore {
 
 export const useCalendarStore = create<CalendarStore>((set, get) => ({
   events: MOCK_EVENTS,
-  currentWeekStart: startOfWeek(new Date('2026-02-16'), { weekStartsOn: 1 }),
+  currentWeekStart: startOfWeek(new Date(), { weekStartsOn: 1 }),
   activeProjectFilters: [],
   activeLayerFilters: [],
   blockDuration: 30,
