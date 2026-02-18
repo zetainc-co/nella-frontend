@@ -1,7 +1,7 @@
 // src/components/calendario/modals/availability-modal.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Trash2, Copy } from 'lucide-react'
 import {
   Dialog,
@@ -38,6 +38,13 @@ export function AvailabilityModal({ open, onClose }: AvailabilityModalProps) {
 
   const [localAvailability, setLocalAvailability] = useState<AvailabilityDay[]>(availability)
   const [localDuration, setLocalDuration] = useState<BlockDuration>(blockDuration)
+
+  useEffect(() => {
+    if (open) {
+      setLocalAvailability(availability)
+      setLocalDuration(blockDuration)
+    }
+  }, [open, availability, blockDuration])
 
   function toggleDay(dayKey: DayKey) {
     setLocalAvailability(prev =>

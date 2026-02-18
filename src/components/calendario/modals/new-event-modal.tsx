@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useCalendarStore } from '@/stores/calendar-store'
 import { TIME_OPTIONS } from '@/types/calendar-types'
-import type { ProjectName, ConfirmationStatus } from '@/types/calendar-types'
+import type { ProjectName, ConfirmationStatus, LeadStage } from '@/types/calendar-types'
 
 interface NewEventModalProps {
   open: boolean
@@ -87,7 +87,7 @@ export function NewEventModal({ open, onClose, initialDate, initialTime }: NewEv
       videoCallLink: videoCallLink || undefined,
       confirmationStatus,
       layer: 'my-agenda',
-      leadStage: (leadStage || undefined) as import('@/types/calendar-types').LeadStage | undefined,
+      leadStage: (leadStage || undefined) as LeadStage | undefined,
       hasBudget,
       notes: notes || undefined,
     })
