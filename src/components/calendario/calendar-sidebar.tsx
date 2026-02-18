@@ -1,4 +1,5 @@
 // src/components/calendario/calendar-sidebar.tsx
+// Server Component — no hooks required; composes Client Component children
 import { MiniCalendar } from './mini-calendar'
 import { ProjectFilters } from './project-filters'
 import { UpcomingEvents } from './upcoming-events'

@@ -21,10 +21,10 @@ export function UpcomingEvents() {
 
   return (
     <div className="px-3 py-2">
-      <span className="text-sm font-semibold text-foreground block mb-2">Proximos Eventos</span>
+      <span className="text-sm font-semibold text-foreground block mb-2">Próximos Eventos</span>
 
       {upcoming.length === 0 ? (
-        <p className="text-xs text-muted-foreground">No hay eventos proximos</p>
+        <p className="text-xs text-muted-foreground">No hay eventos próximos</p>
       ) : (
         <div className="space-y-2">
           {upcoming.map(event => {
