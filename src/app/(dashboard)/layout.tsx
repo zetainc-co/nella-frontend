@@ -19,14 +19,16 @@ import {
   Link as LinkIcon,
   CreditCard,
   Shield,
+  Calendar,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/shared/theme-toggle/theme-toggle";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Contactos", href: "/contacts", icon: Users },
-  { name: "Kanban", href: "/kanban", icon: Layers },
+  { name: "Trending", href: "/trending", icon: Layers },
   { name: "Chat", href: "/chat", icon: MessageSquare },
+  { name: "Calendario", href: "/calendar", icon: Calendar },
+  { name: "Contactos", href: "/contacts", icon: Users },
 ];
 
 type SettingsItem = {
@@ -38,15 +40,15 @@ type SettingsItem = {
 };
 
 const settingsSubmenu: SettingsItem[] = [
-  { name: "Mi Perfil", href: "/configuracion/perfil", icon: User },
-  { name: "Organización", href: "/configuracion/organizacion", icon: Building },
-  //{ name: "Workflows", href: "/configuracion/workflows", icon: Workflow },
-  { name: "Conexiones", href: "/configuracion/conexiones", icon: LinkIcon },
-  { name: "Equipo y Permisos", href: "/configuracion/equipo", icon: Users },
-  { name: "Facturación", href: "/configuracion/facturacion", icon: CreditCard },
+  { name: "Mi Perfil", href: "/settings/profile", icon: User },
+  { name: "Organización", href: "/settings/organization", icon: Building },
+  //{ name: "Workflows", href: "/settings/workflows", icon: Workflow },
+  { name: "Conexiones", href: "/settings/connections", icon: LinkIcon },
+  { name: "Equipo y Permisos", href: "/settings/team", icon: Users },
+  { name: "Facturación", href: "/settings/billing", icon: CreditCard },
   {
     name: "Administración",
-    href: "/configuracion/administracion",
+    href: "/settings/administration",
     icon: Shield,
     adminOnly: true,
   },
@@ -58,8 +60,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Auto-expand if on configuracion route
-    if (pathname.startsWith("/configuracion")) {
+    // Auto-expand if on settings route
+    if (pathname.startsWith("/settings")) {
       setSettingsOpen(true);
     }
     // Check admin status
@@ -108,7 +110,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <button
             onClick={() => setSettingsOpen(!settingsOpen)}
             className={`flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-              pathname.startsWith("/configuracion")
+              pathname.startsWith("/settings")
                 ? "bg-primary/10 text-primary border border-primary/20"
                 : "text-muted-foreground hover:bg-accent hover:text-foreground"
             }`}
