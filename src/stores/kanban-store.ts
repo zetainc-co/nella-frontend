@@ -1,210 +1,125 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
-import type { Lead, LeadStage, KanbanFilters, KanbanUser, SourceChannel } from '@/types/kanban-types'
-
-// ============================================
-// Mock Data - 12 Leads
-// ============================================
+import type { Lead, LeadStage, KanbanFilters, KanbanUser, SourceChannel, KanbanStore } from '@/types/kanban-types'
 
 const MOCK_LEADS: Lead[] = [
-  // Nuevo (3 leads)
   {
     id: '1',
-    name: 'Juan Pérez',
+    name: 'Ana Gómez',
     phone: '+57 300 123 4567',
-    email: 'juan@techsolutions.co',
-    company: 'Tech Solutions SAS',
+    email: 'ana@techcorp.co',
+    company: 'TechCorp SA',
     stage: 'new',
     source_channel: 'instagram',
-    ai_summary: 'Interesado en plan premium para su empresa. Preguntó por precios y demo del sistema.',
+    ai_summary: 'Interesada en plan Premium, presupuesto aprobado',
     assigned_to: 'user-1',
     created_at: '2026-02-14T08:30:00Z',
-    time_in_stage: '2 horas'
+    time_in_stage: '2 horas',
+    probability: 85,
+    probability_label: 'high'
   },
   {
     id: '2',
-    name: null,
+    name: 'Carlos Ruiz',
     phone: '+57 301 234 5678',
-    email: null,
-    company: null,
+    email: 'carlos@innova.co',
+    company: 'Innova Digital',
     stage: 'new',
     source_channel: 'facebook',
-    ai_summary: 'Lead recién llegado desde campaña de Facebook. Primera interacción pendiente.',
-    assigned_to: null,
-    created_at: '2026-02-14T09:15:00Z',
-    time_in_stage: '1 hora'
-  },
-  {
-    id: '3',
-    name: 'María García',
-    phone: '+57 302 345 6789',
-    email: 'maria.garcia@gmail.com',
-    company: null,
-    stage: 'new',
-    source_channel: 'tiktok',
-    ai_summary: 'Consultó por servicios de marketing digital. Responde muy rápido en WhatsApp.',
+    ai_summary: 'Requiere demo técnica, decisión en 2 semanas',
     assigned_to: 'user-2',
-    created_at: '2026-02-14T07:00:00Z',
-    time_in_stage: '3 horas'
+    created_at: '2026-02-14T09:15:00Z',
+    time_in_stage: '1 hora',
+    probability: 72,
+    probability_label: 'medium'
   },
 
-  // Contactado (4 leads)
+  // Calificado (2 leads)
   {
     id: '4',
-    name: 'Carlos Rodríguez',
+    name: 'Laura Martínez',
     phone: '+57 303 456 7890',
-    email: 'carlos@startupxyz.co',
-    company: 'StartupXYZ',
+    email: 'laura@global.co',
+    company: 'Global Solutions',
     stage: 'contacted',
     source_channel: 'whatsapp',
-    ai_summary: 'IA conversando activamente. Interés en automatización de ventas. Solicitó cotización.',
+    ai_summary: 'Alta intención de compra, comparando con competencia',
     assigned_to: 'user-1',
     created_at: '2026-02-13T15:30:00Z',
-    time_in_stage: '1 día'
+    time_in_stage: '1 día',
+    probability: 90,
+    probability_label: 'high'
   },
   {
     id: '5',
-    name: 'Ana Martínez',
+    name: 'Pedro Sánchez',
     phone: '+57 304 567 8901',
-    email: 'ana.martinez@empresa.com',
-    company: 'Distribuidora Nacional',
+    email: 'pedro@startupxyz.co',
+    company: 'StartUp XYZ',
     stage: 'contacted',
     source_channel: 'instagram',
-    ai_summary: 'Necesita solución para equipo de 10 vendedores. Respondió 3 veces en las últimas 6 horas.',
-    assigned_to: 'user-1',
+    ai_summary: 'Necesita propuesta personalizada, bajo presupuesto',
+    assigned_to: 'user-2',
     created_at: '2026-02-13T12:00:00Z',
-    time_in_stage: '1 día'
+    time_in_stage: '1 día',
+    probability: 45,
+    probability_label: 'low'
   },
-  {
-    id: '6',
-    name: 'Luis Fernández',
-    phone: '+57 305 678 9012',
-    email: null,
-    company: null,
-    stage: 'contacted',
-    source_channel: 'facebook',
-    ai_summary: 'Preguntó por integración con WhatsApp Business API. Dudas sobre costo mensual.',
-    assigned_to: 'user-2',
-    created_at: '2026-02-14T06:00:00Z',
-    time_in_stage: '4 horas'
-  },
-  {
-    id: '7',
-    name: 'Sandra López',
-    phone: '+57 306 789 0123',
-    email: 'sandra@tiendaonline.co',
-    company: 'Tienda Online Colombia',
-    stage: 'contacted',
-    source_channel: 'tiktok',
-    ai_summary: 'E-commerce buscando automatizar atención al cliente. Interés alto, pidió caso de éxito.',
-    assigned_to: 'user-2',
-    created_at: '2026-02-13T18:00:00Z',
-    time_in_stage: '16 horas'
-  },
-
-  // Propuesta (3 leads)
+  // Negociación (2 leads)
   {
     id: '8',
-    name: 'Roberto Gómez',
+    name: 'Diana Torres',
     phone: '+57 307 890 1234',
-    email: 'roberto.gomez@agencia.co',
-    company: 'Agencia Digital Pro',
+    email: 'diana@medicplus.co',
+    company: 'Medic Plus',
     stage: 'proposal',
     source_channel: 'whatsapp',
-    ai_summary: 'Propuesta enviada para plan Enterprise. Esperando aprobación del presupuesto interno.',
+    ai_summary: 'En proceso de aprobación interna, muy interesada',
     assigned_to: 'user-1',
     created_at: '2026-02-12T10:00:00Z',
-    time_in_stage: '2 días'
+    time_in_stage: '2 días',
+    probability: 78,
+    probability_label: 'medium'
   },
   {
     id: '9',
-    name: 'Patricia Ruiz',
+    name: 'Patricia Vargas',
     phone: '+57 308 901 2345',
-    email: 'patricia@constructora.co',
-    company: 'Constructora del Valle',
+    email: 'patricia@retailpro.co',
+    company: 'Retail Pro',
     stage: 'proposal',
     source_channel: 'instagram',
-    ai_summary: 'Interesada en demo personalizado. Propuesta presentada ayer, siguiente paso: reunión.',
-    assigned_to: 'user-1',
-    created_at: '2026-02-11T14:30:00Z',
-    time_in_stage: '3 días'
-  },
-  {
-    id: '10',
-    name: 'Diego Torres',
-    phone: '+57 309 012 3456',
-    email: 'diego.torres@retail.co',
-    company: 'Retail Solutions',
-    stage: 'proposal',
-    source_channel: 'facebook',
-    ai_summary: 'Comparando con competencia. IA presentó diferenciadores clave. Responde activamente.',
+    ai_summary: 'Lista para cerrar, esperando orden de compra',
     assigned_to: 'user-2',
-    created_at: '2026-02-13T09:00:00Z',
-    time_in_stage: '1 día'
+    created_at: '2026-02-11T14:30:00Z',
+    time_in_stage: '3 días',
+    probability: 95,
+    probability_label: 'high'
   },
-
-  // Cierre (2 leads)
+  // Cerrado (1 lead)
   {
     id: '11',
-    name: 'Claudia Herrera',
+    name: 'Roberto Díaz',
     phone: '+57 310 123 4567',
-    email: 'claudia@consultoria.co',
-    company: 'Consultoría Empresarial',
+    email: 'roberto@fashiongroup.co',
+    company: 'Fashion Group',
     stage: 'closed',
     source_channel: 'whatsapp',
-    ai_summary: 'Aceptó propuesta. Agendó llamada de onboarding para mañana. Deal confirmado.',
+    ai_summary: 'Contrato firmado, implementación en progreso',
     assigned_to: 'user-1',
     created_at: '2026-02-10T11:00:00Z',
-    time_in_stage: '4 días'
-  },
-  {
-    id: '12',
-    name: 'Fernando Castro',
-    phone: '+57 311 234 5678',
-    email: 'fernando@logistica.co',
-    company: 'Logística Express',
-    stage: 'closed',
-    source_channel: 'instagram',
-    ai_summary: 'Cerrado exitosamente. Firmó contrato anual. Implementación programada para próxima semana.',
-    assigned_to: 'user-1',
-    created_at: '2026-02-09T16:00:00Z',
-    time_in_stage: '5 días'
+    time_in_stage: '4 días',
+    probability: 100,
+    probability_label: 'high'
   }
 ]
 
-// ============================================
-// Store Interface
-// ============================================
-
-interface KanbanStore {
-  // Estado
-  leads: Lead[]
-  filters: KanbanFilters
-  selectedLeadId: string | null
-  currentUser: KanbanUser
-
-  // Acciones
-  moveLeadToStage: (leadId: string, newStage: LeadStage) => void
-  setSearchQuery: (query: string) => void
-  setChannelFilters: (channels: SourceChannel[]) => void
-  toggleOnlyMyLeads: () => void
-  setSelectedLead: (leadId: string | null) => void
-
-  // Selectores
-  getFilteredLeads: () => Lead[]
-  getLeadsByStage: (stage: LeadStage) => Lead[]
-}
-
-// ============================================
-// Store Implementation
-// ============================================
-
 export const useKanbanStore = create<KanbanStore>((set, get) => ({
-  // Estado inicial
   leads: MOCK_LEADS,
   filters: {
     searchQuery: '',
     channels: [],
+    assignedTo: null,
     onlyMyLeads: false
   },
   selectedLeadId: null,
@@ -213,29 +128,32 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
     role: 'admin',
     name: 'Usuario Demo'
   },
+  salesAgents: [
+    {
+      id: 'user-1',
+      role: 'admin',
+      name: 'María González'
+    },
+    {
+      id: 'user-2',
+      role: 'sales_agent',
+      name: 'Carlos Ramírez'
+    }
+  ],
 
-  // Acción: Mover lead a nueva etapa
   moveLeadToStage: (leadId: string, newStage: LeadStage) => {
     const lead = get().leads.find(l => l.id === leadId)
     if (!lead) return
 
-    // Validación 1: No retroceder etapas
-    const stageOrder: LeadStage[] = ['new', 'contacted', 'proposal', 'closed']
-    const currentIndex = stageOrder.indexOf(lead.stage)
-    const newIndex = stageOrder.indexOf(newStage)
+    // Si es la misma etapa, no hacer nada
+    if (lead.stage === newStage) return
 
-    if (newIndex < currentIndex) {
-      toast.error('No puedes retroceder un lead a una etapa anterior')
-      return
-    }
-
-    // Validación 2: Solo Admin puede cerrar
+    // Solo validar permisos para cerrar
     if (newStage === 'closed' && get().currentUser.role !== 'admin') {
       toast.error('Solo administradores pueden cerrar leads')
       return
     }
 
-    // Actualizar estado
     set(state => ({
       leads: state.leads.map(l =>
         l.id === leadId
@@ -246,46 +164,46 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
 
     const stageNames = {
       new: 'Nuevo',
-      contacted: 'Contactado',
-      proposal: 'Propuesta',
-      closed: 'Cierre'
+      contacted: 'Calificado',
+      proposal: 'Negociación',
+      closed: 'Cerrado'
     }
 
     toast.success(`Lead movido a ${stageNames[newStage]}`)
   },
 
-  // Acción: Actualizar búsqueda
   setSearchQuery: (query: string) => {
     set(state => ({
       filters: { ...state.filters, searchQuery: query }
     }))
   },
 
-  // Acción: Actualizar filtro de canales
   setChannelFilters: (channels: SourceChannel[]) => {
     set(state => ({
       filters: { ...state.filters, channels }
     }))
   },
 
-  // Acción: Toggle "Solo mis leads"
+  setAssignedToFilter: (userId: string | null) => {
+    set(state => ({
+      filters: { ...state.filters, assignedTo: userId }
+    }))
+  },
+
   toggleOnlyMyLeads: () => {
     set(state => ({
       filters: { ...state.filters, onlyMyLeads: !state.filters.onlyMyLeads }
     }))
   },
 
-  // Acción: Seleccionar lead (para panel lateral)
   setSelectedLead: (leadId: string | null) => {
     set({ selectedLeadId: leadId })
   },
 
-  // Selector: Obtener leads filtrados
   getFilteredLeads: () => {
     const { leads, filters, currentUser } = get()
 
     return leads.filter(lead => {
-      // Filtro de búsqueda
       if (filters.searchQuery) {
         const query = filters.searchQuery.toLowerCase()
         const matchName = lead.name?.toLowerCase().includes(query)
@@ -293,12 +211,14 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
         if (!matchName && !matchPhone) return false
       }
 
-      // Filtro de canales
       if (filters.channels.length > 0) {
         if (!filters.channels.includes(lead.source_channel)) return false
       }
 
-      // Filtro "Solo mis leads"
+      if (filters.assignedTo) {
+        if (lead.assigned_to !== filters.assignedTo) return false
+      }
+
       if (filters.onlyMyLeads) {
         if (lead.assigned_to !== currentUser.id) return false
       }
@@ -307,7 +227,6 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
     })
   },
 
-  // Selector: Obtener leads por etapa
   getLeadsByStage: (stage: LeadStage) => {
     return get().getFilteredLeads().filter(lead => lead.stage === stage)
   }

@@ -1,84 +1,65 @@
 'use client'
 
-import { Search } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import {
   Select,
-  SelectContent,
   SelectItem,
+  SelectValue,
+  SelectContent,
   SelectTrigger,
-  SelectValue
 } from '@/components/ui/select'
+import { Search } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import { useKanbanStore } from '@/stores/kanban-store'
-import type { SourceChannel } from '@/types/kanban-types'
 
 export function KanbanFilters() {
   const {
     filters,
     leads,
+    salesAgents,
     setSearchQuery,
-    setChannelFilters,
-    toggleOnlyMyLeads,
+    setAssignedToFilter,
     getFilteredLeads
   } = useKanbanStore()
 
   const filteredLeads = getFilteredLeads()
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 p-4 bg-card border border-border rounded-lg">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
       {/* Búsqueda */}
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      <div className="relative flex-1 max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
         <Input
           type="text"
-          placeholder="Buscar por nombre o teléfono..."
+          placeholder="Buscar lead..."
           value={filters.searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 focus:ring-[#CEF25D]"
+          className="pl-9"
         />
       </div>
 
-      {/* Filtro de Canal */}
+      {/* Filtro de Vendedor */}
       <Select
-        value={filters.channels[0] || 'all'}
+        value={filters.assignedTo || 'all'}
         onValueChange={(value) => {
           if (value === 'all') {
-            setChannelFilters([])
+            setAssignedToFilter(null)
           } else {
-            setChannelFilters([value as SourceChannel])
+            setAssignedToFilter(value)
           }
         }}
       >
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Todos los canales" />
+        <SelectTrigger className="w-full sm:w-[200px]">
+          <SelectValue placeholder="Vendedor: Todos" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos los canales</SelectItem>
-          <SelectItem value="instagram">Instagram</SelectItem>
-          <SelectItem value="facebook">Facebook</SelectItem>
-          <SelectItem value="tiktok">TikTok</SelectItem>
-          <SelectItem value="whatsapp">WhatsApp</SelectItem>
+          <SelectItem value="all">Vendedor: Todos</SelectItem>
+          {salesAgents.map((agent) => (
+            <SelectItem key={agent.id} value={agent.id}>
+              {agent.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
-
-      {/* Solo mis leads */}
-      <div className="flex items-center gap-2">
-        <Switch
-          id="only-my-leads"
-          checked={filters.onlyMyLeads}
-          onCheckedChange={toggleOnlyMyLeads}
-        />
-        <Label htmlFor="only-my-leads" className="text-sm cursor-pointer">
-          Solo mis leads
-        </Label>
-      </div>
-
-      {/* Contador */}
-      <span className="text-sm text-muted-foreground whitespace-nowrap">
-        Mostrando {filteredLeads.length} de {leads.length} leads
-      </span>
     </div>
   )
 }

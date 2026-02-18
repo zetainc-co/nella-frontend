@@ -1,16 +1,16 @@
 'use client'
 
-import { Phone, Mail, Building2, Instagram, Facebook, Music, MessageCircle } from 'lucide-react'
 import {
   Sheet,
-  SheetContent,
+  SheetTitle,
   SheetHeader,
-  SheetTitle
+  SheetContent,
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useKanbanStore } from '@/stores/kanban-store'
 import type { LeadDetailsPanelProps } from '@/types/kanban-types'
+import { Phone, Mail, Building2, Instagram, Facebook, Music, MessageCircle } from 'lucide-react'
 
 const channelIcons = {
   instagram: Instagram,
