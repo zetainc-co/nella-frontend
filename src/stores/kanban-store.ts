@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
 import type { BackendContact } from '@/types/contacts'
+import { useAuthStore } from '@/stores/auth-store'
 import { mapLeadStatusToStage, mapLeadStatusToBadge } from '@/hooks/kanban/use-kanban-constants'
 import type { Lead, LeadStage, KanbanStore } from '@/types/kanban-types'
 
@@ -38,7 +39,10 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
     }
 
     try {
-      const res = await fetch('/api/contacts')
+      const token = useAuthStore.getState().session?.accessToken
+      const headers: Record<string, string> = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
+      const res = await fetch('/api/contacts', { headers })
       if (!res.ok) throw new Error('Error al cargar contactos')
       const contacts: BackendContact[] = await res.json()
       const leads = contacts.map(transformContactToLead)
