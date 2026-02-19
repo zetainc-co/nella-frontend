@@ -9,7 +9,7 @@ import {
 } from '@dnd-kit/core'
 import {
   useKanbanData,
-  useKanbanLoading,
+  useKanbanSSE,
   useKanbanDragDrop,
   useKanbanConstants
 } from '@/hooks/kanban'
@@ -30,7 +30,7 @@ export function KanbanBoard() {
   )
 
   // Hooks personalizados
-  const isLoading = useKanbanLoading()
+  const isLoading = useKanbanSSE()
   const { filteredLeads, getStageCount, getLeadsForStage } = useKanbanData()
   const { activeLead, handleDragStart, handleDragEnd } = useKanbanDragDrop()
   const { KANBAN_COLUMNS } = useKanbanConstants()

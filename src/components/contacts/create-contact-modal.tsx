@@ -14,30 +14,50 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Modal, ModalSection } from "@/components/shared/modal/modal"
 import { User, Building2, Globe, MessageSquare, Tag, X } from "lucide-react"
+import type { CreateContactModalProps } from "@/types/contact-types"
+import { useCreateContact, useUpdateContact } from "@/hooks/useContacts"
+import { useEffect } from "react"
 
-interface CreateContactModalProps {
-    open: boolean
-    onOpenChange: (open: boolean) => void
+const EMPTY_FORM = {
+    name: "", email: "", phone: "", company: "",
+    role: "", location: "", stage: "Lead", channel: "WhatsApp",
+    channelDetails: "", linkedin: "", instagram: "", website: "",
+    notes: "",
 }
 
-export function CreateContactModal({ open, onOpenChange }: CreateContactModalProps) {
-    const [form, setForm] = useState({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        role: "",
-        location: "",
-        stage: "Lead",
-        channel: "WhatsApp",
-        channelDetails: "",
-        linkedin: "",
-        instagram: "",
-        website: "",
-        notes: "",
-    })
+export function CreateContactModal({ open, onOpenChange, contact }: CreateContactModalProps) {
+    const createContact = useCreateContact()
+    const updateContact = useUpdateContact()
+    const isEditMode = !!contact
+
+    const [form, setForm] = useState(EMPTY_FORM)
     const [tags, setTags] = useState<string[]>([])
     const [tagInput, setTagInput] = useState("")
+
+    // Pre-llenar el form cuando se abre en modo edición
+    useEffect(() => {
+        if (open && contact) {
+            setForm({
+                name: contact.name || "",
+                email: contact.email || "",
+                phone: contact.phone || "",
+                company: contact.company || "",
+                role: contact.role || "",
+                location: contact.location || "",
+                stage: contact.lead_status || "Lead",
+                channel: contact.channel || "WhatsApp",
+                channelDetails: contact.channelDetail || "",
+                linkedin: "",
+                instagram: "",
+                website: "",
+                notes: contact.ai_summary || "",
+            })
+            setTags(contact.tags || [])
+        } else if (open && !contact) {
+            setForm(EMPTY_FORM)
+            setTags([])
+        }
+    }, [open, contact])
 
     const updateField = (field: string, value: string) => {
         setForm(prev => ({ ...prev, [field]: value }))
@@ -62,25 +82,49 @@ export function CreateContactModal({ open, onOpenChange }: CreateContactModalPro
         }
     }
 
+    const isPending = createContact.isPending || updateContact.isPending
+
     const handleSubmit = () => {
-        // TODO: Integrar con API
-        console.log("[CreateContact] Submitting:", { ...form, tags })
-        onOpenChange(false)
-        setForm({
-            name: "", email: "", phone: "", company: "",
-            role: "", location: "", stage: "Lead", channel: "WhatsApp",
-            channelDetails: "", linkedin: "", instagram: "", website: "",
-            notes: "",
-        })
-        setTags([])
+        const onSuccess = () => {
+            onOpenChange(false)
+            setForm(EMPTY_FORM)
+            setTags([])
+        }
+
+        if (isEditMode) {
+            updateContact.mutate(
+                {
+                    id: Number(contact!.id),
+                    payload: {
+                        name: form.name || undefined,
+                        email: form.email || undefined,
+                        lead_status: form.stage || undefined,
+                        tags: tags,
+                        ai_summary: form.notes || undefined,
+                    },
+                },
+                { onSuccess }
+            )
+        } else {
+            createContact.mutate(
+                {
+                    phone: form.phone,
+                    name: form.name || undefined,
+                    email: form.email || undefined,
+                    lead_status: form.stage || undefined,
+                    tags: tags.length > 0 ? tags : undefined,
+                },
+                { onSuccess }
+            )
+        }
     }
 
     return (
         <Modal
             open={open}
             onOpenChange={onOpenChange}
-            title="Nuevo Contacto"
-            description="Completa la información del contacto"
+            title={isEditMode ? "Editar Contacto" : "Nuevo Contacto"}
+            description={isEditMode ? "Modifica la información del contacto" : "Completa la información del contacto"}
             footer={
                 <>
                     <Button
@@ -92,9 +136,13 @@ export function CreateContactModal({ open, onOpenChange }: CreateContactModalPro
                     </Button>
                     <Button
                         onClick={handleSubmit}
-                        className="bg-[#8BD21D] hover:bg-[#7bc018] text-black font-semibold"
+                        disabled={isPending || !form.phone}
+                        className="bg-[#8BD21D] hover:bg-[#7bc018] text-black font-semibold disabled:opacity-50"
                     >
-                        Crear Contacto
+                        {isPending
+                            ? (isEditMode ? "Guardando..." : "Creando...")
+                            : (isEditMode ? "Guardar Cambios" : "Crear Contacto")
+                        }
                     </Button>
                 </>
             }

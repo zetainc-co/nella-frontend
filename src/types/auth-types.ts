@@ -7,7 +7,8 @@ export interface User {
   phone?: string
   tenantId: string
   tenantSlug: string
-  role: 'admin' | 'sales_agent'
+  tenantName?: string
+  role: 'admin' | 'agent' | 'viewer'
   emailVerified: boolean
   createdAt: string
   updatedAt?: string
@@ -17,9 +18,10 @@ export interface Session {
   userId: string
   tenantId: string
   tenantSlug: string
+  tenantName?: string
   email: string
   fullName: string
-  role: 'admin' | 'sales_agent'
+  role: 'admin' | 'agent' | 'viewer'
   accessToken: string     // JWT 15min
   refreshToken: string    // JWT 7d
   loginAt: string
@@ -93,4 +95,21 @@ export interface RegistrationProgress {
   currentStep: number
   completedSteps: number[]
   formData: Partial<RegistrationFormData>
+}
+
+// Project & Metrics Types
+export interface Project {
+  id: string
+  name: string
+  owner_id: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ProjectMetrics {
+  totalLeads: number
+  activeLeads: number
+  revenueMonth: number
+  trafficSources: { source: string; count: number }[]
+  funnel: { status: string; count: number }[]
 }

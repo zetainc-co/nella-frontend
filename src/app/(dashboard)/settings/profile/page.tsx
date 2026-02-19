@@ -1,133 +1,233 @@
-// src/app/(dashboard)/configuracion/perfil/page.tsx
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { mockUserProfile } from '@/lib/mock-data/settings'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { Bell, Volume2, Lock } from 'lucide-react'
+import { Lock, Bell, Volume2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { useAuthStore } from "@/stores/auth-store";
+import { useState } from "react";
 
-export default function MiPerfilPage() {
-  const [profile, setProfile] = useState(mockUserProfile)
+function getInitials(name?: string | null) {
+  if (!name) return "U";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/* ── Shared field row ── */
+function Field({ label, value }: { label: string; value?: string }) {
+  return (
+    <div className="space-y-1.5">
+      <p
+        className="text-xs font-medium"
+        style={{ color: "rgba(240,244,255,0.45)" }}
+      >
+        {label}
+      </p>
+      <div
+        className="px-3 py-2.5 rounded-xl text-sm"
+        style={{
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          color: value ? "#f0f4ff" : "rgba(240,244,255,0.25)",
+          minHeight: 40,
+        }}
+      >
+        {value || "—"}
+      </div>
+    </div>
+  );
+}
+
+/* ── Card container ── */
+function Card({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="rounded-2xl p-6 space-y-4"
+      style={{
+        background: "rgba(255,255,255,0.03)",
+        border: "1px solid rgba(255,255,255,0.07)",
+      }}
+    >
+      <h2 className="text-sm font-semibold" style={{ color: "#f0f4ff" }}>
+        {title}
+      </h2>
+      {children}
+    </div>
+  );
+}
+
+export default function ProfilePage() {
+  const { user } = useAuthStore();
+  const initials = getInitials(user?.fullName);
+
+  const [notifications, setNotifications] = useState(false);
+  const [sounds, setSounds] = useState(false);
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
+    <div className="p-6 md:p-8 space-y-6 max-w-2xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Mi Perfil</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Gestiona tu información personal y preferencias
+        <h1 className="text-xl font-bold" style={{ color: "#f0f4ff" }}>
+          Mi Perfil
+        </h1>
+        <p
+          className="text-sm mt-0.5"
+          style={{ color: "rgba(240,244,255,0.4)" }}
+        >
+          Tus datos personales y preferencias
         </p>
       </div>
 
-      {/* Foto de Perfil */}
-      <div className="auth-card p-6">
-        <h2 className="text-lg font-bold text-foreground mb-4">Foto de Perfil</h2>
-
-        <div className="flex items-center gap-6">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-primary/40 bg-primary/10 text-2xl font-bold text-primary">
-            {profile.avatar}
+      {/* Avatar card */}
+      <Card title="Profile picture">
+        <div className="flex items-center gap-4">
+          {/* Initials avatar */}
+          <div
+            className="shrink-0 flex items-center justify-center rounded-2xl font-bold text-xl"
+            style={{
+              width: 72,
+              height: 72,
+              background: "rgba(158,255,0,0.15)",
+              border: "1.5px solid rgba(158,255,0,0.35)",
+              color: "#9EFF00",
+            }}
+          >
+            {initials}
           </div>
           <div>
-            <p className="text-sm text-foreground mb-1">Actualiza tu foto de perfil</p>
-            <p className="text-xs text-muted-foreground">JPG, PNG o GIF. Máximo 2MB</p>
+            <p className="text-sm font-medium" style={{ color: "#f0f4ff" }}>
+              {user?.fullName ?? "—"}
+            </p>
+            <p
+              className="text-xs mt-0.5"
+              style={{ color: "rgba(240,244,255,0.4)" }}
+            >
+              {user?.role === "admin"
+                ? "Administrator"
+                : user?.role === "viewer"
+                  ? "Viewer"
+                  : "Sales Agent"}
+            </p>
+            {user?.tenantName && (
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: "rgba(240,244,255,0.3)" }}
+              >
+                {user.tenantName}
+              </p>
+            )}
           </div>
         </div>
-      </div>
+      </Card>
 
-      {/* Información Personal */}
-      <div className="auth-card p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-foreground">Información Personal</h2>
-          <Button variant="outline" size="sm">Editar</Button>
-        </div>
-
+      {/* Personal info */}
+      <Card title="Personal information">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Nombre Completo</Label>
-            <Input
-              value={profile.name}
-              onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-              className="auth-input"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Correo Electrónico</Label>
-            <Input
-              value={profile.email}
-              onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-              className="auth-input"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Cargo / Rol</Label>
-            <Input
-              value={profile.role}
-              onChange={(e) => setProfile({ ...profile, role: e.target.value })}
-              className="auth-input"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Contraseña</Label>
-            <div className="relative">
-              <Input
-                type="password"
-                value="••••••••"
-                disabled
-                className="auth-input"
-              />
-              <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Field label="Full name" value={user?.fullName} />
+          <Field label="Email" value={user?.email} />
+          <Field
+            label="Role"
+            value={
+              user?.role === "admin"
+                ? "Administrator"
+                : user?.role === "viewer"
+                  ? "Viewer"
+                  : user?.role === "agent"
+                    ? "Sales Agent"
+                    : undefined
+            }
+          />
+          <div className="space-y-1.5">
+            <p
+              className="text-xs font-medium"
+              style={{ color: "rgba(240,244,255,0.45)" }}
+            >
+              Password
+            </p>
+            <div
+              className="px-3 py-2.5 rounded-xl text-sm flex items-center justify-between"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                color: "rgba(240,244,255,0.35)",
+                minHeight: 40,
+              }}
+            >
+              <span>••••••••</span>
+              <Lock className="size-3.5 shrink-0" />
             </div>
           </div>
         </div>
-      </div>
+        {/* Fields not yet in backend / optional */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <Field label="Phone" value={user?.phone} />
+          <Field
+            label="Organization"
+            value={user?.tenantName ?? user?.tenantSlug}
+          />
+        </div>
+      </Card>
 
-      {/* Preferencias */}
-      <div className="auth-card p-6">
-        <h2 className="text-lg font-bold text-foreground mb-6">Preferencias</h2>
-
-        <div className="space-y-6">
+      {/* Preferences */}
+      <Card title="Preferences">
+        <div className="space-y-5">
+          {/* Desktop notifications */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Bell className="h-5 w-5 text-primary" />
+              <div
+                className="flex items-center justify-center rounded-lg size-9"
+                style={{ background: "rgba(158,255,0,0.1)" }}
+              >
+                <Bell className="size-4" style={{ color: "#9EFF00" }} />
+              </div>
               <div>
-                <p className="text-sm font-medium text-foreground">Notificaciones de escritorio</p>
-                <p className="text-xs text-muted-foreground">Recibe alertas en tu navegador</p>
+                <p className="text-sm font-medium" style={{ color: "#f0f4ff" }}>
+                  Desktop notifications
+                </p>
+                <p
+                  className="text-xs"
+                  style={{ color: "rgba(240,244,255,0.4)" }}
+                >
+                  Receive alerts in your browser
+                </p>
               </div>
             </div>
             <Switch
-              checked={profile.notifications}
-              onCheckedChange={(checked) => setProfile({ ...profile, notifications: checked })}
+              checked={notifications}
+              onCheckedChange={setNotifications}
             />
           </div>
 
+          {/* Chat sounds */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Volume2 className="h-5 w-5 text-primary" />
+              <div
+                className="flex items-center justify-center rounded-lg size-9"
+                style={{ background: "rgba(158,255,0,0.1)" }}
+              >
+                <Volume2 className="size-4" style={{ color: "#9EFF00" }} />
+              </div>
               <div>
-                <p className="text-sm font-medium text-foreground">Sonidos de chat</p>
-                <p className="text-xs text-muted-foreground">Reproduce sonido al recibir mensajes</p>
+                <p className="text-sm font-medium" style={{ color: "#f0f4ff" }}>
+                  Chat sounds
+                </p>
+                <p
+                  className="text-xs"
+                  style={{ color: "rgba(240,244,255,0.4)" }}
+                >
+                  Play sound when you receive messages
+                </p>
               </div>
             </div>
-            <Switch
-              checked={profile.sounds}
-              onCheckedChange={(checked) => setProfile({ ...profile, sounds: checked })}
-            />
+            <Switch checked={sounds} onCheckedChange={setSounds} />
           </div>
         </div>
-      </div>
-
-      {/* Guardar */}
-      <div className="flex justify-end">
-        <Button className="btn-primary">
-          Guardar Cambios
-        </Button>
-      </div>
+      </Card>
     </div>
-  )
+  );
 }
