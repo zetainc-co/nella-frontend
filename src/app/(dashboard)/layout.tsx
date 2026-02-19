@@ -5,193 +5,325 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Users,
-  Layers,
-  CalendarDays,
+  TrendingUp,
   MessageSquare,
+  CalendarDays,
+  Users,
   Settings,
   LogOut,
-  ChevronDown,
-  ChevronRight,
-  User,
-  Building,
-  Workflow,
-  Link as LinkIcon,
-  CreditCard,
-  Shield,
-  Calendar,
+  Menu,
+  X,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/shared/theme-toggle/theme-toggle";
+import { useAuthStore } from "@/stores/auth-store";
+
+const SIDEBAR_W = 252;
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Trending", href: "/trending", icon: Layers },
+  { name: "Trending", href: "/trending", icon: TrendingUp },
   { name: "Chat", href: "/chat", icon: MessageSquare },
-  { name: "Calendario", href: "/calendar", icon: Calendar },
-  { name: "Contactos", href: "/contacts", icon: Users },
+  { name: "Calendar", href: "/calendar", icon: CalendarDays },
+  { name: "Contacts", href: "/contacts", icon: Users },
 ];
 
-type SettingsItem = {
-  name: string;
+function getInitials(name?: string | null) {
+  if (!name) return "U";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/* ── Shared nav link ──────────────────────────────────────────── */
+function NavItem({
+  href,
+  icon: Icon,
+  label,
+  active,
+  onClick,
+}: {
   href: string;
-  icon: React.ForwardRefExoticComponent<any>;
-  adminOnly?: boolean;
-  submenu?: { name: string; href: string }[];
-};
+  icon: React.ElementType;
+  label: string;
+  active: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-150"
+      style={
+        active
+          ? {
+              background: "rgba(158,255,0,0.1)",
+              border: "1px solid rgba(158,255,0,0.3)",
+              padding: "10px 14px 10px 10px",
+              color: "#ffffff",
+              boxShadow: "0 0 10px 0 rgba(158,255,0,0.3)",
+            }
+          : {
+              border: "1px solid transparent",
+              color: "rgba(240,244,255,0.45)",
+              padding: "10px 14px 10px 10px",
+            }
+      }
+      onMouseEnter={(e) => {
+        if (!active) {
+          e.currentTarget.style.color = "rgba(240,244,255,0.85)";
+          e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!active) {
+          e.currentTarget.style.color = "rgba(240,244,255,0.45)";
+          e.currentTarget.style.background = "transparent";
+        }
+      }}
+    >
+      <Icon className="size-[18px] shrink-0" />
+      {label}
+    </Link>
+  );
+}
 
-const settingsSubmenu: SettingsItem[] = [
-  { name: "Mi Perfil", href: "/settings/profile", icon: User },
-  { name: "Organización", href: "/settings/organization", icon: Building },
-  //{ name: "Workflows", href: "/settings/workflows", icon: Workflow },
-  { name: "Conexiones", href: "/settings/connections", icon: LinkIcon },
-  { name: "Equipo y Permisos", href: "/settings/team", icon: Users },
-  { name: "Facturación", href: "/settings/billing", icon: CreditCard },
-  {
-    name: "Administración",
-    href: "/settings/administration",
-    icon: Shield,
-    adminOnly: true,
-  },
-];
-
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+/* ── Sidebar ──────────────────────────────────────────────────── */
+function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { user, logout } = useAuthStore();
+  const initials = getInitials(user?.fullName);
 
-  useEffect(() => {
-    // Auto-expand if on settings route
-    if (pathname.startsWith("/settings")) {
-      setSettingsOpen(true);
-    }
-    // Check admin status
-    const userRole = localStorage.getItem("user_role");
-    setIsAdmin(userRole === "admin");
-  }, [pathname]);
+  function handleLogout() {
+    logout();
+    const domain = process.env.NEXT_PUBLIC_APP_DOMAIN || "localhost";
+    const port = window.location.port ? `:${window.location.port}` : "";
+    window.location.href = `http://${domain}${port}/login`;
+  }
+
+  const isSettingsActive = pathname.startsWith("/settings");
 
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-border flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Nella <span className="text-primary">Pro</span>
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1">Revenue OS</p>
-          </div>
-          <ThemeToggle />
+    <div className="flex flex-col h-full" style={{ background: "#0d0d0d" }}>
+      {/* ─ Header ─ */}
+      <div
+        className="flex items-center gap-3 px-5 py-5"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        {/* Avatar */}
+        <div
+          className="shrink-0 flex items-center justify-center rounded-xl font-bold"
+          style={{
+            width: 46,
+            height: 46,
+            fontSize: 15,
+            background: "rgba(158,255,0,0.15)",
+            border: "1px solid rgba(158,255,0,0.3)",
+            color: "#9EFF00",
+          }}
+        >
+          {initials}
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                  isActive
-                    ? "bg-primary/10 text-primary border border-primary/20"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                }`}
-              >
-                <item.icon className="size-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-border space-y-1">
-          <button
-            onClick={() => setSettingsOpen(!settingsOpen)}
-            className={`flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-              pathname.startsWith("/settings")
-                ? "bg-primary/10 text-primary border border-primary/20"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground"
-            }`}
+        {/* Name + email */}
+        <div className="min-w-0 flex-1">
+          <div
+            className="text-[13px] font-semibold leading-tight truncate"
+            style={{ color: "#f0f4ff" }}
           >
-            <div className="flex items-center gap-3">
-              <Settings className="size-5" />
-              Configuración
-            </div>
-            {settingsOpen ? (
-              <ChevronDown className="size-4" />
-            ) : (
-              <ChevronRight className="size-4" />
-            )}
-          </button>
-
-          {/* Submenu */}
-          {settingsOpen && (
-            <div className="ml-4 mt-1 space-y-1 border-l border-border pl-4">
-              {settingsSubmenu.map((item) => {
-                if (item.adminOnly && !isAdmin) return null;
-
-                const isActive =
-                  pathname === item.href ||
-                  pathname.startsWith(item.href + "/");
-                const Icon = item.icon;
-
-                return (
-                  <div key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
-                        isActive
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                      }`}
-                    >
-                      <Icon className="size-4" />
-                      {item.name}
-                      {item.adminOnly && (
-                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/10 text-yellow-500 font-mono">
-                          ADMIN
-                        </span>
-                      )}
-                    </Link>
-
-                    {/* Nested submenu */}
-                    {item.submenu && isActive && (
-                      <div className="ml-6 mt-1 space-y-1">
-                        {item.submenu.map((subitem: any) => {
-                          const subIsActive = pathname === subitem.href;
-                          return (
-                            <Link
-                              key={subitem.name}
-                              href={subitem.href}
-                              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${
-                                subIsActive
-                                  ? "bg-primary/10 text-primary font-medium"
-                                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                              }`}
-                            >
-                              {subitem.name}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+            {user?.fullName ?? "User"}
+          </div>
+          {user?.email && (
+            <div
+              className="text-[11px] truncate mt-0.5"
+              style={{ color: "rgba(240,244,255,0.38)" }}
+            >
+              {user.email}
             </div>
           )}
-
-          <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-destructive transition-all w-full text-left">
-            <LogOut className="size-5" />
-            Cerrar Sesión
-          </button>
         </div>
+
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="shrink-0 p-1 rounded-lg transition-colors"
+            style={{ color: "rgba(240,244,255,0.35)" }}
+          >
+            <X className="size-4" />
+          </button>
+        )}
+      </div>
+
+      {/* ─ Navigation ─ */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5">
+        {navigation.map((item) => {
+          const active =
+            item.href === "/dashboard"
+              ? pathname === item.href || pathname.startsWith("/dashboard")
+              : pathname === item.href || pathname.startsWith(item.href + "/");
+          return (
+            <NavItem
+              key={item.name}
+              href={item.href}
+              icon={item.icon}
+              label={item.name}
+              active={active}
+              onClick={onClose}
+            />
+          );
+        })}
+      </nav>
+
+      {/* ─ Footer ─ */}
+      <div
+        className="px-3 py-4 space-y-0.5"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <NavItem
+          href="/settings"
+          icon={Settings}
+          label="Configuración"
+          active={isSettingsActive}
+          onClick={onClose}
+        />
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-150 w-full text-left"
+          style={{
+            borderLeft: "2px solid transparent",
+            color: "rgba(240,244,255,0.45)",
+            padding: "10px 14px 10px 10px",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#ef4444";
+            e.currentTarget.style.background = "rgba(239,68,68,0.06)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "rgba(240,244,255,0.45)";
+            e.currentTarget.style.background = "transparent";
+          }}
+        >
+          <LogOut className="size-[18px] shrink-0" />
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Layout ───────────────────────────────────────────────────── */
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => setMobileOpen(false), [pathname]);
+
+  return (
+    <div
+      className="flex h-screen overflow-hidden"
+      style={{ background: "#151515", position: "relative" }}
+    >
+      {/* ── Background orbs (same as auth) ── */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          top: "-18%",
+          right: "-8%",
+          width: "720px",
+          height: "720px",
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at 50% 50%, rgba(0,205,190,0.22) 0%, rgba(0,175,162,0.09) 38%, rgba(0,140,130,0.03) 60%, transparent 75%)",
+          filter: "blur(65px)",
+          animation: "orb-breathe 7s ease-in-out infinite",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          bottom: "-18%",
+          left: `${SIDEBAR_W}px`,
+          width: "600px",
+          height: "600px",
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at 50% 50%, rgba(65,60,220,0.15) 0%, rgba(45,40,175,0.06) 42%, transparent 70%)",
+          filter: "blur(80px)",
+          animation: "orb-breathe-slow 9s ease-in-out infinite",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+
+      {/* ── Desktop sidebar ── */}
+      <aside
+        className="hidden md:flex flex-col shrink-0"
+        style={{
+          width: SIDEBAR_W,
+          background: "#0d0d0d",
+          borderRight: "1px solid rgba(255,255,255,0.06)",
+          position: "relative",
+          zIndex: 10,
+        }}
+      >
+        <SidebarContent />
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-background">{children}</main>
+      {/* ── Mobile overlay ── */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 md:hidden"
+          style={{ background: "rgba(0,0,0,0.65)" }}
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* ── Mobile sidebar drawer ── */}
+      <aside
+        className="fixed top-0 left-0 z-50 h-full md:hidden flex flex-col transition-transform duration-200"
+        style={{
+          width: SIDEBAR_W,
+          background: "#0d0d0d",
+          borderRight: "1px solid rgba(255,255,255,0.06)",
+          transform: mobileOpen ? "translateX(0)" : "translateX(-100%)",
+        }}
+      >
+        <SidebarContent onClose={() => setMobileOpen(false)} />
+      </aside>
+
+      {/* ── Main ── */}
+      <div
+        className="flex flex-col flex-1 overflow-hidden"
+        style={{ position: "relative", zIndex: 1 }}
+      >
+        {/* Mobile top bar */}
+        <div
+          className="flex md:hidden items-center px-4 h-14 shrink-0"
+          style={{
+            background: "#0d0d0d",
+            borderBottom: "1px solid rgba(255,255,255,0.06)",
+          }}
+        >
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-2 rounded-lg"
+            style={{ color: "rgba(240,244,255,0.6)" }}
+          >
+            <Menu className="size-5" />
+          </button>
+          <span
+            className="ml-3 text-base font-bold"
+            style={{ color: "#f0f4ff" }}
+          >
+            Nella<span style={{ color: "#9EFF00" }}>Sales</span>
+          </span>
+        </div>
+
+        <main className="flex-1 overflow-auto">{children}</main>
+      </div>
     </div>
   );
 }
