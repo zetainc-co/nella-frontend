@@ -79,7 +79,7 @@ export function Modal({
             {/* Modal */}
             <div
                 className={cn(
-                    "relative z-10 w-full flex flex-col rounded-xl border border-gray-800 bg-[#141417] shadow-2xl",
+                    "relative z-10 w-full flex flex-col rounded-xl border border-zinc-700 bg-[#1C1C1D] shadow-2xl",
                     "max-h-[90vh] mx-4",
                     "transition-all duration-250 ease-out",
                     visible
@@ -91,14 +91,12 @@ export function Modal({
             >
                 {/* Header: custom | title | solo X */}
                 {header ? (
-                    <div className="relative overflow-hidden rounded-t-xl bg-[#1a1a1e] border-b border-gray-800/50">
-                        {/* Glow - top spread */}
-                        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-[radial-gradient(ellipse,rgba(56,189,248,0.08)_0%,rgba(56,189,248,0.04)_40%,transparent_70%)] pointer-events-none" />
-                        <div className="absolute -top-10 right-10 w-40 h-40 bg-[radial-gradient(circle,rgba(56,189,248,0.12)_0%,transparent_60%)] pointer-events-none" />
+                    <div className="relative overflow-hidden rounded-t-xl bg-[#1C1C1D] border-b border-zinc-800/50">
+                        <div className="absolute -top-24 -right-24 w-60 h-60 bg-[radial-gradient(circle,rgba(56,189,248,0.12)_0%,transparent_80%)] pointer-events-none" />
                         {/* Close */}
                         <button
                             onClick={handleClose}
-                            className="absolute top-4 right-4 z-10 p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                            className="absolute top-4 right-4 z-10 p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
                         >
                             <X className="w-5 h-5" />
                         </button>
@@ -108,16 +106,16 @@ export function Modal({
                         </div>
                     </div>
                 ) : title ? (
-                    <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-gray-800/50">
+                    <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-zinc-800/50">
                         <div>
                             <h2 className="text-xl font-bold text-white">{title}</h2>
                             {description && (
-                                <p className="text-sm text-gray-400 mt-1">{description}</p>
+                                <p className="text-sm text-zinc-400 mt-1">{description}</p>
                             )}
                         </div>
                         <button
                             onClick={handleClose}
-                            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors shrink-0"
+                            className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-[#2a2a2a] transition-colors shrink-0"
                         >
                             <X className="w-5 h-5" />
                         </button>
@@ -125,7 +123,7 @@ export function Modal({
                 ) : (
                     <button
                         onClick={handleClose}
-                        className="absolute top-4 right-4 z-10 p-2 rounded-lg text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors"
+                        className="absolute top-4 right-4 z-10 p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-[#2a2a2a] transition-colors"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -138,7 +136,7 @@ export function Modal({
 
                 {/* Footer */}
                 {footer && (
-                    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-800">
+                    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-zinc-800">
                         {footer}
                     </div>
                 )}
@@ -157,7 +155,7 @@ export function ModalSection({ icon, title, children }: ModalSectionProps) {
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                <span className="text-gray-400">{icon}</span>
+                <span className="text-zinc-400">{icon}</span>
                 {title}
             </div>
             {children}

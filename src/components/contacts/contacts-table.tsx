@@ -4,147 +4,74 @@ import { useState, useMemo } from "react"
 import { Search, Filter, Download, MoreVertical, Phone, ChevronLeft, ChevronRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ContactDetailModal, type ContactDetail } from "./contact-detail-modal"
+import { ContactDetailModal } from "./contact-detail-modal"
+import type { ContactDetail } from "@/types/contact-types"
+import { useContacts, useContactsSSE } from "@/hooks/useContacts"
+import type { BackendContact } from "@/lib/contacts/contacts-api"
 
-// Datos de ejemplo (mock) con datos extendidos para el detalle
-const mockContacts: ContactDetail[] = [
-    {
-        id: "1",
-        name: "Ana Gómez",
-        company: "TechCorp SA",
-        role: "Directora de Compras",
-        phone: "+57 310 234 5678",
-        stage: "Cliente",
-        time: "hace 2h",
-        email: "ana.gomez@techcorp.co",
-        location: "Bogotá, Colombia",
-        score: 92,
-        scoreLabel: "Alto",
-        channel: "WhatsApp",
-        channelDetail: "Campaña Google Ads",
-        lastConversation: "Interesada en plan enterprise. Solicita demo para su equipo de 15 personas.",
-        tags: ["VIP", "Enterprise"],
-    },
-    {
-        id: "2",
-        name: "Carlos Ruiz",
-        company: "Innova Digital",
-        role: "CEO",
-        phone: "+57 315 876 5432",
-        stage: "Lead",
-        time: "hace 5h",
-        email: "carlos@innovadigital.co",
-        location: "Medellín, Colombia",
-        score: 65,
-        scoreLabel: "Medio",
-        channel: "LinkedIn",
-        channelDetail: "Conexión directa",
-        lastConversation: "Consultó precios y planes. Necesita propuesta para presentar a junta directiva.",
-        tags: ["Nuevo lead", "B2B"],
-    },
-    {
-        id: "3",
-        name: "María López",
-        company: "Startup Solutions",
-        role: "Gerente de Marketing",
-        phone: "+57 320 123 9876",
-        stage: "Lead",
-        time: "hace 1d",
-        email: "maria.lopez@startup.co",
-        location: "Cali, Colombia",
-        score: 78,
-        scoreLabel: "Medio",
-        channel: "Sitio Web",
-        channelDetail: "Landing Page - Formulario",
-        lastConversation: "Primera interacción. Descargó nuestro whitepaper sobre automatización de ventas. Empresa en crecimiento rápido.",
-        tags: ["Nuevo lead", "Calificación pendiente"],
-    },
-    {
-        id: "4",
-        name: "Luis Rodríguez",
-        company: "Empresa Global",
-        role: "Director Comercial",
-        phone: "+57 318 456 7890",
-        stage: "Inactivo",
-        time: "hace 15d",
-        email: "luis.rodriguez@global.co",
-        location: "Barranquilla, Colombia",
-        score: 20,
-        scoreLabel: "Bajo",
-        channel: "Email",
-        channelDetail: "Newsletter mensual",
-        lastConversation: "No respondió a los últimos 3 seguimientos. Posible cambio de proveedor.",
-        tags: ["Reactivar", "Seguimiento"],
-    },
-    {
-        id: "5",
-        name: "Patricia Morales",
-        company: "Digital Co",
-        role: "VP de Ventas",
-        phone: "+57 311 234 8765",
-        stage: "Cliente",
-        time: "hace 30min",
-        email: "patricia@digitalco.co",
-        location: "Bogotá, Colombia",
-        score: 88,
-        scoreLabel: "Alto",
-        channel: "WhatsApp",
-        channelDetail: "Referido por Ana Gómez",
-        lastConversation: "Renovó suscripción anual. Interesada en módulo de analytics avanzado.",
-        tags: ["VIP", "Upsell"],
-    },
-    {
-        id: "6",
-        name: "Diego Fernández",
-        company: "Nexus Corp",
-        role: "CTO",
-        phone: "+57 312 567 8901",
-        stage: "Lead",
-        time: "hace 3h",
-        email: "diego@nexuscorp.co",
-        location: "Cartagena, Colombia",
-        score: 55,
-        scoreLabel: "Medio",
-        channel: "Instagram",
-        channelDetail: "Campaña Instagram Feb 2026",
-        lastConversation: "Solicitó información técnica sobre integraciones API.",
-        tags: ["Técnico", "API"],
-    },
-    {
-        id: "7",
-        name: "Camila Torres",
-        company: "Soluciones XYZ",
-        role: "Gerente General",
-        phone: "+57 314 890 1234",
-        stage: "Lead",
-        time: "hace 7h",
-        email: "camila@solucionesxyz.co",
-        location: "Bucaramanga, Colombia",
-        score: 42,
-        scoreLabel: "Medio",
-        channel: "Sitio Web",
-        channelDetail: "Blog - Artículo SEO",
-        lastConversation: "Descargó caso de estudio. Empresa pequeña con potencial de crecimiento.",
-        tags: ["PYME", "Contenido"],
-    },
-    {
-        id: "8",
-        name: "Roberto Sánchez",
-        company: "Alpha Tech",
-        role: "Director de TI",
-        phone: "+57 316 345 6789",
-        stage: "Cliente",
-        time: "hace 1d",
-        email: "roberto@alphatech.co",
-        location: "Pereira, Colombia",
-        score: 85,
-        scoreLabel: "Alto",
-        channel: "WhatsApp",
-        channelDetail: "Evento presencial Bogotá",
-        lastConversation: "Implementación exitosa. Solicitó capacitación adicional para nuevo equipo.",
-        tags: ["Onboarding", "Capacitación"],
-    },
-]
+// Mapea lead_status (ai_clasificacion de n8n) a la categoría del UI
+// Lead = conversación activa (COLD LEAD, WARM LEAD, HOT LEAD, SOPORTE HUMANO)
+// Cliente = cerró/convirtió (AGENDADO, CIERRE GANADO)
+// Inactivo = descartado/perdido (DESCARTADO, CIERRE PERDIDO, null)
+const LEAD_STATUSES = ['COLD', 'COLD LEAD', 'WARM', 'WARM LEAD', 'HOT', 'HOT LEAD', 'HUMAN_ATTENTION', 'SOPORTE HUMANO']
+const CLIENTE_STATUSES = ['AGENDADO', 'CIERRE GANADO', 'CLOSED', 'CONVERTED']
+const INACTIVE_STATUSES = ['DESCARTADO', 'CIERRE PERDIDO', 'INACTIVE']
+
+function mapLeadStatusToStage(status: string | null): string {
+    if (!status) return 'Inactivo'
+    const upper = status.toUpperCase()
+    if (LEAD_STATUSES.includes(upper)) return 'Lead'
+    if (CLIENTE_STATUSES.includes(upper)) return 'Cliente'
+    if (INACTIVE_STATUSES.includes(upper)) return 'Inactivo'
+    return 'Lead'
+}
+
+// Score IA basado en lead_status (ai_clasificacion de n8n)
+const SCORE_MAP: Record<string, { score: number; label: string }> = {
+    'WARM LEAD':        { score: 90, label: 'Alto' },
+    'HOT LEAD':         { score: 60, label: 'Calificado' },
+    'HOT':              { score: 60, label: 'Calificado' },
+    'HUMAN_ATTENTION':  { score: 75, label: 'Atención' },
+    'SOPORTE HUMANO':   { score: 75, label: 'Atención' },
+    'COLD LEAD':        { score: 20, label: 'Bajo' },
+    'COLD':             { score: 20, label: 'Bajo' },
+    'AGENDADO':         { score: 95, label: 'Cerrado' },
+    'CIERRE GANADO':    { score: 100, label: 'Ganado' },
+    'DESCARTADO':       { score: 5, label: 'Descartado' },
+    'CIERRE PERDIDO':   { score: 5, label: 'Perdido' },
+}
+
+function mapLeadStatusToScore(status: string | null): { score: number; label: string } {
+    if (!status) return { score: 0, label: '-' }
+    return SCORE_MAP[status.toUpperCase()] || { score: 0, label: '-' }
+}
+
+// Mapea un contacto del backend al tipo que usa la UI
+function mapBackendContact(c: BackendContact): ContactDetail {
+    return {
+        id: String(c.id),
+        name: c.name || c.phone,
+        phone: c.phone,
+        email: c.email || '',
+        tags: c.tags || [],
+        lead_status: c.lead_status,
+        handoff_active: c.handoff_active,
+        ai_summary: c.ai_summary || '',
+        last_interaction_at: c.last_interaction_at,
+        stage: mapLeadStatusToStage(c.lead_status),
+        time: c.last_interaction_at
+            ? new Date(c.last_interaction_at).toLocaleDateString('es', { day: 'numeric', month: 'short' })
+            : '-',
+        company: '-',
+        role: '-',
+        location: '-',
+        score: mapLeadStatusToScore(c.lead_status).score,
+        scoreLabel: mapLeadStatusToScore(c.lead_status).label,
+        channel: 'WhatsApp',
+        channelDetail: '-',
+        lastConversation: c.ai_summary || '-',
+    }
+}
 
 const ITEMS_PER_PAGE = 5
 
@@ -166,6 +93,11 @@ export function ContactsTable() {
     const [currentPage, setCurrentPage] = useState(1)
     const [selectedContact, setSelectedContact] = useState<ContactDetail | null>(null)
 
+    const { data: backendContacts = [], isLoading } = useContacts()
+    useContactsSSE()
+
+    const contacts = useMemo(() => backendContacts.map(mapBackendContact), [backendContacts])
+
     const getInitials = (name: string) => {
         const parts = name.split(' ')
         if (parts.length >= 2) {
@@ -175,14 +107,14 @@ export function ContactsTable() {
     }
 
     const filteredContacts = useMemo(() => {
-        return mockContacts.filter(contact => {
+        return contacts.filter(contact => {
             const matchesSearch = contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 contact.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 contact.role.toLowerCase().includes(searchTerm.toLowerCase())
             const matchesStage = selectedStage === "Todos" || contact.stage === selectedStage
             return matchesSearch && matchesStage
         })
-    }, [searchTerm, selectedStage])
+    }, [contacts, searchTerm, selectedStage])
 
     const totalPages = Math.ceil(filteredContacts.length / ITEMS_PER_PAGE)
     const paginatedContacts = filteredContacts.slice(
@@ -206,6 +138,24 @@ export function ContactsTable() {
     const handleSearchChange = (value: string) => {
         setSearchTerm(value)
         setCurrentPage(1)
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col gap-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="bg-[#1a1a1e] border border-gray-800 rounded-lg p-5 animate-pulse">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-gray-700" />
+                            <div className="flex-1 space-y-2">
+                                <div className="h-4 bg-gray-700 rounded w-1/3" />
+                                <div className="h-3 bg-gray-800 rounded w-1/4" />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )
     }
 
     return (

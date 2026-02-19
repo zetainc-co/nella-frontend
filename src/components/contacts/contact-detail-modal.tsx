@@ -3,52 +3,33 @@
 import {
     Mail,
     Phone,
-    MapPin,
-    Globe,
     MessageSquare,
     Tag,
     Sparkles,
     MessageCircle,
     PhoneCall,
 } from "lucide-react"
+import { useState } from "react"
 import { Modal } from "@/components/shared/modal/modal"
 import { Button } from "@/components/ui/button"
 import { ScoreRing } from "./score-ring"
 import { InfoCard } from "./info-card"
 import { ContactHeader } from "./contact-header"
-
-export interface ContactDetail {
-    id: string
-    name: string
-    company: string
-    role: string
-    phone: string
-    stage: string
-    time: string
-    email: string
-    location: string
-    score: number
-    scoreLabel: string
-    channel: string
-    channelDetail: string
-    lastConversation: string
-    tags: string[]
-}
-
-interface ContactDetailModalProps {
-    open: boolean
-    onOpenChange: (open: boolean) => void
-    contact: ContactDetail | null
-}
+import { ChannelIcon } from "./channel-icon"
+import { CreateContactModal } from "./create-contact-modal"
+import type { ContactDetailModalProps } from "@/types/contact-types"
 
 export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetailModalProps) {
+    const [showEditModal, setShowEditModal] = useState(false)
+
     if (!contact) return null
 
     return (
+        <>
         <Modal
             open={open}
             onOpenChange={onOpenChange}
-            header={<ContactHeader contact={contact} />}
+            header={<ContactHeader contact={contact} onEdit={() => setShowEditModal(true)} />}
             footer={
                 <div className="flex gap-3 w-full">
                     <Button className="flex-1 bg-[#8BD21D] hover:bg-[#7bc018] text-black font-semibold">
@@ -73,7 +54,7 @@ export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetai
                         Datos de Negocio
                     </h4>
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4 shadow-[0_-4px_20px_-6px_rgba(56,189,248,0.06)]">
+                        <div className="bg-[#1a1a1a] border border-zinc-800 rounded-lg p-4  ">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-sm text-gray-400">Score IA</span>
                                 <span className={`text-sm font-semibold ${
@@ -91,10 +72,8 @@ export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetai
                             </div>
                         </div>
 
-                        <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4 flex items-center gap-3 shadow-[0_-4px_20px_-6px_rgba(56,189,248,0.06)]">
-                            <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center shrink-0">
-                                <Globe className="w-5 h-5 text-blue-400" />
-                            </div>
+                        <div className="bg-[#1a1a1a] border border-zinc-800 rounded-lg p-4 flex items-center gap-3">
+                            <ChannelIcon channel={contact.channel} />
                             <div>
                                 <p className="text-xs text-gray-400">Canal de Origen</p>
                                 <p className="text-sm font-semibold text-white">{contact.channel}</p>
@@ -109,21 +88,14 @@ export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetai
                     <h4 className="text-sm font-semibold text-white mb-3">Información de Contacto</h4>
                     <div className="grid grid-cols-2 gap-3">
                         <InfoCard
-                            icon={<Mail className="w-4 h-4 text-gray-400" />}
+                            icon={<Mail className="w-5 h-5 text-gray-200" />}
                             label="Email"
                             value={contact.email}
                         />
                         <InfoCard
-                            icon={<Phone className="w-4 h-4 text-gray-400" />}
+                            icon={<Phone className="w-5 h-5 text-gray-200" />}
                             label="Teléfono"
                             value={contact.phone}
-                        />
-                    </div>
-                    <div className="mt-3 max-w-[calc(50%-6px)]">
-                        <InfoCard
-                            icon={<MapPin className="w-4 h-4 text-gray-400" />}
-                            label="Ubicación"
-                            value={contact.location}
                         />
                     </div>
                 </div>
@@ -131,7 +103,7 @@ export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetai
                 {/* Contexto */}
                 <div>
                     <h4 className="text-sm font-semibold text-white mb-3">Contexto</h4>
-                    <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4 shadow-[0_-4px_20px_-6px_rgba(56,189,248,0.06)]">
+                        <div className="bg-[#1a1a1a] border border-zinc-800 rounded-lg p-4  ">
                         <div className="flex items-center gap-2 mb-2">
                             <MessageSquare className="w-4 h-4 text-gray-400" />
                             <span className="text-sm font-semibold text-white">Última Conversación</span>
@@ -166,5 +138,12 @@ export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetai
                 </div>
             </div>
         </Modal>
+
+            <CreateContactModal
+                open={showEditModal}
+                onOpenChange={setShowEditModal}
+                contact={contact}
+            />
+        </>
     )
 }

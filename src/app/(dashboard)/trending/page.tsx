@@ -2,7 +2,7 @@ import { KanbanBoard } from '@/components/kanban/kanban-board'
 
 export default function KanbanPage() {
   return (
-    <div className="min-h-screen bg-[#000000] p-6">
+    <div className="min-h-screen p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight text-white">
           Tablero Kanban
