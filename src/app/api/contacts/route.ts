@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { backendHeaders } from '@/lib/backend-fetch'
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://mundo-stetic.localhost:3001'
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'
 
 export async function GET(request: NextRequest) {
   try {

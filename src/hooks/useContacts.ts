@@ -1,17 +1,25 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@/stores/auth-store'
 import type { BackendContact, ContactsQuery, UpdateContactPayload, CreateContactPayload } from '@/types/contacts'
 
 const CONTACTS_KEY = ['contacts']
+
+function authHeaders(): Record<string, string> {
+  const token = useAuthStore.getState().session?.accessToken
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (token) headers['Authorization'] = `Bearer ${token}`
+  return headers
+}
 
 async function fetchContacts(query?: ContactsQuery): Promise<BackendContact[]> {
   const params = new URLSearchParams()
   if (query?.phone) params.set('phone', query.phone)
   if (query?.lead_status) params.set('lead_status', query.lead_status)
 
-  const url = `/contacts${params.toString() ? `?${params}` : ''}`
-  const res = await fetch(url)
+  const url = `/api/contacts${params.toString() ? `?${params}` : ''}`
+  const res = await fetch(url, { headers: authHeaders() })
   if (!res.ok) throw new Error('Error al cargar contactos')
   return res.json()
 }
@@ -27,7 +35,7 @@ export function useContact(id: number) {
   return useQuery({
     queryKey: [...CONTACTS_KEY, id],
     queryFn: async () => {
-      const res = await fetch(`/contacts/${id}`)
+      const res = await fetch(`/api/contacts/${id}`, { headers: authHeaders() })
       if (!res.ok) throw new Error('Contacto no encontrado')
       return res.json() as Promise<BackendContact>
     },
@@ -39,9 +47,9 @@ export function useCreateContact() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (payload: CreateContactPayload) => {
-      const res = await fetch('/contacts', {
+      const res = await fetch('/api/contacts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify(payload),
       })
       if (!res.ok) throw new Error('Error al crear contacto')
@@ -55,9 +63,9 @@ export function useUpdateContact() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, payload }: { id: number; payload: UpdateContactPayload }) => {
-      const res = await fetch(`/contacts/${id}`, {
+      const res = await fetch(`/api/contacts/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify(payload),
       })
       if (!res.ok) throw new Error('Error al actualizar contacto')
@@ -71,7 +79,10 @@ export function useDeleteContact() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(`/contacts/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/contacts/${id}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
       if (!res.ok) throw new Error('Error al eliminar contacto')
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: CONTACTS_KEY }),
