@@ -1,5 +1,5 @@
 // src/types/kanban-types.ts
-import type { BackendContact } from '@/lib/contacts/contacts-api'
+import type { BackendContact } from '@/types/contacts'
 
 export type LeadStage = 'new' | 'contacted' | 'proposal' | 'closed'
 

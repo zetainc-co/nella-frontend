@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
-import { contactsApi, type BackendContact } from '@/lib/contacts/contacts-api'
+import type { BackendContact } from '@/types/contacts'
 import { mapLeadStatusToStage, mapLeadStatusToBadge } from '@/hooks/kanban/use-kanban-constants'
 import type { Lead, LeadStage, KanbanStore } from '@/types/kanban-types'
 
@@ -38,7 +38,9 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
     }
 
     try {
-      const contacts = await contactsApi.getAll()
+      const res = await fetch('/api/contacts')
+      if (!res.ok) throw new Error('Error al cargar contactos')
+      const contacts: BackendContact[] = await res.json()
       const leads = contacts.map(transformContactToLead)
       set({ leads, isLoading: false, error: null })
     } catch (err) {
