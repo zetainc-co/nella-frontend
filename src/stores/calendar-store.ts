@@ -9,66 +9,6 @@ import type {
   BlockDuration,
 } from '@/types/calendar-types'
 
-// ─── Mock data ──────────────────────────────────────────────────────────────
-
-const MOCK_EVENTS: CalendarEvent[] = [
-  {
-    id: '1',
-    title: 'Demo con Ana',
-    client: 'Ana García',
-    project: 'MundoStetic',
-    startTime: '09:00',
-    endTime: '10:30',
-    date: '2026-02-16',
-    confirmationStatus: 'confirmed',
-    layer: 'my-agenda',
-  },
-  {
-    id: '2',
-    title: 'Seguimiento propuesta',
-    client: 'Carlos López',
-    project: 'TechCorp',
-    startTime: '11:00',
-    endTime: '11:45',
-    date: '2026-02-16',
-    confirmationStatus: 'pending',
-    layer: 'team-agenda',
-  },
-  {
-    id: '3',
-    title: 'Revisión de Proyecto',
-    client: 'María Torres',
-    project: 'TechCorp',
-    startTime: '10:00',
-    endTime: '11:00',
-    date: '2026-02-20',
-    confirmationStatus: 'confirmed',
-    layer: 'team-agenda',
-  },
-  {
-    id: '4',
-    title: 'Cita IA - Onboarding',
-    client: 'Luis Fernández',
-    project: 'NellaSales',
-    startTime: '14:00',
-    endTime: '14:30',
-    date: '2026-02-18',
-    confirmationStatus: 'confirmed',
-    layer: 'ai-appointments',
-  },
-  {
-    id: '5',
-    title: 'Demo NellaSales',
-    client: 'Sofia Ruiz',
-    project: 'NellaSales',
-    startTime: '15:00',
-    endTime: '16:00',
-    date: '2026-02-19',
-    confirmationStatus: 'pending',
-    layer: 'my-agenda',
-  },
-]
-
 const DEFAULT_AVAILABILITY: AvailabilityDay[] = [
   { day: 'lun', enabled: true,  slots: [{ start: '09:00', end: '18:00' }] },
   { day: 'mar', enabled: true,  slots: [{ start: '09:00', end: '18:00' }] },
@@ -93,21 +33,24 @@ interface CalendarStore {
   goToPrevWeek: () => void
   goToToday: () => void
 
-  addEvent: (event: Omit<CalendarEvent, 'id'>) => void
+  // API-driven actions
+  setEvents: (events: CalendarEvent[]) => void
+  addEvent: (event: CalendarEvent) => void
+  setAvailability: (availability: AvailabilityDay[]) => void
+  setBlockDuration: (duration: BlockDuration) => void
+  updateAvailability: (availability: AvailabilityDay[]) => void
+
   getFilteredEvents: () => CalendarEvent[]
   getEventsForDate: (dateStr: string) => CalendarEvent[]
 
   toggleProjectFilter: (project: ProjectName) => void
   toggleLayerFilter: (layer: CalendarLayer) => void
-
-  setBlockDuration: (duration: BlockDuration) => void
-  updateAvailability: (availability: AvailabilityDay[]) => void
 }
 
 // ─── Store implementation ─────────────────────────────────────────────────────
 
 export const useCalendarStore = create<CalendarStore>((set, get) => ({
-  events: MOCK_EVENTS,
+  events: [],
   currentWeekStart: startOfWeek(new Date(), { weekStartsOn: 1 }),
   activeProjectFilters: [],
   activeLayerFilters: [],
@@ -123,19 +66,23 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
   goToToday: () =>
     set({ currentWeekStart: startOfWeek(new Date(), { weekStartsOn: 1 }) }),
 
+  setEvents: (events) => set({ events }),
+
   addEvent: (event) =>
-    set((state) => ({
-      events: [
-        ...state.events,
-        { ...event, id: `evt-${Date.now()}` },
-      ],
-    })),
+    set((state) => ({ events: [...state.events, event] })),
+
+  setAvailability: (availability) => set({ availability }),
+
+  setBlockDuration: (blockDuration) => set({ blockDuration }),
+
+  updateAvailability: (availability) => set({ availability }),
 
   getFilteredEvents: () => {
     const { events, activeProjectFilters, activeLayerFilters } = get()
     return events.filter((e) => {
       const projectOk =
-        activeProjectFilters.length === 0 || activeProjectFilters.includes(e.project)
+        activeProjectFilters.length === 0 ||
+        (activeProjectFilters as string[]).includes(e.project)
       const layerOk =
         activeLayerFilters.length === 0 || activeLayerFilters.includes(e.layer)
       return projectOk && layerOk
@@ -160,8 +107,4 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
         ? state.activeLayerFilters.filter((l) => l !== layer)
         : [...state.activeLayerFilters, layer],
     })),
-
-  setBlockDuration: (duration) => set({ blockDuration: duration }),
-
-  updateAvailability: (availability) => set({ availability }),
 }))

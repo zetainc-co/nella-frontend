@@ -2,7 +2,9 @@
 
 import React, { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useAuthStore } from "@/stores/auth-store";
 import {
   LayoutDashboard,
   Users,
@@ -56,6 +58,8 @@ const settingsSubmenu: SettingsItem[] = [
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuthStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -68,6 +72,22 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     const userRole = localStorage.getItem("user_role");
     setIsAdmin(userRole === "admin");
   }, [pathname]);
+
+  function handleLogout() {
+    // Limpiar el store de autenticación
+    logout();
+    
+    // Limpiar otros datos del localStorage relacionados con la sesión
+    localStorage.removeItem("user_role");
+    
+    // Mostrar mensaje de confirmación
+    toast.success("Sesión cerrada", {
+      description: "Has cerrado sesión correctamente",
+    });
+    
+    // Redirigir a la página de login
+    router.push("/login");
+  }
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -183,7 +203,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             </div>
           )}
 
-          <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-destructive transition-all w-full text-left">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-destructive transition-all w-full text-left"
+          >
             <LogOut className="size-5" />
             Cerrar Sesión
           </button>

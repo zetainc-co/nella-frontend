@@ -1,11 +1,12 @@
 // src/components/calendario/calendar-event-card.tsx
 'use client'
 
-import { PROJECT_COLORS } from '@/types/calendar-types'
+import { getProjectColors } from '@/types/calendar-types'
 import type { CalendarEvent } from '@/types/calendar-types'
 
 interface CalendarEventCardProps {
   event: CalendarEvent
+  onClick?: (event: CalendarEvent) => void
 }
 
 function getEventPositionStyle(event: CalendarEvent): React.CSSProperties {
@@ -25,8 +26,13 @@ function getEventPositionStyle(event: CalendarEvent): React.CSSProperties {
   }
 }
 
-export function CalendarEventCard({ event }: CalendarEventCardProps) {
-  const colors = PROJECT_COLORS[event.project]
+export function CalendarEventCard({ event, onClick }: CalendarEventCardProps) {
+  const colors = getProjectColors(event.project)
+
+  function handleClick(e: React.MouseEvent) {
+    e.stopPropagation()
+    onClick?.(event)
+  }
 
   return (
     <div
@@ -37,6 +43,7 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
       }}
       className="rounded-r-md px-2 py-1 cursor-pointer overflow-hidden hover:brightness-110 transition-all"
       title={`${event.title} — ${event.client}`}
+      onClick={handleClick}
     >
       <div
         className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 mb-0.5"
