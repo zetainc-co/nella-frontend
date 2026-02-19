@@ -113,11 +113,12 @@ export function useRegistrationWizard() {
       setIsCreatingWorkflow(false)
       clearRegistrationProgress()
 
-      // Redirect to global login (base domain, no subdomain)
+      // Redirect to the tenant's own login page after registration
+      const tenantSlug = (result.data?.slug ?? result.slug) as string
       const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost'
       const port = window.location.port
       const portSuffix = port ? `:${port}` : ''
-      window.location.href = `http://${appDomain}${portSuffix}/login`
+      window.location.href = `http://${tenantSlug}.${appDomain}${portSuffix}/login`
     } catch (error) {
       setIsCreatingWorkflow(false)
       setWorkflowError(
