@@ -9,7 +9,7 @@ export default function ContactsPage() {
     const [showCreateModal, setShowCreateModal] = useState(false)
 
     return (
-        <div className="flex flex-col h-full min-h-screen p-6 bg-[#000000] overflow-hidden">
+        <div className="flex flex-col h-full min-h-screen p-6 overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
