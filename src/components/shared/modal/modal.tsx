@@ -91,8 +91,10 @@ export function Modal({
             >
                 {/* Header: custom | title | solo X */}
                 {header ? (
-                    <div className="relative overflow-hidden rounded-t-xl bg-[#1C1C1D] border-b border-zinc-800/50">
-                        <div className="absolute -top-24 -right-24 w-60 h-60 bg-[radial-gradient(circle,rgba(56,189,248,0.12)_0%,transparent_80%)] pointer-events-none" />
+                    <div className="relative overflow-visible rounded-t-xl bg-[#1a1a1e] border-b border-gray-800/50">
+                        {/* Glow - top spread */}
+                        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-[radial-gradient(ellipse,rgba(56,189,248,0.08)_0%,rgba(56,189,248,0.04)_40%,transparent_70%)] pointer-events-none" />
+                        <div className="absolute -top-10 right-10 w-40 h-40 bg-[radial-gradient(circle,rgba(56,189,248,0.12)_0%,transparent_60%)] pointer-events-none" />
                         {/* Close */}
                         <button
                             onClick={handleClose}
@@ -101,7 +103,7 @@ export function Modal({
                             <X className="w-5 h-5" />
                         </button>
                         {/* Custom header content */}
-                        <div className="relative px-6 pt-6 pb-5">
+                        <div className="relative px-6 pt-6 pb-6">
                             {header}
                         </div>
                     </div>

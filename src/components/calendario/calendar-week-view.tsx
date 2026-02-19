@@ -17,6 +17,7 @@ interface CalendarWeekViewProps {
   onOpenLinks: () => void
   onOpenAvailability: () => void
   onOpenSidebar: () => void
+  onEventClick?: (event: import('@/types/calendar-types').CalendarEvent) => void
 }
 
 export function CalendarWeekView({
@@ -24,6 +25,7 @@ export function CalendarWeekView({
   onOpenLinks,
   onOpenAvailability,
   onOpenSidebar,
+  onEventClick,
 }: CalendarWeekViewProps) {
   const { currentWeekStart, goToNextWeek, goToPrevWeek, getEventsForDate } =
     useCalendarStore()
@@ -140,7 +142,7 @@ export function CalendarWeekView({
       </div>
 
       {/* Scrollable time grid */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto custom-scrollbar">
         <div
           className="grid relative"
           style={{
@@ -184,7 +186,7 @@ export function CalendarWeekView({
                 ))}
 
                 {dayEvents.map(event => (
-                  <CalendarEventCard key={event.id} event={event} />
+                  <CalendarEventCard key={event.id} event={event} onClick={onEventClick} />
                 ))}
 
                 {isCurrentDay && <CalendarTimeIndicator />}

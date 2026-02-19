@@ -2,7 +2,9 @@
 
 import React, { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useAuthStore } from "@/stores/auth-store";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -89,6 +91,20 @@ function NavItem({
 /* ── Sidebar ──────────────────────────────────────────────────── */
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuthStore();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Auto-expand if on settings route
+    if (pathname.startsWith("/settings")) {
+      setSettingsOpen(true);
+    }
+    // Check admin status
+    const userRole = localStorage.getItem("user_role");
+    setIsAdmin(userRole === "admin");
+  }, [pathname]);
   const { user, logout } = useAuthStore();
   const initials = getInitials(user?.fullName);
 
@@ -100,6 +116,22 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   }
 
   const isSettingsActive = pathname.startsWith("/settings");
+
+  function handleLogout() {
+    // Limpiar el store de autenticación
+    logout();
+    
+    // Limpiar otros datos del localStorage relacionados con la sesión
+    localStorage.removeItem("user_role");
+    
+    // Mostrar mensaje de confirmación
+    toast.success("Sesión cerrada", {
+      description: "Has cerrado sesión correctamente",
+    });
+    
+    // Redirigir a la página de login
+    router.push("/login");
+  }
 
   return (
     <div className="flex flex-col h-full" style={{ background: "#0d0d0d" }}>
@@ -210,6 +242,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   );
 }
 
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-destructive transition-all w-full text-left"
+          >
+            <LogOut className="size-5" />
+            Cerrar Sesión
 /* ── Layout ───────────────────────────────────────────────────── */
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);

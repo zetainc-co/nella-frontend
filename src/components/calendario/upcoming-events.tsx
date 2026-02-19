@@ -4,7 +4,7 @@
 import { format, parseISO, isAfter, startOfToday } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useCalendarStore } from '@/stores/calendar-store'
-import { PROJECT_COLORS } from '@/types/calendar-types'
+import { getProjectColors } from '@/types/calendar-types'
 
 export function UpcomingEvents() {
   const { getFilteredEvents } = useCalendarStore()
@@ -28,7 +28,7 @@ export function UpcomingEvents() {
       ) : (
         <div className="space-y-2">
           {upcoming.map(event => {
-            const colors = PROJECT_COLORS[event.project]
+            const colors = getProjectColors(event.project)
             const parsedDate = parseISO(event.date)
             const dayLabel = format(parsedDate, "d 'de' MMM", { locale: es })
 
