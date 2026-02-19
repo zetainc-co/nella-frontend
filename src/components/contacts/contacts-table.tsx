@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ContactDetailModal } from "./contact-detail-modal"
 import type { ContactDetail } from "@/types/contact-types"
-import { useContacts, useContactsSSE } from "@/hooks/useContacts"
-import type { BackendContact } from "@/lib/contacts/contacts-api"
+import { useContacts } from "@/hooks/useContacts"
+import type { BackendContact } from "@/types/contacts"
 
 // Mapea lead_status (ai_clasificacion de n8n) a la categoría del UI
 // Lead = conversación activa (COLD LEAD, WARM LEAD, HOT LEAD, SOPORTE HUMANO)
@@ -94,7 +94,6 @@ export function ContactsTable() {
     const [selectedContact, setSelectedContact] = useState<ContactDetail | null>(null)
 
     const { data: backendContacts = [], isLoading } = useContacts()
-    useContactsSSE()
 
     const contacts = useMemo(() => backendContacts.map(mapBackendContact), [backendContacts])
 
