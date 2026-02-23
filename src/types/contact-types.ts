@@ -1,2 +1,2 @@
 // Re-export from new location -- will be removed in PASO 10
-export * from '@/modules/contacts/hooks/useContacts'
+export * from '@/modules/contacts/types/contact-types'
