@@ -1,6 +1,6 @@
 'use client'
 
-import type { ProjectMetrics } from '@/types/auth-types'
+import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
 
 const STATUS_LABELS: Record<string, string> = {
   new: 'Nuevos',

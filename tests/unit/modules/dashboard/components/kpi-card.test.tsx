@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { KpiCard } from '@/components/dashboard/kpi-card'
+import { KpiCard } from '@/modules/dashboard/components/kpi-card'
 import { Users } from 'lucide-react'
 
 describe('KpiCard', () => {

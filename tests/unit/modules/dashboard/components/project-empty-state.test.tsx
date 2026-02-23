@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { ProjectEmptyState } from '@/components/dashboard/project-empty-state'
+import { ProjectEmptyState } from '@/modules/dashboard/components/project-empty-state'
 
 describe('ProjectEmptyState', () => {
   it('renders heading and CTA button', () => {

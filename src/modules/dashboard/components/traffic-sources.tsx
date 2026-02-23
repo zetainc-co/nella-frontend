@@ -1,7 +1,7 @@
 'use client'
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
-import type { ProjectMetrics } from '@/types/auth-types'
+import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
 
 // Two-tone lime palette matching reference
 const COLORS = ['#9EFF00', '#39d353', '#5a9900', '#2a6e00', '#1a4500']

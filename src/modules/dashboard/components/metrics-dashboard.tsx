@@ -6,8 +6,8 @@ import { KpiCard } from "./kpi-card";
 import { LeadsLineChart } from "./leads-line-chart";
 import { ConversionFunnel } from "./conversion-funnel";
 import { TrafficSources } from "./traffic-sources";
-import { useMetrics, type Period } from "@/hooks/use-metrics";
-import { useMetricsSocket } from "@/hooks/use-metrics-socket";
+import { useMetrics, type Period } from "@/modules/dashboard/hooks/useMetrics";
+import { useMetricsSocket } from "@/modules/dashboard/hooks/useMetricsSocket";
 
 interface MetricsDashboardProps {
   projectId: string;

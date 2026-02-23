@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import {
   AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import type { ProjectMetrics } from '@/types/auth-types'
+import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
 
 interface LeadsLineChartProps {
   revenueMonth: ProjectMetrics['revenueMonth']

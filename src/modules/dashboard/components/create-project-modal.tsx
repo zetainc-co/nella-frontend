@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { X, Plus, Trash2, Rocket } from 'lucide-react'
-import { useCreateProject } from '@/hooks/use-projects'
+import { useCreateProject } from '@/modules/dashboard/hooks/useProjects'
 import { toast } from 'sonner'
 
 interface CreateProjectModalProps {

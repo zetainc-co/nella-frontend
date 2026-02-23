@@ -1,2 +1,2 @@
-// Renamed to use-metrics.ts — this file re-exports for backwards compatibility
-export { useMetrics } from './use-metrics'
+// Re-export from new location -- will be removed in PASO 10
+export { useMetrics } from '@/modules/dashboard/hooks/useMetrics'

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronDown, Plus } from 'lucide-react'
-import type { Project } from '@/types/auth-types'
+import type { Project } from '@/modules/dashboard/types/dashboard-types'
 
 interface ProjectSelectorProps {
   projects: Project[]
