@@ -8,7 +8,7 @@ import { step2Schema } from '@/lib/registration-validations'
 import { calculatePasswordStrength } from '@/lib/registration-validations'
 import { RegistrationFormData } from '@/types'
 import { Button } from '@/components/ui/button'
-import { CountryPhoneSelector } from '@/components/auth/country-phone-selector'
+import { CountryPhoneSelector } from '@/modules/auth/components/country-phone-selector'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface RegistrationStep2Props {

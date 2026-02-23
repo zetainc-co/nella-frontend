@@ -1,14 +1,14 @@
-// src/components/auth/registration-wizard.tsx
+// src/modules/auth/components/registration-wizard.tsx
 "use client";
 
 import Link from 'next/link'
 import { useRegistrationWizard } from "@/hooks/useRegistrationWizard";
-import { RegistrationStep1 } from "@/components/auth/registration-step-1";
-import { RegistrationStep2 } from "@/components/auth/registration-step-2";
-import { RegistrationStep3 } from "@/components/auth/registration-step-3";
-import { RegistrationStep4 } from "@/components/auth/registration-step-4";
-import { RegistrationSummary } from "@/components/auth/registration-summary";
-import { EmailVerification } from "@/components/auth/email-verification";
+import { RegistrationStep1 } from "@/modules/auth/components/registration-step-1";
+import { RegistrationStep2 } from "@/modules/auth/components/registration-step-2";
+import { RegistrationStep3 } from "@/modules/auth/components/registration-step-3";
+import { RegistrationStep4 } from "@/modules/auth/components/registration-step-4";
+import { RegistrationSummary } from "@/modules/auth/components/registration-summary";
+import { EmailVerification } from "@/modules/auth/components/email-verification";
 
 export function RegistrationWizard() {
   const {

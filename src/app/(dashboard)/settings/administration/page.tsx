@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { HudBackground } from "@/components/auth/hud-background";
+import { HudBackground } from "@/modules/auth/components/hud-background";
 import { HudCorners } from "@/components/ui/hud-corners";
 import { Button } from "@/components/ui/button";
 import {

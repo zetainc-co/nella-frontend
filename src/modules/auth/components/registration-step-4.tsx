@@ -8,7 +8,7 @@ import { step4Schema } from '@/lib/registration-validations'
 import { RegistrationFormData } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { CountryPhoneSelector } from '@/components/auth/country-phone-selector'
+import { CountryPhoneSelector } from '@/modules/auth/components/country-phone-selector'
 import { ChevronLeft, ChevronRight, Loader2, CheckCircle2, MessageSquare } from 'lucide-react'
 
 interface RegistrationStep4Props {
