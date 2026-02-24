@@ -8,14 +8,17 @@ vi.mock('@/stores/auth-store', () => ({
       session: {
         accessToken: 'test-token',
         tenantSlug: 'acme',
+        refreshToken: 'test-refresh-token',
       },
       logout: vi.fn(),
+      setSession: vi.fn(),
     }),
   },
 }))
 
 describe('apiClient', () => {
   beforeEach(() => {
+    vi.restoreAllMocks()
     vi.spyOn(global, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({ data: 'ok' }), { status: 200 })
     )
@@ -69,5 +72,44 @@ describe('apiClient', () => {
       new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 })
     )
     await expect(apiClient.get('/api/contacts')).rejects.toThrow('Sesión expirada')
+  })
+
+  it('attempts token refresh on 401 before logging out', async () => {
+    vi.spyOn(global, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 })
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ accessToken: 'new-token', refreshToken: 'new-refresh' }), { status: 200 })
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: 'ok' }), { status: 200 })
+      )
+
+    const result = await apiClient.get('/api/contacts')
+    expect(result).toEqual({ data: 'ok' })
+    expect(fetch).toHaveBeenCalledTimes(3)
+  })
+
+  it('logs out when refresh token also fails', async () => {
+    vi.spyOn(global, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 })
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: 'Invalid refresh token' }), { status: 401 })
+      )
+
+    await expect(apiClient.get('/api/contacts')).rejects.toThrow('Sesión expirada')
+  })
+
+  it('does not attempt refresh on auth endpoints returning 401', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce(
+      new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 })
+    )
+
+    await expect(apiClient.post('/api/auth/login', { email: 'a', password: 'b' }))
+      .rejects.toThrow()
+    expect(fetch).toHaveBeenCalledTimes(1)
   })
 })
