@@ -1,4 +1,4 @@
-// HU-017: MIGRACI\u00d3N DE TENANTS EXISTENTES
+// HU-017: MIGRACIÓN DE TENANTS EXISTENTES
 "use client";
 
 import { useState } from "react";
@@ -23,7 +23,7 @@ export function MigracionesTab() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [migrationProgress, setMigrationProgress] = useState<any>(null);
 
-  // Mock data de estado de migraci\u00f3n
+  // Mock data de estado de migración
   const [migrationStats, setMigrationStats] = useState({
     total: 12,
     migrated: 7,
@@ -35,84 +35,84 @@ export function MigracionesTab() {
   const [organizations, setOrganizations] = useState([
     {
       id: "org-001",
-      name: "Organizaci\u00f3n Alpha",
+      name: "Organización Alpha",
       currentVersion: "v1.2.0",
       status: "migrated",
       migratedAt: "2026-02-10",
     },
     {
       id: "org-002",
-      name: "Organizaci\u00f3n Beta",
+      name: "Organización Beta",
       currentVersion: "v1.2.0",
       status: "migrated",
       migratedAt: "2026-02-10",
     },
     {
       id: "org-003",
-      name: "Organizaci\u00f3n Gamma",
+      name: "Organización Gamma",
       currentVersion: "v1.1.5",
       status: "pending",
       migratedAt: null,
     },
     {
       id: "org-004",
-      name: "Organizaci\u00f3n Delta",
+      name: "Organización Delta",
       currentVersion: "v1.2.0",
       status: "migrated",
       migratedAt: "2026-02-11",
     },
     {
       id: "org-005",
-      name: "Organizaci\u00f3n Epsilon",
+      name: "Organización Epsilon",
       currentVersion: "v1.1.5",
       status: "pending",
       migratedAt: null,
     },
     {
       id: "org-006",
-      name: "Organizaci\u00f3n Zeta",
+      name: "Organización Zeta",
       currentVersion: "v1.2.0",
       status: "migrated",
       migratedAt: "2026-02-11",
     },
     {
       id: "org-007",
-      name: "Organizaci\u00f3n Eta",
+      name: "Organización Eta",
       currentVersion: "v1.1.5",
       status: "pending",
       migratedAt: null,
     },
     {
       id: "org-008",
-      name: "Organizaci\u00f3n Theta",
+      name: "Organización Theta",
       currentVersion: "v1.2.0",
       status: "migrated",
       migratedAt: "2026-02-12",
     },
     {
       id: "org-009",
-      name: "Organizaci\u00f3n Iota",
+      name: "Organización Iota",
       currentVersion: "v1.1.5",
       status: "pending",
       migratedAt: null,
     },
     {
       id: "org-010",
-      name: "Organizaci\u00f3n Kappa",
+      name: "Organización Kappa",
       currentVersion: "v1.2.0",
       status: "migrated",
       migratedAt: "2026-02-12",
     },
     {
       id: "org-011",
-      name: "Organizaci\u00f3n Lambda",
+      name: "Organización Lambda",
       currentVersion: "v1.1.5",
       status: "pending",
       migratedAt: null,
     },
     {
       id: "org-012",
-      name: "Organizaci\u00f3n Mu",
+      name: "Organización Mu",
       currentVersion: "v1.2.0",
       status: "migrated",
       migratedAt: "2026-02-13",
@@ -128,7 +128,7 @@ export function MigracionesTab() {
     const pendingOrgs = organizations.filter((org) => org.status === "pending");
     const batches = [];
 
-    // Dividir en lotes seg\u00fan batchSize
+    // Dividir en lotes según batchSize
     for (let i = 0; i < pendingOrgs.length; i += batchSize) {
       batches.push(pendingOrgs.slice(i, i + batchSize));
     }
@@ -153,20 +153,20 @@ export function MigracionesTab() {
         processing: true,
       }));
 
-      // Procesar cada organizaci\u00f3n del lote
+      // Procesar cada organización del lote
       for (let orgIndex = 0; orgIndex < batch.length; orgIndex++) {
         if (isPaused) break;
 
         const org = batch[orgIndex];
 
-        // Simular tiempo de migraci\u00f3n
+        // Simular tiempo de migración
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // HU-017: Validar que workflows funcionan
-        const validationSuccess = Math.random() > 0.05; // 95% \u00e9xito
+        const validationSuccess = Math.random() > 0.05; // 95% éxito
 
         if (validationSuccess) {
-          // Actualizar organizaci\u00f3n como migrada
+          // Actualizar organización como migrada
           setOrganizations((prev) =>
             prev.map((o) =>
               o.id === org.id
@@ -190,7 +190,7 @@ export function MigracionesTab() {
             orgId: org.id,
             orgName: org.name,
             status: "success",
-            message: "Migraci\u00f3n y validaci\u00f3n exitosa",
+            message: "Migración y validación exitosa",
           });
         } else {
           setMigrationStats((prev) => ({
@@ -203,7 +203,7 @@ export function MigracionesTab() {
             orgId: org.id,
             orgName: org.name,
             status: "failed",
-            message: "Error en validaci\u00f3n de workflow",
+            message: "Error en validación de workflow",
           });
         }
       }
@@ -248,7 +248,7 @@ export function MigracionesTab() {
       </div>
 
       <div className="space-y-6">
-        {/* Estad\u00edsticas de Migraci\u00f3n */}
+        {/* Estadísticas de Migración */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div className="relative border border-primary/20 bg-black/20 p-4">
             <div className="space-y-2">
@@ -296,10 +296,10 @@ export function MigracionesTab() {
           </div>
         </div>
 
-        {/* Configuraci\u00f3n de Migraci\u00f3n */}
+        {/* Configuración de Migración */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="space-y-2">
-            <label className="text-sm text-gray-400">Versi\u00f3n Origen</label>
+            <label className="text-sm text-gray-400">Versión Origen</label>
             <select
               value={sourceVersion}
               onChange={(e) => setSourceVersion(e.target.value)}
@@ -312,7 +312,7 @@ export function MigracionesTab() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm text-gray-400">Versi\u00f3n Destino</label>
+            <label className="text-sm text-gray-400">Versión Destino</label>
             <select
               value={targetVersion}
               onChange={(e) => setTargetVersion(e.target.value)}
@@ -325,7 +325,7 @@ export function MigracionesTab() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm text-gray-400">Tama\u00f1o de Lote</label>
+            <label className="text-sm text-gray-400">Tamaño de Lote</label>
             <select
               value={batchSize}
               onChange={(e) => setBatchSize(Number(e.target.value))}
@@ -339,15 +339,15 @@ export function MigracionesTab() {
           </div>
         </div>
 
-        {/* Progreso de Migraci\u00f3n */}
+        {/* Progreso de Migración */}
         {migrationProgress && (
           <div className="rounded border border-blue-500/20 bg-blue-500/5 p-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-bold text-white">
                   {migrationProgress.completed
-                    ? "Migraci\u00f3n Completada"
-                    : "Migraci\u00f3n en Progreso"}
+                    ? "Migración Completada"
+                    : "Migración en Progreso"}
                 </h4>
                 <span className="text-xs text-gray-400 font-mono">
                   Lote {migrationProgress.currentBatch}/
@@ -423,8 +423,8 @@ export function MigracionesTab() {
               <thead className="border-b border-primary/20 sticky top-0 bg-black/60 backdrop-blur-sm">
                 <tr className="text-xs text-gray-400">
                   <th className="px-3 py-2 text-left">ID</th>
-                  <th className="px-3 py-2 text-left">Organizaci\u00f3n</th>
-                  <th className="px-3 py-2 text-left">Versi\u00f3n Actual</th>
+                  <th className="px-3 py-2 text-left">Organización</th>
+                  <th className="px-3 py-2 text-left">Versión Actual</th>
                   <th className="px-3 py-2 text-left">Estado</th>
                   <th className="px-3 py-2 text-left">Migrada</th>
                 </tr>
@@ -465,7 +465,7 @@ export function MigracionesTab() {
           </div>
         </div>
 
-        {/* Botones de Acci\u00f3n */}
+        {/* Botones de Acción */}
         <div className="flex gap-3">
           <Button
             variant="outline"
@@ -473,7 +473,7 @@ export function MigracionesTab() {
             disabled={migrationStats.pending === 0 || isMigrating}
           >
             <Play className="h-4 w-4" />
-            Simular Migraci\u00f3n
+            Simular Migración
           </Button>
           <Button
             className="flex-1 gap-2"
@@ -488,13 +488,13 @@ export function MigracionesTab() {
             ) : (
               <>
                 <RefreshCw className="h-4 w-4" />
-                Iniciar Migraci\u00f3n ({migrationStats.pending} pendientes)
+                Iniciar Migración ({migrationStats.pending} pendientes)
               </>
             )}
           </Button>
         </div>
 
-        {/* Modal de Confirmaci\u00f3n */}
+        {/* Modal de Confirmación */}
         {showConfirmation && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
             <div className="relative max-w-md w-full mx-4 border border-yellow-500/30 bg-black/90 p-6 backdrop-blur-sm">
@@ -503,12 +503,12 @@ export function MigracionesTab() {
                 <div className="flex items-center gap-3">
                   <AlertTriangle className="h-6 w-6 text-yellow-500" />
                   <h3 className="text-lg font-bold text-white">
-                    Confirmar Migraci\u00f3n
+                    Confirmar Migración
                   </h3>
                 </div>
                 <div className="space-y-2 text-sm text-gray-300">
                   <p>
-                    Est\u00e1s a punto de migrar{" "}
+                    Estás a punto de migrar{" "}
                     <strong className="text-primary">
                       {migrationStats.pending} organizaciones
                     </strong>{" "}
@@ -516,15 +516,15 @@ export function MigracionesTab() {
                     <strong>{targetVersion}</strong>.
                   </p>
                   <p>
-                    La migraci\u00f3n se realizar\u00e1 en lotes de{" "}
+                    La migración se realizará en lotes de{" "}
                     <strong className="text-primary">
                       {batchSize} organizaciones
                     </strong>{" "}
-                    para evitar saturaci\u00f3n del sistema.
+                    para evitar saturación del sistema.
                   </p>
                   <p className="text-xs text-gray-400">
-                    Cada workflow ser\u00e1 validado despu\u00e9s de la migraci\u00f3n. El
-                    workflow centralizado se mantendr\u00e1 activo hasta que todas
+                    Cada workflow será validado después de la migración. El
+                    workflow centralizado se mantendrá activo hasta que todas
                     las migraciones se completen exitosamente.
                   </p>
                 </div>

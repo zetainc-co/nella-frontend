@@ -27,35 +27,35 @@ export function BulkUpdatesTab() {
   const mockWorkflows = [
     {
       id: "1",
-      organization: "Organizaci\u00f3n Alpha",
+      organization: "Organización Alpha",
       name: "WhatsApp Bot Alpha",
       status: "active",
       version: "v1.2.0",
     },
     {
       id: "2",
-      organization: "Organizaci\u00f3n Beta",
+      organization: "Organización Beta",
       name: "WhatsApp Bot Beta",
       status: "active",
       version: "v1.2.0",
     },
     {
       id: "3",
-      organization: "Organizaci\u00f3n Gamma",
+      organization: "Organización Gamma",
       name: "WhatsApp Bot Gamma",
       status: "active",
       version: "v1.1.5",
     },
     {
       id: "4",
-      organization: "Organizaci\u00f3n Delta",
+      organization: "Organización Delta",
       name: "WhatsApp Bot Delta",
       status: "active",
       version: "v1.2.0",
     },
     {
       id: "5",
-      organization: "Organizaci\u00f3n Epsilon",
+      organization: "Organización Epsilon",
       name: "WhatsApp Bot Epsilon",
       status: "active",
       version: "v1.1.5",
@@ -66,7 +66,7 @@ export function BulkUpdatesTab() {
     (wf) => scope === "all" || (scope === "version" && wf.version === "v1.1.5"),
   );
 
-  // Validaci\u00f3n de formulario
+  // Validación de formulario
   const isFormValid = () => {
     if (updateType === "parameter") {
       return selectedParam && newValue;
@@ -79,7 +79,7 @@ export function BulkUpdatesTab() {
     setIsDryRun(true);
     setIsExecuting(true);
 
-    // Simular an\u00e1lisis de impacto
+    // Simular análisis de impacto
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const dryRunResults = {
@@ -99,7 +99,7 @@ export function BulkUpdatesTab() {
     setIsDryRun(false);
   };
 
-  // Aplicar Actualizaci\u00f3n Real (HU-016: Aplicar a todos los workflows activos)
+  // Aplicar Actualización Real (HU-016: Aplicar a todos los workflows activos)
   const handleApplyUpdate = async () => {
     setShowConfirmation(false);
     setIsExecuting(true);
@@ -111,14 +111,14 @@ export function BulkUpdatesTab() {
       details: [] as any[],
     };
 
-    // Simular actualizaci\u00f3n workflow por workflow
+    // Simular actualización workflow por workflow
     for (let i = 0; i < selectedWorkflows.length; i++) {
       const wf = selectedWorkflows[i];
 
       // Simular tiempo de procesamiento
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Simular \u00e9xito/fallo (90% \u00e9xito, 10% fallo)
+      // Simular éxito/fallo (90% éxito, 10% fallo)
       const success = Math.random() > 0.1;
 
       if (success) {
@@ -127,7 +127,7 @@ export function BulkUpdatesTab() {
           workflowId: wf.id,
           organization: wf.organization,
           status: "success",
-          message: "Actualizaci\u00f3n aplicada correctamente",
+          message: "Actualización aplicada correctamente",
         });
       } else {
         results.failed++;
@@ -155,7 +155,7 @@ export function BulkUpdatesTab() {
         ...results,
         inProgress: false,
         rollback: true,
-        rollbackReason: `${failureRate.toFixed(1)}% de workflows fallaron (l\u00edmite: 10%). Iniciando rollback...`,
+        rollbackReason: `${failureRate.toFixed(1)}% de workflows fallaron (límite: 10%). Iniciando rollback...`,
       });
 
       // Simular rollback
@@ -190,7 +190,7 @@ export function BulkUpdatesTab() {
               Actualizaciones Masivas
             </h3>
             <p className="text-sm text-gray-400">
-              Aplicar cambios a m\u00faltiples workflows simult\u00e1neamente
+              Aplicar cambios a múltiples workflows simultáneamente
             </p>
           </div>
         </div>
@@ -200,11 +200,11 @@ export function BulkUpdatesTab() {
       </div>
 
       <div className="space-y-6">
-        {/* Configuraci\u00f3n de Actualizaci\u00f3n */}
+        {/* Configuración de Actualización */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm text-gray-400">
-              Tipo de Actualizaci\u00f3n *
+              Tipo de Actualización *
             </label>
             <select
               value={updateType}
@@ -215,7 +215,7 @@ export function BulkUpdatesTab() {
               disabled={isExecuting}
               className="w-full rounded border border-primary/20 bg-black/40 px-3 py-2 text-white backdrop-blur-sm focus:border-primary focus:outline-none disabled:opacity-50"
             >
-              <option value="parameter">Actualizar Par\u00e1metro</option>
+              <option value="parameter">Actualizar Parámetro</option>
               <option value="prompt">Actualizar Prompt IA</option>
               <option value="node">Actualizar Nodo</option>
               <option value="version">Actualizar Template Version</option>
@@ -237,14 +237,14 @@ export function BulkUpdatesTab() {
                 Todos los workflows activos ({mockWorkflows.length})
               </option>
               <option value="version">Solo workflows v1.1.5 (2)</option>
-              <option value="specific">Workflows espec\u00edficos</option>
+              <option value="specific">Workflows específicos</option>
             </select>
           </div>
 
           {updateType === "parameter" && (
             <>
               <div className="space-y-2">
-                <label className="text-sm text-gray-400">Par\u00e1metro *</label>
+                <label className="text-sm text-gray-400">Parámetro *</label>
                 <select
                   value={selectedParam}
                   onChange={(e) => {
@@ -254,7 +254,7 @@ export function BulkUpdatesTab() {
                   disabled={isExecuting}
                   className="w-full rounded border border-primary/20 bg-black/40 px-3 py-2 text-white backdrop-blur-sm focus:border-primary focus:outline-none disabled:opacity-50"
                 >
-                  <option value="">Seleccionar par\u00e1metro...</option>
+                  <option value="">Seleccionar parámetro...</option>
                   <option value="max_tokens">max_tokens (AI)</option>
                   <option value="temperature">temperature (AI)</option>
                   <option value="timeout">timeout (Webhook)</option>
@@ -294,9 +294,9 @@ export function BulkUpdatesTab() {
             <table className="w-full">
               <thead className="border-b border-primary/20 sticky top-0 bg-black/60 backdrop-blur-sm">
                 <tr className="text-xs text-gray-400">
-                  <th className="px-3 py-2 text-left">Organizaci\u00f3n</th>
+                  <th className="px-3 py-2 text-left">Organización</th>
                   <th className="px-3 py-2 text-left">Workflow</th>
-                  <th className="px-3 py-2 text-left">Versi\u00f3n</th>
+                  <th className="px-3 py-2 text-left">Versión</th>
                   <th className="px-3 py-2 text-left">Estado</th>
                 </tr>
               </thead>
@@ -326,7 +326,7 @@ export function BulkUpdatesTab() {
           </div>
         </div>
 
-        {/* Resultados de Dry Run o Ejecuci\u00f3n */}
+        {/* Resultados de Dry Run o Ejecución */}
         {executionResults && (
           <div
             className={`rounded border p-4 ${
@@ -339,10 +339,10 @@ export function BulkUpdatesTab() {
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-bold text-white">
                   {executionResults.inProgress
-                    ? "Ejecuci\u00f3n en Progreso..."
+                    ? "Ejecución en Progreso..."
                     : executionResults.rollback
                       ? "Rollback Ejecutado"
-                      : "Resultado de la Operaci\u00f3n"}
+                      : "Resultado de la Operación"}
                 </h4>
                 {executionResults.inProgress && (
                   <span className="text-xs text-gray-400 font-mono">
@@ -363,7 +363,7 @@ export function BulkUpdatesTab() {
                 </div>
               )}
 
-              {/* Estad\u00edsticas */}
+              {/* Estadísticas */}
               {!executionResults.inProgress && (
                 <div className="grid grid-cols-3 gap-3">
                   <div className="text-center">
@@ -397,13 +397,13 @@ export function BulkUpdatesTab() {
                 <div className="flex items-start gap-2 p-3 rounded bg-red-500/10 border border-red-500/20">
                   <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-red-400">
-                    <p className="font-semibold mb-1">Rollback Autom\u00e1tico</p>
+                    <p className="font-semibold mb-1">Rollback Automático</p>
                     <p>{executionResults.rollbackReason}</p>
                   </div>
                 </div>
               )}
 
-              {/* Detalles de la ejecuci\u00f3n */}
+              {/* Detalles de la ejecución */}
               {executionResults.details &&
                 executionResults.details.length > 0 && (
                   <div className="space-y-2 max-h-[200px] overflow-y-auto">
@@ -436,7 +436,7 @@ export function BulkUpdatesTab() {
           </div>
         )}
 
-        {/* Botones de Acci\u00f3n */}
+        {/* Botones de Acción */}
         <div className="flex gap-3">
           <Button
             variant="outline"
@@ -469,13 +469,13 @@ export function BulkUpdatesTab() {
             ) : (
               <>
                 <RefreshCw className="h-4 w-4" />
-                Aplicar Actualizaci\u00f3n
+                Aplicar Actualización
               </>
             )}
           </Button>
         </div>
 
-        {/* Modal de Confirmaci\u00f3n */}
+        {/* Modal de Confirmación */}
         {showConfirmation && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
             <div className="relative max-w-md w-full mx-4 border border-yellow-500/30 bg-black/90 p-6 backdrop-blur-sm">
@@ -484,19 +484,19 @@ export function BulkUpdatesTab() {
                 <div className="flex items-center gap-3">
                   <AlertTriangle className="h-6 w-6 text-yellow-500" />
                   <h3 className="text-lg font-bold text-white">
-                    Confirmar Actualizaci\u00f3n
+                    Confirmar Actualización
                   </h3>
                 </div>
                 <p className="text-sm text-gray-300">
-                  Est\u00e1s a punto de actualizar{" "}
+                  Estás a punto de actualizar{" "}
                   <strong className="text-primary">
                     {selectedWorkflows.length} workflows
                   </strong>
-                  . Esta operaci\u00f3n puede tardar varios minutos.
+                  . Esta operación puede tardar varios minutos.
                 </p>
                 <p className="text-xs text-gray-400">
-                  Si m\u00e1s del 10% de los workflows fallan, se ejecutar\u00e1 un
-                  rollback autom\u00e1tico.
+                  Si más del 10% de los workflows fallan, se ejecutará un
+                  rollback automático.
                 </p>
                 <div className="flex gap-3">
                   <Button

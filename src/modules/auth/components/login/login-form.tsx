@@ -40,7 +40,7 @@ export function LoginForm({ tenantSlug }: LoginFormProps) {
       {
         onSuccess: ({ session }) => {
           toast.success('Bienvenido', {
-            description: `Sesi\u00f3n iniciada como ${session.fullName}`,
+            description: `Sesión iniciada como ${session.fullName}`,
           })
           // Full URL redirect to the tenant subdomain dashboard
           const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost'
@@ -61,7 +61,7 @@ export function LoginForm({ tenantSlug }: LoginFormProps) {
           Nella<span style={{ color: '#9EFF00' }}>Sales</span>
         </h1>
         <p className="text-sm" style={{ color: 'rgba(240,244,255,0.5)' }}>
-          Inicia sesi\u00f3n en tu cuenta
+          Inicia sesión en tu cuenta
         </p>
       </div>
 
@@ -95,13 +95,13 @@ export function LoginForm({ tenantSlug }: LoginFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Contrase\u00f1a <span className="text-destructive">*</span>
+                  Contraseña <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="Ingresa tu contrase\u00f1a"
+                      placeholder="Ingresa tu contraseña"
                       className="auth-input pr-10"
                       {...field}
                     />
@@ -124,7 +124,7 @@ export function LoginForm({ tenantSlug }: LoginFormProps) {
               href="/forgot-password"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              \u00bfOlvidaste tu contrase\u00f1a?
+              ¿Olvidaste tu contraseña?
             </a>
           </div>
 
@@ -134,7 +134,7 @@ export function LoginForm({ tenantSlug }: LoginFormProps) {
             ) : (
               <>
                 <LogIn className="h-4 w-4" />
-                Iniciar Sesi\u00f3n
+                Iniciar Sesión
               </>
             )}
           </Button>
@@ -142,7 +142,7 @@ export function LoginForm({ tenantSlug }: LoginFormProps) {
           <div className="relative my-5">
             <Separator />
             <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-              o contin\u00faa con
+              o continúa con
             </span>
           </div>
 
@@ -150,13 +150,13 @@ export function LoginForm({ tenantSlug }: LoginFormProps) {
 
           {/* Footer link — inside card */}
           <div className="text-center text-sm pt-2">
-            <span style={{ color: 'rgba(240,244,255,0.5)' }}>\u00bfNo tienes una cuenta? </span>
+            <span style={{ color: 'rgba(240,244,255,0.5)' }}>¿No tienes una cuenta? </span>
             <Link
               href="/register"
               className="font-medium hover:underline transition-colors"
               style={{ color: '#9EFF00' }}
             >
-              Reg\u00edstrate aqu\u00ed
+              Regístrate aquí
             </Link>
           </div>
         </form>
