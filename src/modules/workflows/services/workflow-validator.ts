@@ -1,5 +1,5 @@
 // src/lib/workflows/workflow-validator.ts
-import type { WorkflowConfig, WorkflowCredentials } from './workflow-types'
+import type { WorkflowConfig, WorkflowCredentials } from '@/modules/workflows/types/workflow-types'
 
 interface ValidationResult {
   isValid: boolean

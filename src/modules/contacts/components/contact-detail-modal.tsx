@@ -17,7 +17,7 @@ import { InfoCard } from "./info-card"
 import { ContactHeader } from "./contact-header"
 import { ChannelIcon } from "./channel-icon"
 import { CreateContactModal } from "./create-contact-modal"
-import type { ContactDetailModalProps } from "@/types/contact-types"
+import type { ContactDetailModalProps } from "@/modules/contacts/types/contact-types"
 
 export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetailModalProps) {
     const [showEditModal, setShowEditModal] = useState(false)

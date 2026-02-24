@@ -1,7 +1,7 @@
 import { Pencil } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import type { ContactDetail } from "@/types/contact-types"
+import type { ContactDetail } from "@/modules/contacts/types/contact-types"
 
 const stageVariants: Record<string, "cliente" | "lead" | "inactivo"> = {
     "Cliente": "cliente",

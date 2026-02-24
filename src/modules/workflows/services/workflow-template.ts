@@ -1,5 +1,5 @@
 // src/lib/workflows/workflow-template.ts
-import type { WorkflowTemplate } from './workflow-types'
+import type { WorkflowTemplate } from '@/modules/workflows/types/workflow-types'
 
 class WorkflowTemplateManager {
   async getBase(): Promise<WorkflowTemplate> {

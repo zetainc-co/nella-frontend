@@ -3,8 +3,8 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { workflowService } from '@/lib/workflows/workflow-service'
-import type { TenantWorkflowConfig, WorkflowConfigUpdate } from '@/lib/workflows/workflow-types'
+import { workflowService } from '@/modules/workflows/services/workflow-service'
+import type { TenantWorkflowConfig, WorkflowConfigUpdate } from '@/modules/workflows/types/workflow-types'
 
 function getTenantId(): string {
   if (typeof window === 'undefined') return ''

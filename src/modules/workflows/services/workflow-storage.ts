@@ -1,5 +1,5 @@
 // src/lib/workflows/workflow-storage.ts
-import type { TenantWorkflowConfig } from './workflow-types'
+import type { TenantWorkflowConfig } from '@/modules/workflows/types/workflow-types'
 
 const STORAGE_KEY = 'nella_workflow_configs'
 

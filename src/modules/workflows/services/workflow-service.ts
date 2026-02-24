@@ -7,7 +7,7 @@ import type {
   WorkflowConfigUpdate,
   WorkflowCredentials,
   CreateWorkflowParams,
-} from './workflow-types'
+} from '@/modules/workflows/types/workflow-types'
 
 /**
  * Servicio que simula la API de N8n

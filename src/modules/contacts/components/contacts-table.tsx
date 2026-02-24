@@ -5,9 +5,9 @@ import { Search, Filter, Download, MoreVertical, Phone, ChevronLeft, ChevronRigh
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ContactDetailModal } from "./contact-detail-modal"
-import type { ContactDetail } from "@/types/contact-types"
-import { useContacts } from "@/hooks/useContacts"
-import type { BackendContact } from "@/types/contacts"
+import type { ContactDetail } from "@/modules/contacts/types/contact-types"
+import { useContacts } from "@/modules/contacts/hooks/useContacts"
+import type { BackendContact } from "@/modules/contacts/types/contacts"
 
 // Mapea lead_status (ai_clasificacion de n8n) a la categoría del UI
 // Lead = conversación activa (COLD LEAD, WARM LEAD, HOT LEAD, SOPORTE HUMANO)

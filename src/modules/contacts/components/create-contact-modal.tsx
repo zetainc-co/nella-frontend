@@ -14,8 +14,8 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Modal, ModalSection } from "@/components/shared/modal/modal"
 import { User, Building2, Globe, MessageSquare, Tag, X } from "lucide-react"
-import type { CreateContactModalProps } from "@/types/contact-types"
-import { useCreateContact, useUpdateContact } from "@/hooks/useContacts"
+import type { CreateContactModalProps } from "@/modules/contacts/types/contact-types"
+import { useCreateContact, useUpdateContact } from "@/modules/contacts/hooks/useContacts"
 import { useEffect } from "react"
 
 const EMPTY_FORM = {

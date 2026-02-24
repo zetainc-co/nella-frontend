@@ -3,8 +3,8 @@
 
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { workflowService } from '@/lib/workflows/workflow-service'
-import type { WorkflowCredentials } from '@/lib/workflows/workflow-types'
+import { workflowService } from '@/modules/workflows/services/workflow-service'
+import type { WorkflowCredentials } from '@/modules/workflows/types/workflow-types'
 
 export function useWorkflowCredentials(workflowId: string) {
   const queryClient = useQueryClient()

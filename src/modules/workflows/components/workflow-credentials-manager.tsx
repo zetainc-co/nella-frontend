@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useWorkflowCredentials } from '@/hooks/useWorkflowCredentials'
+import { useWorkflowCredentials } from '@/modules/workflows/hooks/useWorkflowCredentials'
 import { HudCorners } from '@/components/ui/hud-corners'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,7 +17,7 @@ import {
   Key,
   AlertCircle
 } from 'lucide-react'
-import type { WorkflowCredentials } from '@/lib/workflows/workflow-types'
+import type { WorkflowCredentials } from '@/modules/workflows/types/workflow-types'
 
 interface WorkflowCredentialsManagerProps {
   workflowId: string
