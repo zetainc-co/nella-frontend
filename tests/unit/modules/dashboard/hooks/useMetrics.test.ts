@@ -33,11 +33,6 @@ describe('useMetrics', () => {
 
     renderHook(() => useMetrics('proj-1', 'all'), { wrapper: createWrapper() })
 
-    // Zustand persist may read storage for its own store, but the hook itself should NOT
-    // read nella-auth-storage directly (that was the bug)
-    const directAuthReads = getSpy.mock.calls.filter(
-      call => call[0] === 'nella-auth-storage'
-    )
     // The hook should use apiClient which reads from zustand store, NOT localStorage
     // We verify by checking the apiClient was called instead
     const { apiClient } = await import('@/core/api/api-client')

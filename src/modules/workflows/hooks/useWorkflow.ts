@@ -1,15 +1,15 @@
-// src/hooks/useWorkflow.ts
+// src/modules/workflows/hooks/useWorkflow.ts
 "use client"
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { workflowService } from '@/modules/workflows/services/workflow-service'
+import { useAuthStore } from '@/core/store/auth-store'
 import type { TenantWorkflowConfig, WorkflowConfigUpdate } from '@/modules/workflows/types/workflow-types'
 
 function getTenantId(): string {
-  if (typeof window === 'undefined') return ''
-  const session = JSON.parse(localStorage.getItem('nella_session') || '{}')
-  return session.tenantId || ''
+  const { session } = useAuthStore.getState()
+  return session?.tenantId || ''
 }
 
 export function useWorkflow() {
