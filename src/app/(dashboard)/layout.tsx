@@ -14,7 +14,7 @@ import {
   Menu,
   X,
 } from 'lucide-react'
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore } from '@/core/store/auth-store'
 import { useLogout } from '@/shared/hooks/useLogout'
 import { ProtectedRoute } from '@/core/routes/ProtectedRoute'
 

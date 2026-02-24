@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { apiClient } from '@/core/api/api-client'
 
 // Mock the auth store
-vi.mock('@/stores/auth-store', () => ({
+vi.mock('@/core/store/auth-store', () => ({
   useAuthStore: {
     getState: () => ({
       session: {

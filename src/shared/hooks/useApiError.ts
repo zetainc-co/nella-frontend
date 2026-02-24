@@ -18,7 +18,7 @@ function getMessageForStatus(error: ApiError, fallback?: string): string {
   if (status === 404) return 'El recurso solicitado no existe'
   if (status && status >= 500) return 'Error interno, intenta de nuevo'
   if (typeof navigator !== 'undefined' && !navigator.onLine) return 'No hay conexión con el servidor'
-  return fallback ?? error.message ?? 'Ocurrió un error inesperado'
+  return error.message ?? fallback ?? 'Ocurrió un error inesperado'
 }
 
 export function useApiError() {

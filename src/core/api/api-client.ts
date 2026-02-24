@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore } from '@/core/store/auth-store'
 
 let isRefreshing = false
 let refreshPromise: Promise<boolean> | null = null

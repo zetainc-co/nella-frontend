@@ -60,14 +60,14 @@ describe('useApiError', () => {
     expect(toast.error).toHaveBeenCalledWith('Error interno, intenta de nuevo')
   })
 
-  it('shows fallbackMessage when error has no status', async () => {
+  it('shows error.message when error has no status and message exists', async () => {
     const { toast } = await import('sonner')
     const { result } = renderHook(() => useApiError())
     result.current.handleError(new Error('Network error'), {
       showToast: true,
       fallbackMessage: 'Error al cargar contactos',
     })
-    expect(toast.error).toHaveBeenCalledWith('Error al cargar contactos')
+    expect(toast.error).toHaveBeenCalledWith('Network error')
   })
 
   it('withErrorHandling returns success result', async () => {

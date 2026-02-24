@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore } from '@/core/store/auth-store'
 
 export function useLogout() {
   const router = useRouter()
