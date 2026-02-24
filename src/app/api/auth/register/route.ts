@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { unwrapBackend } from '@/lib/backend-fetch'
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'
 
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json(unwrapBackend(data), { status: 201 })
   } catch (error) {
     console.error('[API/auth/register] Error:', error)
     return NextResponse.json(

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { backendHeaders } from '@/lib/backend-fetch'
+import { backendHeaders, unwrapBackend } from '@/lib/backend-fetch'
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       const message = (data as { message?: string })?.message ?? 'Backend error'
       return NextResponse.json({ error: message }, { status: response.status })
     }
-    return NextResponse.json(data, { status: 200 })
+    return NextResponse.json(unwrapBackend(data), { status: 200 })
   } catch (error) {
     console.error('[API/projects GET]', error)
     return NextResponse.json({ error: 'Backend no disponible' }, { status: 503 })
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       const message = (data as { message?: string })?.message ?? 'Backend error'
       return NextResponse.json({ error: message }, { status: response.status })
     }
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json(unwrapBackend(data), { status: 201 })
   } catch (error) {
     console.error('[API/projects POST]', error)
     return NextResponse.json({ error: 'Backend no disponible' }, { status: 503 })
