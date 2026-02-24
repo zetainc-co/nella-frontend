@@ -2,21 +2,22 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthValidation } from '@/core/routes/hooks/useAuthValidation'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
+  module?: string
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, module }: ProtectedRouteProps) {
   const router = useRouter()
-  const { isAuthenticated, session, isLoading } = useAuthStore()
+  const { isValid, isLoading } = useAuthValidation()
 
   useEffect(() => {
-    if (!isLoading && (!isAuthenticated || !session?.tenantId)) {
+    if (!isLoading && !isValid) {
       router.replace('/login')
     }
-  }, [isAuthenticated, session, isLoading, router])
+  }, [isValid, isLoading, router])
 
   if (isLoading) {
     return (
@@ -29,7 +30,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     )
   }
 
-  if (!isAuthenticated || !session?.tenantId) return null
+  if (!isValid) return null
 
   return <>{children}</>
 }
