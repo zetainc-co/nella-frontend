@@ -23,13 +23,19 @@ export function TimeSlots({ slots, selectedSlot, onSelectSlot, selectedDay, mont
       </div>
 
       {/* Grid de slots */}
-      <div className="grid grid-cols-3 gap-2">
-        {slots.map(slot => {
+      {slots.length === 0 ? (
+        <p className="text-sm text-center py-4" style={{ color: 'rgba(240,244,255,0.35)' }}>
+          No hay horarios disponibles para este día.
+        </p>
+      ) : (
+        <div className="grid grid-cols-3 gap-2">
+          {slots.map(slot => {
           const isSelected = selectedSlot === slot
           return (
             <button
               key={slot}
               onClick={() => onSelectSlot(slot)}
+              aria-label={`Seleccionar horario ${slot}`}
               className="rounded-lg text-sm font-medium transition-all duration-150 py-2.5"
               style={{
                 background: isSelected ? '#9EFF00' : 'rgba(255,255,255,0.04)',
@@ -58,7 +64,8 @@ export function TimeSlots({ slots, selectedSlot, onSelectSlot, selectedDay, mont
             </button>
           )
         })}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
