@@ -33,10 +33,12 @@ export function CalendarPicker({
   availableDays,
   selectedDay,
   onSelectDay,
+  month,
+  year,
 }: CalendarPickerProps) {
   const today = new Date()
-  const [viewMonth, setViewMonth] = useState(today.getMonth())
-  const [viewYear, setViewYear] = useState(today.getFullYear())
+  const [viewMonth, setViewMonth] = useState(month ?? today.getMonth())
+  const [viewYear, setViewYear] = useState(year ?? today.getFullYear())
 
   const daysInMonth = getDaysInMonth(viewYear, viewMonth)
   const firstDayOffset = getFirstDayOffset(viewYear, viewMonth)
