@@ -90,6 +90,8 @@ export function BookingLayout({ token: _token }: BookingLayoutProps) {
                       onMonthChange={(month, year) => {
                         setActiveMonth(month)
                         setActiveYear(year)
+                        setSelectedDay(null)
+                        setSelectedSlot(null)
                       }}
                     />
 

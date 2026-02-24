@@ -42,25 +42,19 @@ export function CalendarPicker({
   const firstDayOffset = getFirstDayOffset(viewYear, viewMonth)
 
   function prevMonth() {
-    if (viewMonth === 0) {
-      setViewMonth(11)
-      setViewYear(y => y - 1)
-      onMonthChange?.(11, viewYear - 1)
-    } else {
-      setViewMonth(m => m - 1)
-      onMonthChange?.(viewMonth - 1, viewYear)
-    }
+    const nextM = viewMonth === 0 ? 11 : viewMonth - 1
+    const nextY = viewMonth === 0 ? viewYear - 1 : viewYear
+    setViewMonth(nextM)
+    setViewYear(nextY)
+    onMonthChange?.(nextM, nextY)
   }
 
   function nextMonth() {
-    if (viewMonth === 11) {
-      setViewMonth(0)
-      setViewYear(y => y + 1)
-      onMonthChange?.(0, viewYear + 1)
-    } else {
-      setViewMonth(m => m + 1)
-      onMonthChange?.(viewMonth + 1, viewYear)
-    }
+    const nextM = viewMonth === 11 ? 0 : viewMonth + 1
+    const nextY = viewMonth === 11 ? viewYear + 1 : viewYear
+    setViewMonth(nextM)
+    setViewYear(nextY)
+    onMonthChange?.(nextM, nextY)
   }
 
   // Construir array de celdas (null = celda vacía de offset)
