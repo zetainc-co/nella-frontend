@@ -1,10 +1,5 @@
 import { CheckCircle2, CalendarDays, Clock, Video } from 'lucide-react'
-import { BookingAgent, BookingLead } from '@/types/booking'
-
-const MONTH_NAMES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-]
+import { BookingAgent, BookingLead, MONTH_NAMES } from '@/types/booking'
 
 interface BookingConfirmationProps {
   agent: BookingAgent
@@ -61,19 +56,19 @@ export function BookingConfirmation({
         }}
       >
         <div className="flex items-center gap-3">
-          <CalendarDays size={16} style={{ color: '#9EFF00' }} />
+          <CalendarDays size={16} className="shrink-0" style={{ color: '#9EFF00' }} />
           <span className="text-sm" style={{ color: '#f0f4ff' }}>
             {selectedDay} de {MONTH_NAMES[month]} de {year}
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <Clock size={16} style={{ color: '#9EFF00' }} />
+          <Clock size={16} className="shrink-0" style={{ color: '#9EFF00' }} />
           <span className="text-sm" style={{ color: '#f0f4ff' }}>
             {selectedSlot} — {agent.duration} minutos
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <Video size={16} style={{ color: '#9EFF00' }} />
+          <Video size={16} className="shrink-0" style={{ color: '#9EFF00' }} />
           <span className="text-sm" style={{ color: '#f0f4ff' }}>
             {agent.platform}
           </span>

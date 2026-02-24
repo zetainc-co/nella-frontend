@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { MONTH_NAMES } from '@/types/booking'
 
 interface CalendarPickerProps {
   availableDays: number[]
@@ -10,11 +11,6 @@ interface CalendarPickerProps {
   month?: number  // 0-indexed (0 = enero)
   year?: number
 }
-
-const MONTH_NAMES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-]
 
 const DAY_HEADERS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do']
 

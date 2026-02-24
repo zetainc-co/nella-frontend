@@ -21,6 +21,11 @@ export interface BookingState {
   confirmed: boolean
 }
 
+export const MONTH_NAMES = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+]
+
 // Mock data — en Fase 2 se resuelve desde el token contra la DB
 export const MOCK_AGENT: BookingAgent = {
   name: 'Juan Pérez',
