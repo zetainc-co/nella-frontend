@@ -11,7 +11,11 @@ import type { Project } from '@/modules/dashboard/types/dashboard-types'
 export function useProjects() {
   return useQuery<Project[]>({
     queryKey: queryKeys.dashboard.projects(),
-    queryFn: () => apiClient.get<Project[]>('/api/projects'),
+    queryFn: async () => {
+      const res = await apiClient.get<{ items: Project[] } | Project[]>('/api/projects')
+      // Backend wraps list in { items: [...] }
+      return Array.isArray(res) ? res : res.items
+    },
     staleTime: 30_000,
   })
 }
