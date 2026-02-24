@@ -2,8 +2,8 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useWorkflow } from '@/hooks/useWorkflow'
-import { WorkflowStatusBadge } from '@/components/workflows/workflow-status-badge'
+import { useWorkflow } from '@/modules/workflows/hooks/useWorkflow'
+import { WorkflowStatusBadge } from '@/modules/workflows/components/workflow-status-badge'
 import { Button } from '@/components/ui/button'
 import {
   Workflow,

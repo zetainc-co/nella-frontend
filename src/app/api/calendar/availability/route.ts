@@ -1,6 +1,7 @@
 // src/app/api/calendar/availability/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getBackendUrl, extractAuthHeaders } from '@/lib/backend-proxy'
+import { unwrapBackend } from '@/lib/backend-fetch'
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(data, { status: response.status })
     }
 
-    return NextResponse.json(data, { status: 200 })
+    return NextResponse.json(unwrapBackend(data), { status: 200 })
   } catch (error) {
     console.error('[API/calendar/availability GET] Error:', error)
     return NextResponse.json({ error: 'Error al obtener disponibilidad' }, { status: 500 })
@@ -50,7 +51,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(data, { status: response.status })
     }
 
-    return NextResponse.json(data, { status: 200 })
+    return NextResponse.json(unwrapBackend(data), { status: 200 })
   } catch (error) {
     console.error('[API/calendar/availability PUT] Error:', error)
     return NextResponse.json({ error: 'Error al guardar disponibilidad' }, { status: 500 })

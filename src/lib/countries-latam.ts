@@ -1,6 +1,6 @@
 // src/lib/countries-latam.ts
 
-import { Country, Industry } from '@/types'
+import { Country, Industry } from '@/modules/auth/types/auth-types'
 
 export const LATAM_COUNTRIES: Country[] = [
   { code: 'AR', name: 'Argentina', dialCode: '+54', flag: '🇦🇷', placeholder: '11 2345 6789' },

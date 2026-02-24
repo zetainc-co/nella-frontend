@@ -2,11 +2,11 @@
 
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useProjects } from '@/hooks/use-projects'
-import { ProjectEmptyState } from '@/components/dashboard/project-empty-state'
-import { CreateProjectModal } from '@/components/dashboard/create-project-modal'
-import { ProjectSelector } from '@/components/dashboard/project-selector'
-import { MetricsDashboard } from '@/components/dashboard/metrics-dashboard'
+import { useProjects } from '@/modules/dashboard/hooks/useProjects'
+import { ProjectEmptyState } from '@/modules/dashboard/components/project-empty-state'
+import { CreateProjectModal } from '@/modules/dashboard/components/create-project-modal'
+import { ProjectSelector } from '@/modules/dashboard/components/project-selector'
+import { MetricsDashboard } from '@/modules/dashboard/components/metrics-dashboard'
 
 function DashboardSkeleton() {
   return (

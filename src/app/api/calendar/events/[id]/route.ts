@@ -1,6 +1,7 @@
 // src/app/api/calendar/events/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getBackendUrl, extractAuthHeaders } from '@/lib/backend-proxy'
+import { unwrapBackend } from '@/lib/backend-fetch'
 
 export async function PATCH(
   request: NextRequest,
@@ -25,7 +26,7 @@ export async function PATCH(
       return NextResponse.json(data, { status: response.status })
     }
 
-    return NextResponse.json(data, { status: 200 })
+    return NextResponse.json(unwrapBackend(data), { status: 200 })
   } catch (error) {
     console.error('[API/calendar/events/[id] PATCH] Error:', error)
     return NextResponse.json({ error: 'Error al actualizar el evento' }, { status: 500 })
@@ -50,7 +51,7 @@ export async function DELETE(
       return NextResponse.json(data, { status: response.status })
     }
 
-    return NextResponse.json(data, { status: 200 })
+    return NextResponse.json(unwrapBackend(data), { status: 200 })
   } catch (error) {
     console.error('[API/calendar/events/[id] DELETE] Error:', error)
     return NextResponse.json({ error: 'Error al eliminar el evento' }, { status: 500 })

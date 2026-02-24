@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
-import { AuthLayout } from '@/components/auth/shared'
-import { LoginForm } from '@/components/auth/login/login-form'
+import { AuthLayout } from '@/modules/auth/components/shared'
+import { LoginForm } from '@/modules/auth/components/login/login-form'
 
 export default async function LoginPage() {
   const headersList = await headers()

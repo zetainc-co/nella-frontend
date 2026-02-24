@@ -1,4 +1,4 @@
-import type { User, Session, RegistrationFormData } from '@/types/auth-types'
+import type { User, Session, RegistrationFormData } from '@/modules/auth/types/auth-types'
 
 const STORAGE_KEYS = {
   USERS: 'nella_users',

@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { Plus } from "lucide-react"
-import { ContactsTable } from "@/components/contacts/contacts-table"
-import { CreateContactModal } from "@/components/contacts/create-contact-modal"
+import { ContactsTable } from "@/modules/contacts/components/contacts-table"
+import { CreateContactModal } from "@/modules/contacts/components/create-contact-modal"
 
 export default function ContactsPage() {
     const [showCreateModal, setShowCreateModal] = useState(false)
