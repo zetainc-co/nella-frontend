@@ -12,6 +12,7 @@ interface ApiError extends Error {
 
 function getMessageForStatus(error: ApiError, fallback?: string): string {
   const status = error.status
+  if (status === 400) return 'Datos inválidos, revisa el formulario'
   if (status === 401) return 'Tu sesión expiró, inicia sesión nuevamente'
   if (status === 403) return 'No tienes permisos para realizar esta acción'
   if (status === 404) return 'El recurso solicitado no existe'

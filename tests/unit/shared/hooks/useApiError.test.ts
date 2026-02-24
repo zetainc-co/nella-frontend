@@ -12,6 +12,16 @@ describe('useApiError', () => {
     vi.clearAllMocks()
   })
 
+  it('maps 400 to validation error message', async () => {
+    const { toast } = await import('sonner')
+    const { result } = renderHook(() => useApiError())
+    const err = Object.assign(new Error('Bad Request'), { status: 400 })
+    result.current.handleError(err, { showToast: true })
+    expect(toast.error).toHaveBeenCalledWith(
+      'Datos inválidos, revisa el formulario'
+    )
+  })
+
   it('maps 401 error to Spanish session message', async () => {
     const { toast } = await import('sonner')
     const { result } = renderHook(() => useApiError())
