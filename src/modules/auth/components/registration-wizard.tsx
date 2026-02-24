@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link'
-import { useRegistrationWizard } from "@/hooks/useRegistrationWizard";
+import { useRegistrationWizard } from "@/modules/auth/hooks/useRegistrationWizard";
 import { RegistrationStep1 } from "@/modules/auth/components/registration-step-1";
 import { RegistrationStep2 } from "@/modules/auth/components/registration-step-2";
 import { RegistrationStep3 } from "@/modules/auth/components/registration-step-3";
