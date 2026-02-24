@@ -1,10 +1,11 @@
+// src/modules/auth/hooks/useLogin.ts
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 import { authService } from '@/modules/auth/services/auth-service'
 import { useAuthStore } from '@/core/store/auth-store'
+import { useApiError } from '@/shared/hooks/useApiError'
 
 interface LoginInput {
   email: string
@@ -14,6 +15,7 @@ interface LoginInput {
 export function useLogin() {
   const router = useRouter()
   const { setSession, setUser } = useAuthStore()
+  const { handleError } = useApiError()
 
   return useMutation({
     mutationFn: ({ email, password }: LoginInput) =>
@@ -24,7 +26,10 @@ export function useLogin() {
       router.push('/dashboard')
     },
     onError: (error: Error) => {
-      toast.error(error.message ?? 'Error al iniciar sesion')
+      handleError(error, {
+        showToast: true,
+        fallbackMessage: 'Error al iniciar sesión',
+      })
     },
   })
 }

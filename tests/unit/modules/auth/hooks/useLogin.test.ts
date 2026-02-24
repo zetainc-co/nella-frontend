@@ -85,6 +85,7 @@ describe('useLogin', () => {
       result.current.mutate({ email: 'wrong@b.com', password: 'wrong' })
     })
 
+    // useApiError shows error.message when no HTTP status is present
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Credenciales invalidas'))
     expect(mockPush).not.toHaveBeenCalled()
   })
