@@ -1,13 +1,16 @@
-// src/hooks/useWorkflowCredentials.ts
+// src/modules/workflows/hooks/useWorkflowCredentials.ts
 "use client"
 
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { workflowService } from '@/modules/workflows/services/workflow-service'
+import { useApiError } from '@/shared/hooks/useApiError'
 import type { WorkflowCredentials } from '@/modules/workflows/types/workflow-types'
 
 export function useWorkflowCredentials(workflowId: string) {
   const queryClient = useQueryClient()
+  const { handleError } = useApiError()
   const [isValidating, setIsValidating] = useState(false)
 
   const { data: credentials } = useQuery({
@@ -26,27 +29,35 @@ export function useWorkflowCredentials(workflowId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workflow-credentials', workflowId] })
-      console.log('✅ Credenciales actualizadas')
+      toast.success('Credenciales actualizadas correctamente')
     },
-    onError: (error) => {
-      console.error('❌ Error al actualizar credenciales:', error)
-    }
+    onError: (error: Error) => {
+      handleError(error, {
+        showToast: true,
+        fallbackMessage: 'Error al actualizar credenciales',
+      })
+    },
   })
 
   const validateCredential = async (type: 'whatsapp' | 'openai' | 'anthropic', token: string) => {
     setIsValidating(true)
     try {
       await new Promise(resolve => setTimeout(resolve, 1500))
-
       const isValid = await workflowService.validateCredential(type, token)
 
       if (isValid) {
-        console.log(`✅ ${type} token válido`)
+        toast.success(`Token de ${type} validado correctamente`)
       } else {
-        console.error(`❌ ${type} token inválido`)
+        toast.error(`Token de ${type} inválido`)
       }
 
       return isValid
+    } catch (error) {
+      handleError(error, {
+        showToast: true,
+        fallbackMessage: `Error al validar token de ${type}`,
+      })
+      return false
     } finally {
       setIsValidating(false)
     }
