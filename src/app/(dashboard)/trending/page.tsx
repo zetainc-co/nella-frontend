@@ -1,4 +1,4 @@
-import { KanbanBoard } from '@/components/kanban/kanban-board'
+import { KanbanBoard } from '@/modules/kanban/components/kanban-board'
 
 export default function KanbanPage() {
   return (

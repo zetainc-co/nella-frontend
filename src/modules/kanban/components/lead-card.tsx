@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 import { useDraggable } from '@dnd-kit/core'
 import { Badge } from '@/components/ui/badge'
-import type { LeadCardProps } from '@/types/kanban-types'
+import type { LeadCardProps } from '@/modules/kanban/types/kanban-types'
 
 export function LeadCard({ lead, onClick }: LeadCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({

@@ -12,7 +12,7 @@ import {
   useKanbanSSE,
   useKanbanDragDrop,
   useKanbanConstants
-} from '@/hooks/kanban'
+} from '@/modules/kanban/hooks'
 import { LeadCard } from './lead-card'
 import { KanbanColumn } from './kanban-column'
 import { KanbanFilters } from './kanban-filters'

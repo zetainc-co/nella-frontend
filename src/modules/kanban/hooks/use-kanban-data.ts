@@ -1,7 +1,7 @@
 'use client'
 
-import { useKanbanStore } from '@/stores/kanban-store'
-import type { LeadStage } from '@/types/kanban-types'
+import { useKanbanStore } from '@/modules/kanban/stores/kanban-store'
+import type { LeadStage } from '@/modules/kanban/types/kanban-types'
 
 export function useKanbanData() {
   const { leads, getFilteredLeads } = useKanbanStore()

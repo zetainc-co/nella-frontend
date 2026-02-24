@@ -1,4 +1,2 @@
-export { useKanbanDragDrop } from './use-kanban-drag-drop'
-export { useKanbanSSE } from './use-kanban-sse'
-export { useKanbanData } from './use-kanban-data'
-export { useKanbanConstants } from './use-kanban-constants'
+// Re-export from new location -- will be removed in PASO 10
+export * from '@/modules/kanban/hooks'

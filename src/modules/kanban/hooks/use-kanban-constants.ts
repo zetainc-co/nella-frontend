@@ -1,6 +1,6 @@
 'use client'
 
-import type { LeadStage, LeadProbability, KanbanColumnConfig } from '@/types/kanban-types'
+import type { LeadStage, LeadProbability, KanbanColumnConfig } from '@/modules/kanban/types/kanban-types'
 
 // ============================================
 // Constantes del Kanban (unica fuente de verdad)

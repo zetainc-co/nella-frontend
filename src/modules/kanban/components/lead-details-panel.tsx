@@ -7,8 +7,8 @@ import {
   SheetContent,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-import { useKanbanStore } from '@/stores/kanban-store'
-import type { LeadDetailsPanelProps } from '@/types/kanban-types'
+import { useKanbanStore } from '@/modules/kanban/stores/kanban-store'
+import type { LeadDetailsPanelProps } from '@/modules/kanban/types/kanban-types'
 import { Phone, Mail } from 'lucide-react'
 
 const stageLabels = {

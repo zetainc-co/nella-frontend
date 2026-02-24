@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { Inbox } from 'lucide-react'
 import { LeadCard } from './lead-card'
 import { useDroppable } from '@dnd-kit/core'
-import type { KanbanColumnProps } from '@/types/kanban-types'
+import type { KanbanColumnProps } from '@/modules/kanban/types/kanban-types'
 
 export function KanbanColumn({ stage, title, leads, onLeadClick }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({

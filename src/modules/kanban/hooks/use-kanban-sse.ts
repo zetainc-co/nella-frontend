@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { io } from 'socket.io-client'
-import { useKanbanStore } from '@/stores/kanban-store'
+import { useKanbanStore } from '@/modules/kanban/stores/kanban-store'
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
 

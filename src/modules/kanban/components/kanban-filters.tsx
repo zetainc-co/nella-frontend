@@ -2,7 +2,7 @@
 
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { useKanbanStore } from '@/stores/kanban-store'
+import { useKanbanStore } from '@/modules/kanban/stores/kanban-store'
 
 export function KanbanFilters() {
   const { filters, setSearchQuery } = useKanbanStore()

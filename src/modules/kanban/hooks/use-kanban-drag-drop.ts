@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
-import { useKanbanStore } from '@/stores/kanban-store'
-import type { Lead, LeadStage } from '@/types/kanban-types'
+import { useKanbanStore } from '@/modules/kanban/stores/kanban-store'
+import type { Lead, LeadStage } from '@/modules/kanban/types/kanban-types'
 
 export function useKanbanDragDrop() {
   const { leads, moveLeadToStage } = useKanbanStore()
