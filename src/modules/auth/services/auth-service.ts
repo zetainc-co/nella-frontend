@@ -3,8 +3,16 @@ import type { RegistrationFormData, User, Session } from '@/modules/auth/types/a
 function getTenantSubdomain(): string {
   if (typeof window === 'undefined') return ''
   const hostname = window.location.hostname
-  const parts = hostname.split('.')
-  if (parts.length >= 3) return parts[0]
+  const appDomain = (process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost').split(':')[0]
+
+  // zetainc.localhost → "zetainc", acme.nella.app → "acme"
+  if (hostname.endsWith(`.${appDomain}`)) {
+    const subdomain = hostname.slice(0, hostname.length - appDomain.length - 1)
+    if (subdomain && subdomain !== 'www' && !subdomain.includes('.')) {
+      return subdomain
+    }
+  }
+
   return process.env.NEXT_PUBLIC_TENANT_SUBDOMAIN ?? ''
 }
 
