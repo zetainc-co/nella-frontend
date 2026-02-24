@@ -6,9 +6,9 @@ import { Copy, Calendar, Users, Loader2, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { Modal } from '@/components/shared/modal/modal'
 import { Button } from '@/components/ui/button'
-import { calendarFetch } from '@/lib/calendar-api'
-import { useAuthStore } from '@/stores/auth-store'
-import type { BookingLink } from '@/types/calendar-types'
+import { calendarFetch } from '@/modules/calendar/services/calendar-api'
+import { useAuthStore } from '@/core/store/auth-store'
+import type { BookingLink } from '@/modules/calendar/types/calendar-types'
 
 interface LinksModalProps {
   open: boolean

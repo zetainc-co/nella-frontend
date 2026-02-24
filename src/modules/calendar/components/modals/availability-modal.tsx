@@ -7,10 +7,10 @@ import { toast } from 'sonner'
 import { Modal } from '@/components/shared/modal/modal'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { calendarFetch } from '@/lib/calendar-api'
-import { useAuthStore } from '@/stores/auth-store'
-import { TIME_OPTIONS } from '@/types/calendar-types'
-import type { AvailabilityDay, BlockDuration, DayKey, GoogleCalendarStatus } from '@/types/calendar-types'
+import { calendarFetch } from '@/modules/calendar/services/calendar-api'
+import { useAuthStore } from '@/core/store/auth-store'
+import { TIME_OPTIONS } from '@/modules/calendar/types/calendar-types'
+import type { AvailabilityDay, BlockDuration, DayKey, GoogleCalendarStatus } from '@/modules/calendar/types/calendar-types'
 
 interface AvailabilityModalProps {
   open: boolean

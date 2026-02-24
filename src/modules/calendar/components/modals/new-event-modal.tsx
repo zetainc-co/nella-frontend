@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { calendarFetch } from '@/lib/calendar-api'
-import { TIME_OPTIONS } from '@/types/calendar-types'
-import type { ProjectName, ConfirmationStatus, LeadStage } from '@/types/calendar-types'
+import { calendarFetch } from '@/modules/calendar/services/calendar-api'
+import { TIME_OPTIONS } from '@/modules/calendar/types/calendar-types'
+import type { ProjectName, ConfirmationStatus, LeadStage } from '@/modules/calendar/types/calendar-types'
 
 interface NewEventModalProps {
   open: boolean

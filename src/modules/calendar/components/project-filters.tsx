@@ -2,9 +2,9 @@
 'use client'
 
 import { Filter } from 'lucide-react'
-import { useCalendarStore } from '@/stores/calendar-store'
-import { PROJECT_COLORS, LAYER_CONFIG } from '@/types/calendar-types'
-import type { ProjectName, CalendarLayer } from '@/types/calendar-types'
+import { useCalendarStore } from '@/modules/calendar/stores/calendar-store'
+import { PROJECT_COLORS, LAYER_CONFIG } from '@/modules/calendar/types/calendar-types'
+import type { ProjectName, CalendarLayer } from '@/modules/calendar/types/calendar-types'
 
 const ALL_PROJECTS: ProjectName[] = ['MundoStetic', 'TechCorp', 'NellaSales']
 const ALL_LAYERS: CalendarLayer[] = ['my-agenda', 'team-agenda', 'ai-appointments']

@@ -4,10 +4,10 @@
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { addDays, format, startOfWeek } from 'date-fns'
-import { useCalendarStore } from '@/stores/calendar-store'
-import { useAuthStore } from '@/stores/auth-store'
-import { calendarFetch, mapBackendEventToLocal } from '@/lib/calendar-api'
-import type { BackendCalendarEvent } from '@/types/calendar-types'
+import { useCalendarStore } from '@/modules/calendar/stores/calendar-store'
+import { useAuthStore } from '@/core/store/auth-store'
+import { calendarFetch, mapBackendEventToLocal } from '@/modules/calendar/services/calendar-api'
+import type { BackendCalendarEvent } from '@/modules/calendar/types/calendar-types'
 
 interface EventsResponse {
   data: BackendCalendarEvent[]

@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight, Link2, Settings2, Plus, Menu } from 'lucide-
 import { Button } from '@/components/ui/button'
 import { CalendarEventCard } from './calendar-event-card'
 import { CalendarTimeIndicator } from './calendar-time-indicator'
-import { useCalendarStore } from '@/stores/calendar-store'
+import { useCalendarStore } from '@/modules/calendar/stores/calendar-store'
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
 
@@ -17,7 +17,7 @@ interface CalendarWeekViewProps {
   onOpenLinks: () => void
   onOpenAvailability: () => void
   onOpenSidebar: () => void
-  onEventClick?: (event: import('@/types/calendar-types').CalendarEvent) => void
+  onEventClick?: (event: import('@/modules/calendar/types/calendar-types').CalendarEvent) => void
 }
 
 export function CalendarWeekView({

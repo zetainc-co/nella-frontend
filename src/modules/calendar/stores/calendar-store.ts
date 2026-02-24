@@ -7,7 +7,7 @@ import type {
   ProjectName,
   AvailabilityDay,
   BlockDuration,
-} from '@/types/calendar-types'
+} from '@/modules/calendar/types/calendar-types'
 
 const DEFAULT_AVAILABILITY: AvailabilityDay[] = [
   { day: 'lun', enabled: true,  slots: [{ start: '09:00', end: '18:00' }] },

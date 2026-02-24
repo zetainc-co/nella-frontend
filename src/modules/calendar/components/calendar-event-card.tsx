@@ -1,8 +1,8 @@
 // src/components/calendario/calendar-event-card.tsx
 'use client'
 
-import { getProjectColors } from '@/types/calendar-types'
-import type { CalendarEvent } from '@/types/calendar-types'
+import { getProjectColors } from '@/modules/calendar/types/calendar-types'
+import type { CalendarEvent } from '@/modules/calendar/types/calendar-types'
 
 interface CalendarEventCardProps {
   event: CalendarEvent

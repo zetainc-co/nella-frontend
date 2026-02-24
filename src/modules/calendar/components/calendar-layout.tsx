@@ -10,8 +10,8 @@ import { NewEventModal } from './modals/new-event-modal'
 import { AvailabilityModal } from './modals/availability-modal'
 import { LinksModal } from './modals/links-modal'
 import { EventDetailsModal } from './modals/event-details-modal'
-import { useCalendarEvents } from '@/hooks/useCalendarEvents'
-import type { CalendarEvent } from '@/types/calendar-types'
+import { useCalendarEvents } from '@/modules/calendar/hooks/useCalendarEvents'
+import type { CalendarEvent } from '@/modules/calendar/types/calendar-types'
 
 const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
   google_denied: 'Rechazaste la autorización en Google.',

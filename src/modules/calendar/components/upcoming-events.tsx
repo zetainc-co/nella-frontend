@@ -3,8 +3,8 @@
 
 import { format, parseISO, isAfter, startOfToday } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { useCalendarStore } from '@/stores/calendar-store'
-import { getProjectColors } from '@/types/calendar-types'
+import { useCalendarStore } from '@/modules/calendar/stores/calendar-store'
+import { getProjectColors } from '@/modules/calendar/types/calendar-types'
 
 export function UpcomingEvents() {
   const { getFilteredEvents } = useCalendarStore()

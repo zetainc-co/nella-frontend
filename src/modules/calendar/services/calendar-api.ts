@@ -1,7 +1,7 @@
 // src/lib/calendar-api.ts
 // Client-side utilities for the calendar module
-import { useAuthStore } from '@/stores/auth-store'
-import type { BackendCalendarEvent, CalendarEvent } from '@/types/calendar-types'
+import { useAuthStore } from '@/core/store/auth-store'
+import type { BackendCalendarEvent, CalendarEvent } from '@/modules/calendar/types/calendar-types'
 
 // ─── Auth headers ─────────────────────────────────────────────────────────────
 

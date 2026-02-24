@@ -7,8 +7,8 @@ import { Calendar, Clock, MapPin, Video, FileText, User, Building2, CheckCircle2
 import { Modal } from '@/components/shared/modal/modal'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import type { CalendarEvent } from '@/types/calendar-types'
-import { getProjectColors } from '@/types/calendar-types'
+import type { CalendarEvent } from '@/modules/calendar/types/calendar-types'
+import { getProjectColors } from '@/modules/calendar/types/calendar-types'
 
 interface EventDetailsModalProps {
   open: boolean
