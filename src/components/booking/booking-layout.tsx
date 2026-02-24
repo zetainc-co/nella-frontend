@@ -18,7 +18,7 @@ interface BookingLayoutProps {
   token: string
 }
 
-export function BookingLayout({ token: _token }: BookingLayoutProps) {
+export function BookingLayout({ token: _token }: BookingLayoutProps) { // eslint-disable-line @typescript-eslint/no-unused-vars
   const today = new Date()
   const currentMonth = today.getMonth()
   const currentYear = today.getFullYear()
