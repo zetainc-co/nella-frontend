@@ -41,7 +41,9 @@ export function BookingLayout({ token: _token }: BookingLayoutProps) { // eslint
 
   return (
     <AuthBackground>
-      <div className="flex min-h-screen items-center justify-center p-4 py-10 overflow-y-auto">
+      {/* h-screen crea un scroll container de altura fija dentro del body overflow-hidden */}
+      <div className="h-screen overflow-y-auto">
+        <div className="flex min-h-full flex-col items-center justify-center px-4 py-10">
         <div className="w-full max-w-4xl" style={{ animation: 'fadeIn 0.35s ease-out' }}>
 
           {/* Logo */}
@@ -134,7 +136,8 @@ export function BookingLayout({ token: _token }: BookingLayoutProps) { // eslint
             Powered by <span style={{ color: 'rgba(158,255,0,0.6)' }}>NellaSales</span>
           </p>
         </div>
-      </div>
+        </div>
+        </div>
     </AuthBackground>
   )
 }
