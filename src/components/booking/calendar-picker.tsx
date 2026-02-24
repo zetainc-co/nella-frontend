@@ -10,6 +10,7 @@ interface CalendarPickerProps {
   onSelectDay: (day: number) => void
   month?: number  // 0-indexed (0 = enero)
   year?: number
+  onMonthChange?: (month: number, year: number) => void
 }
 
 const DAY_HEADERS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do']
@@ -31,6 +32,7 @@ export function CalendarPicker({
   onSelectDay,
   month,
   year,
+  onMonthChange,
 }: CalendarPickerProps) {
   const today = new Date()
   const [viewMonth, setViewMonth] = useState(month ?? today.getMonth())
@@ -43,8 +45,10 @@ export function CalendarPicker({
     if (viewMonth === 0) {
       setViewMonth(11)
       setViewYear(y => y - 1)
+      onMonthChange?.(11, viewYear - 1)
     } else {
       setViewMonth(m => m - 1)
+      onMonthChange?.(viewMonth - 1, viewYear)
     }
   }
 
@@ -52,8 +56,10 @@ export function CalendarPicker({
     if (viewMonth === 11) {
       setViewMonth(0)
       setViewYear(y => y + 1)
+      onMonthChange?.(0, viewYear + 1)
     } else {
       setViewMonth(m => m + 1)
+      onMonthChange?.(viewMonth + 1, viewYear)
     }
   }
 
