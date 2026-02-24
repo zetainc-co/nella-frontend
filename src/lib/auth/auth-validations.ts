@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import type { CompanySize } from '@/types/auth-types'
+import type { CompanySize } from '@/modules/auth/types/auth-types'
 
 // Login Schema
 export const loginSchema = z.object({

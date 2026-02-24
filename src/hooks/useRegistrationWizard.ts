@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { RegistrationFormData } from '@/types'
+import { RegistrationFormData } from '@/modules/auth/types/auth-types'
 import {
   saveRegistrationProgress,
   loadRegistrationProgress,

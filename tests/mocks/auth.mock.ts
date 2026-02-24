@@ -1,4 +1,4 @@
-import type { User, Session } from '@/types/auth-types'
+import type { User, Session } from '@/modules/auth/types/auth-types'
 
 export const mockUser: User = {
   id: 'user-1',

@@ -1,4 +1,4 @@
-import type { BackendContact } from '@/types/contacts'
+import type { BackendContact } from '@/modules/contacts/types/contacts'
 
 export const mockContact: BackendContact = {
   id: 1,

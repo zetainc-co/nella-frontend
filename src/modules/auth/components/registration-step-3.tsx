@@ -4,7 +4,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { step3Schema } from '@/lib/registration-validations'
-import { RegistrationFormData } from '@/types'
+import { RegistrationFormData } from '@/modules/auth/types/auth-types'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 

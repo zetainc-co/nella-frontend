@@ -1,4 +1,4 @@
-import type { ProjectMetrics, Project } from '@/types/auth-types'
+import type { ProjectMetrics, Project } from '@/modules/auth/types/auth-types'
 
 export const mockProject: Project = {
   id: 'proj-1',

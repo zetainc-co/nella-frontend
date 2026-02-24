@@ -6,8 +6,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { step1Schema } from '@/lib/registration-validations'
 import { LATAM_COUNTRIES, INDUSTRIES, COMPANY_SIZES } from '@/lib/countries-latam'
-import type { RegistrationFormData } from '@/types'
-import type { CompanySize } from '@/types/auth-types'
+import type { RegistrationFormData } from '@/modules/auth/types/auth-types'
+import type { CompanySize } from '@/modules/auth/types/auth-types'
 import {
   Select,
   SelectContent,

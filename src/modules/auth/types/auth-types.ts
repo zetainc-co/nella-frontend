@@ -113,3 +113,17 @@ export interface ProjectMetrics {
   trafficSources: { source: string; count: number }[]
   funnel: { status: string; count: number }[]
 }
+
+// Country & Industry Types (used in registration)
+export interface Country {
+  code: string
+  name: string
+  dialCode: string
+  flag: string
+  placeholder: string
+}
+
+export interface Industry {
+  value: string
+  label: string
+}

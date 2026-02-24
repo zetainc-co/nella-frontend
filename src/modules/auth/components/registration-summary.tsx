@@ -1,7 +1,7 @@
 // src/components/auth/registration-summary.tsx
 "use client";
 
-import { RegistrationFormData } from "@/types";
+import { RegistrationFormData } from "@/modules/auth/types/auth-types";
 import { generateSlug } from "@/lib/registration-storage";
 import {
   LATAM_COUNTRIES,

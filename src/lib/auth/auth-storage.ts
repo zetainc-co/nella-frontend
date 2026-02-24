@@ -1,4 +1,4 @@
-import type { RegistrationFormData } from '@/types/auth-types'
+import type { RegistrationFormData } from '@/modules/auth/types/auth-types'
 
 const STORAGE_KEYS = {
   REGISTRATION_PROGRESS: 'nella_registration_progress',
