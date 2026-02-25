@@ -8,94 +8,109 @@ interface CalendarPickerProps {
   availableDays: number[]
   selectedDay: number | null
   onSelectDay: (day: number) => void
-  month?: number  // 0-indexed (0 = enero)
-  year?: number
+  month?: number  // ignorado — se usa weekStart internamente
+  year?: number   // ignorado — se usa weekStart internamente
   onMonthChange?: (month: number, year: number) => void
 }
 
 const DAY_HEADERS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do']
 
-function getDaysInMonth(year: number, month: number): number {
-  return new Date(year, month + 1, 0).getDate()
-}
-
-// Retorna el offset del primer día (0 = Lunes, 6 = Domingo)
-function getFirstDayOffset(year: number, month: number): number {
-  const day = new Date(year, month, 1).getDay()
-  // getDay(): 0=domingo, 1=lunes... convertir a lunes=0
-  return day === 0 ? 6 : day - 1
+// Retorna el lunes de la semana que contiene `date`
+function getWeekStart(date: Date): Date {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  const day = d.getDay()
+  // getDay: 0=domingo → retroceder 6, resto → retroceder (day - 1)
+  d.setDate(d.getDate() - (day === 0 ? 6 : day - 1))
+  return d
 }
 
 export function CalendarPicker({
   availableDays,
   selectedDay,
   onSelectDay,
-  month,
-  year,
   onMonthChange,
 }: CalendarPickerProps) {
   const today = new Date()
-  const [viewMonth, setViewMonth] = useState(month ?? today.getMonth())
-  const [viewYear, setViewYear] = useState(year ?? today.getFullYear())
+  today.setHours(0, 0, 0, 0)
 
-  const daysInMonth = getDaysInMonth(viewYear, viewMonth)
-  const firstDayOffset = getFirstDayOffset(viewYear, viewMonth)
+  const currentWeekStart = getWeekStart(today)
+  const [weekStart, setWeekStart] = useState<Date>(() => new Date(currentWeekStart))
 
-  function prevMonth() {
-    const nextM = viewMonth === 0 ? 11 : viewMonth - 1
-    const nextY = viewMonth === 0 ? viewYear - 1 : viewYear
-    setViewMonth(nextM)
-    setViewYear(nextY)
-    onMonthChange?.(nextM, nextY)
+  // 7 fechas de la semana visible (Lu → Do)
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart)
+    d.setDate(weekStart.getDate() + i)
+    return d
+  })
+
+  // Solo se puede retroceder si la semana visible no es la semana actual
+  const canGoPrev = weekStart.getTime() > currentWeekStart.getTime()
+
+  function prevWeek() {
+    if (!canGoPrev) return
+    const newStart = new Date(weekStart)
+    newStart.setDate(weekStart.getDate() - 7)
+    setWeekStart(newStart)
+    onMonthChange?.(newStart.getMonth(), newStart.getFullYear())
   }
 
-  function nextMonth() {
-    const nextM = viewMonth === 11 ? 0 : viewMonth + 1
-    const nextY = viewMonth === 11 ? viewYear + 1 : viewYear
-    setViewMonth(nextM)
-    setViewYear(nextY)
-    onMonthChange?.(nextM, nextY)
+  function nextWeek() {
+    const newStart = new Date(weekStart)
+    newStart.setDate(weekStart.getDate() + 7)
+    setWeekStart(newStart)
+    onMonthChange?.(newStart.getMonth(), newStart.getFullYear())
   }
 
-  // Construir array de celdas (null = celda vacía de offset)
-  const cells: (number | null)[] = [
-    ...Array(firstDayOffset).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
-  ]
+  // "23 Feb — 1 Mar 2026"  o  "24 — 30 Mar 2026"
+  function getWeekLabel(): string {
+    const first = weekDays[0]
+    const last = weekDays[6]
+    if (first.getMonth() === last.getMonth()) {
+      return `${first.getDate()} — ${last.getDate()} ${MONTH_NAMES[first.getMonth()]} ${first.getFullYear()}`
+    }
+    return `${first.getDate()} ${MONTH_NAMES[first.getMonth()]} — ${last.getDate()} ${MONTH_NAMES[last.getMonth()]} ${last.getFullYear()}`
+  }
 
   return (
     <div className="flex flex-col gap-5 p-6 md:p-8">
-      {/* Navegación de mes */}
+      {/* Navegación de semana */}
       <div className="flex items-center justify-between">
         <button
-          onClick={prevMonth}
+          onClick={prevWeek}
+          disabled={!canGoPrev}
           className="flex items-center justify-center rounded-lg transition-all duration-150"
           style={{
             width: 32,
             height: 32,
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.08)',
-            color: 'rgba(240,244,255,0.6)',
+            color: canGoPrev ? 'rgba(240,244,255,0.6)' : 'rgba(240,244,255,0.18)',
+            cursor: canGoPrev ? 'pointer' : 'not-allowed',
           }}
           onMouseEnter={e => {
-            e.currentTarget.style.borderColor = 'rgba(158,255,0,0.3)'
-            e.currentTarget.style.color = '#9EFF00'
+            if (canGoPrev) {
+              e.currentTarget.style.borderColor = 'rgba(158,255,0,0.3)'
+              e.currentTarget.style.color = '#9EFF00'
+            }
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
-            e.currentTarget.style.color = 'rgba(240,244,255,0.6)'
+            if (canGoPrev) {
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+              e.currentTarget.style.color = 'rgba(240,244,255,0.6)'
+            }
           }}
-          aria-label="Mes anterior"
+          aria-label="Semana anterior"
         >
           <ChevronLeft size={16} />
         </button>
 
         <span className="text-sm font-semibold" style={{ color: '#f0f4ff' }}>
-          {MONTH_NAMES[viewMonth]} {viewYear}
+          {getWeekLabel()}
         </span>
 
         <button
-          onClick={nextMonth}
+          onClick={nextWeek}
           className="flex items-center justify-center rounded-lg transition-all duration-150"
           style={{
             width: 32,
@@ -112,7 +127,7 @@ export function CalendarPicker({
             e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
             e.currentTarget.style.color = 'rgba(240,244,255,0.6)'
           }}
-          aria-label="Mes siguiente"
+          aria-label="Semana siguiente"
         >
           <ChevronRight size={16} />
         </button>
@@ -130,18 +145,17 @@ export function CalendarPicker({
           </div>
         ))}
 
-        {/* Celdas del mes */}
-        {cells.map((day, idx) => {
-          if (day === null) {
-            return <div key={`empty-${idx}`} />
-          }
-
-          const isAvailable = availableDays.includes(day)
+        {/* Celdas de la semana visible */}
+        {weekDays.map((date, idx) => {
+          const day = date.getDate()
+          const isPast = date.getTime() < today.getTime()
+          const isToday = date.getTime() === today.getTime()
+          const isAvailable = availableDays.includes(day) && !isPast
           const isSelected = selectedDay === day
 
           return (
             <button
-              key={day}
+              key={idx}
               onClick={() => isAvailable && onSelectDay(day)}
               disabled={!isAvailable}
               className="flex flex-col items-center justify-center rounded-lg text-sm transition-all duration-150 relative"
@@ -150,13 +164,15 @@ export function CalendarPicker({
                 cursor: isAvailable ? 'pointer' : 'not-allowed',
                 background: isSelected
                   ? 'rgba(158,255,0,0.15)'
+                  : isToday
+                  ? 'rgba(255,255,255,0.04)'
                   : 'transparent',
                 border: isSelected
                   ? '1px solid rgba(158,255,0,0.4)'
+                  : isToday
+                  ? '1px solid rgba(255,255,255,0.1)'
                   : '1px solid transparent',
-                boxShadow: isSelected
-                  ? '0 0 10px 0 rgba(158,255,0,0.15)'
-                  : 'none',
+                boxShadow: isSelected ? '0 0 10px 0 rgba(158,255,0,0.15)' : 'none',
                 color: isSelected
                   ? '#9EFF00'
                   : isAvailable
@@ -171,11 +187,11 @@ export function CalendarPicker({
               }}
               onMouseLeave={e => {
                 if (isAvailable && !isSelected) {
-                  e.currentTarget.style.background = 'transparent'
-                  e.currentTarget.style.borderColor = 'transparent'
+                  e.currentTarget.style.background = isToday ? 'rgba(255,255,255,0.04)' : 'transparent'
+                  e.currentTarget.style.borderColor = isToday ? 'rgba(255,255,255,0.1)' : 'transparent'
                 }
               }}
-              aria-label={`${day} de ${MONTH_NAMES[viewMonth]}`}
+              aria-label={`${day} de ${MONTH_NAMES[date.getMonth()]}`}
             >
               <span>{day}</span>
               {/* Punto de disponibilidad */}

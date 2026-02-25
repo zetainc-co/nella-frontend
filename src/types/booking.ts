@@ -40,7 +40,8 @@ export const MOCK_LEAD: BookingLead = {
 }
 
 // Días del mes con disponibilidad (números del 1-28/31)
-export const MOCK_AVAILABLE_DAYS = [3, 4, 5, 10, 11, 12, 17, 18, 19, 24, 25, 26]
+// Incluye días pasados para validar que el calendario los bloquee correctamente
+export const MOCK_AVAILABLE_DAYS = [3, 4, 5, 10, 11, 12, 17, 18, 19, 24, 25, 26, 27, 28]
 
 // Slots disponibles por día
 export const MOCK_TIME_SLOTS = [
