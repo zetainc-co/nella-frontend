@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd:*)",
+      "Bash(ls:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(cd \"C:/Users/Sebinhas/Desktop/Proyectos Z/Nella marketing/nella-frontend\" && npx eslint src/components/booking/calendar-picker.tsx --max-warnings=50 2>&1)",
+      "Bash(head:*)",
+      "Bash(grep:*)",
+      "Bash(tail:*)",
+      "Bash(cd \"C:/Users/Sebinhas/Desktop/Proyectos Z/Nella marketing/nella-frontend\" && npx eslint src/components/booking/booking-layout.tsx 2>&1)",
+      "Bash(cd \"C:/Users/Sebinhas/Desktop/Proyectos Z/Nella marketing/nella-frontend\" && npx eslint src/components/booking/ src/types/booking.ts \"src/app/\\(public\\)/book/\" 2>&1)",
+      "Bash(echo Exit: $?:*)"
+    ]
+  }
+}

@@ -127,8 +127,11 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           )}
         </div>
         {onClose && (
-          <button onClick={onClose} className="shrink-0 p-1 rounded-lg transition-colors"
-            style={{ color: 'rgba(240,244,255,0.35)' }}>
+          <button
+            onClick={onClose}
+            className="shrink-0 p-1 rounded-lg transition-colors"
+            style={{ color: 'rgba(240,244,255,0.35)' }}
+          >
             <X className="size-4" />
           </button>
         )}
@@ -141,15 +144,26 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               ? pathname === item.href || pathname.startsWith('/dashboard')
               : pathname === item.href || pathname.startsWith(item.href + '/')
           return (
-            <NavItem key={item.name} href={item.href} icon={item.icon}
-              label={item.name} active={active} onClick={onClose} />
+            <NavItem
+              key={item.name}
+              href={item.href}
+              icon={item.icon}
+              label={item.name}
+              active={active}
+              onClick={onClose}
+            />
           )
         })}
       </nav>
 
       <div className="px-3 py-4 space-y-0.5" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <NavItem href="/settings" icon={Settings} label="Configuración"
-          active={isSettingsActive} onClick={onClose} />
+        <NavItem
+          href="/settings"
+          icon={Settings}
+          label="Configuración"
+          active={isSettingsActive}
+          onClick={onClose}
+        />
         <button
           onClick={logout}
           className="flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-150 w-full text-left"
@@ -179,8 +193,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <ProtectedRoute>
-      <div className="flex h-screen overflow-hidden"
-        style={{ background: '#151515', position: 'relative' }}>
+      <div
+        className="flex h-screen overflow-hidden"
+        style={{ background: '#151515', position: 'relative' }}
+      >
         {/* Background orbs */}
         <div aria-hidden style={{
           position: 'fixed', top: '-18%', right: '-8%',
@@ -208,18 +224,22 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Mobile overlay */}
         {mobileOpen && (
-          <div className="fixed inset-0 z-40 md:hidden"
+          <div
+            className="fixed inset-0 z-40 md:hidden"
             style={{ background: 'rgba(0,0,0,0.65)' }}
-            onClick={() => setMobileOpen(false)} />
+            onClick={() => setMobileOpen(false)}
+          />
         )}
 
         {/* Mobile sidebar drawer */}
-        <aside className="fixed top-0 left-0 z-50 h-full md:hidden flex flex-col transition-transform duration-200"
+        <aside
+          className="fixed top-0 left-0 z-50 h-full md:hidden flex flex-col transition-transform duration-200"
           style={{
             width: SIDEBAR_W, background: '#0d0d0d',
             borderRight: '1px solid rgba(255,255,255,0.06)',
             transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
-          }}>
+          }}
+        >
           <SidebarContent onClose={() => setMobileOpen(false)} />
         </aside>
 
@@ -229,8 +249,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             background: '#0d0d0d',
             borderBottom: '1px solid rgba(255,255,255,0.06)',
           }}>
-            <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg"
-              style={{ color: 'rgba(240,244,255,0.6)' }}>
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="p-2 rounded-lg"
+              style={{ color: 'rgba(240,244,255,0.6)' }}
+            >
               <Menu className="size-5" />
             </button>
             <span className="ml-3 text-base font-bold" style={{ color: '#f0f4ff' }}>
