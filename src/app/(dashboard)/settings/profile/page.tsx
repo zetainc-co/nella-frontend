@@ -2,7 +2,7 @@
 
 import { Lock, Bell, Volume2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/core/store/auth-store";
 import { useState } from "react";
 
 function getInitials(name?: string | null) {

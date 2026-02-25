@@ -1,6 +1,6 @@
 // src/lib/registration-storage.ts
 
-import { RegistrationFormData } from '@/types'
+import { RegistrationFormData } from '@/modules/auth/types/auth-types'
 
 const STORAGE_KEYS = {
   PROGRESS: 'nella_registration_progress',

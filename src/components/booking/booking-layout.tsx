@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AuthBackground, AuthBranding } from '@/components/auth/shared'
+import { AuthBackground, AuthBranding } from '@/modules/auth/components/shared'
 import { AgentInfoPanel } from './agent-info-panel'
 import { CalendarPicker } from './calendar-picker'
 import { TimeSlots } from './time-slots'

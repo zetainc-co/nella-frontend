@@ -1,6 +1,6 @@
 // Server Component — lee variables de entorno server-side
 // El iframe y la detección de fallos se delegan al Client Component
-import { ChatwootIframe } from '@/components/chat/chatwoot-iframe'
+import { ChatwootIframe } from '@/modules/chat/components/chatwoot-iframe'
 
 // URL base de Chatwoot: en dev apunta a localhost, en prod al dominio real.
 // NUNCA usar NEXT_PUBLIC_ para esta URL — se resuelve solo server-side.

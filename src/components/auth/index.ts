@@ -1,4 +1,2 @@
-export { HudBackground } from './hud-background'
-export { LoginHeader } from './login-header'
-export { LoginCard } from './login-card'
-export { TechnicalFooter } from './technical-footer'
+// Re-export from new location — will be removed in PASO 10
+export * from '@/modules/auth/components/index'
