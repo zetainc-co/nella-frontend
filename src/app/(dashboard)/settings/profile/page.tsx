@@ -4,6 +4,14 @@ import { Lock, Bell, Volume2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useAuthStore } from "@/core/store/auth-store";
 import { useState } from "react";
+import {
+  SettingsPageHeader,
+  SettingsCard,
+  SettingsField,
+  SettingsCTAButton,
+  SettingsGhostButton,
+} from "@/modules/settings/components/settings-ui";
+import { ProfileCardSkeleton } from "@/modules/settings/components/settings-skeleton";
 
 function getInitials(name?: string | null) {
   if (!name) return "U";
@@ -12,172 +20,89 @@ function getInitials(name?: string | null) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-/* ── Shared field row ── */
-function Field({ label, value }: { label: string; value?: string }) {
-  return (
-    <div className="space-y-1.5">
-      <p
-        className="text-xs font-medium"
-        style={{ color: "rgba(240,244,255,0.45)" }}
-      >
-        {label}
-      </p>
-      <div
-        className="px-3 py-2.5 rounded-xl text-sm"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          color: value ? "#f0f4ff" : "rgba(240,244,255,0.25)",
-          minHeight: 40,
-        }}
-      >
-        {value || "—"}
-      </div>
-    </div>
-  );
-}
-
-/* ── Card container ── */
-function Card({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className="rounded-2xl p-6 space-y-4"
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.07)",
-      }}
-    >
-      <h2 className="text-sm font-semibold" style={{ color: "#f0f4ff" }}>
-        {title}
-      </h2>
-      {children}
-    </div>
-  );
-}
-
 export default function ProfilePage() {
   const { user } = useAuthStore();
   const initials = getInitials(user?.fullName);
 
-  const [notifications, setNotifications] = useState(false);
+  const [notifications, setNotifications] = useState(true);
   const [sounds, setSounds] = useState(false);
 
+  const roleLabel =
+    user?.role === "admin"
+      ? "Administrador"
+      : user?.role === "viewer"
+        ? "Visualizador"
+        : "Agente de Ventas";
+
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-2xl">
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold" style={{ color: "#f0f4ff" }}>
-          Mi Perfil
-        </h1>
-        <p
-          className="text-sm mt-0.5"
-          style={{ color: "rgba(240,244,255,0.4)" }}
-        >
-          Tus datos personales y preferencias
-        </p>
-      </div>
+    <div className="p-6 md:p-6 space-y-6 max-w-5xl mx-auto">
+      <SettingsPageHeader
+        title="Mi Perfil"
+        subtitle="Gestiona tu información personal y preferencias"
+      />
 
       {/* Avatar card */}
-      <Card title="Profile picture">
-        <div className="flex items-center gap-4">
-          {/* Initials avatar */}
+      <SettingsCard title="Foto de Perfil" tealGradient>
+        <div className="flex items-center gap-4 relative z-[1]">
           <div
-            className="shrink-0 flex items-center justify-center rounded-2xl font-bold text-xl"
+            className="shrink-0 flex items-center justify-center rounded-full font-bold text-xl shadow-[0_10px_20px_-5px_rgba(163,255,18,0.4)]"
             style={{
-              width: 72,
-              height: 72,
-              background: "rgba(158,255,0,0.15)",
-              border: "1.5px solid rgba(158,255,0,0.35)",
-              color: "#9EFF00",
+              width: 80,
+              height: 80,
+              background: "#9EFF00",
+              color: "#0a0a0a",
             }}
           >
             {initials}
           </div>
           <div>
             <p className="text-sm font-medium" style={{ color: "#f0f4ff" }}>
-              {user?.fullName ?? "—"}
+              Actualiza tu foto de perfil
             </p>
             <p
               className="text-xs mt-0.5"
-              style={{ color: "rgba(240,244,255,0.4)" }}
+              style={{ color: "rgba(240,244,255,0.35)" }}
             >
-              {user?.role === "admin"
-                ? "Administrator"
-                : user?.role === "viewer"
-                  ? "Viewer"
-                  : "Sales Agent"}
+              JPG, PNG o GIF. Máximo 2MB.
             </p>
-            {user?.tenantName && (
-              <p
-                className="text-xs mt-0.5"
-                style={{ color: "rgba(240,244,255,0.3)" }}
-              >
-                {user.tenantName}
-              </p>
-            )}
           </div>
         </div>
-      </Card>
+      </SettingsCard>
 
       {/* Personal info */}
-      <Card title="Personal information">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Full name" value={user?.fullName} />
-          <Field label="Email" value={user?.email} />
-          <Field
-            label="Role"
-            value={
-              user?.role === "admin"
-                ? "Administrator"
-                : user?.role === "viewer"
-                  ? "Viewer"
-                  : user?.role === "agent"
-                    ? "Sales Agent"
-                    : undefined
-            }
-          />
-          <div className="space-y-1.5">
-            <p
-              className="text-xs font-medium"
-              style={{ color: "rgba(240,244,255,0.45)" }}
-            >
-              Password
-            </p>
-            <div
-              className="px-3 py-2.5 rounded-xl text-sm flex items-center justify-between"
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: "rgba(240,244,255,0.35)",
-                minHeight: 40,
-              }}
-            >
-              <span>••••••••</span>
-              <Lock className="size-3.5 shrink-0" />
-            </div>
+      <SettingsCard
+        title="Información Personal"
+        action={<SettingsGhostButton>Editar</SettingsGhostButton>}
+      >
+        {!user ? (
+          <ProfileCardSkeleton />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <SettingsField label="Nombre Completo" value={user.fullName} />
+            <SettingsField label="Correo Electrónico" value={user.email} />
+            <SettingsField label="Cargo / Rol" value={roleLabel} />
+            <SettingsField
+              label="Contraseña"
+              value="••••••••"
+              icon={
+                <Lock
+                  className="size-3.5 shrink-0"
+                  style={{ color: "rgba(240,244,255,0.3)" }}
+                />
+              }
+            />
           </div>
-        </div>
-        {/* Fields not yet in backend / optional */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-          <Field label="Phone" value={user?.phone} />
-          <Field
-            label="Organization"
-            value={user?.tenantName ?? user?.tenantSlug}
-          />
-        </div>
-      </Card>
+        )}
+      </SettingsCard>
 
       {/* Preferences */}
-      <Card title="Preferences">
-        <div className="space-y-5">
+      <SettingsCard title="Preferencias">
+        <div>
           {/* Desktop notifications */}
-          <div className="flex items-center justify-between">
+          <div
+            className="flex items-center justify-between py-4"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+          >
             <div className="flex items-center gap-3">
               <div
                 className="flex items-center justify-center rounded-lg size-9"
@@ -187,24 +112,25 @@ export default function ProfilePage() {
               </div>
               <div>
                 <p className="text-sm font-medium" style={{ color: "#f0f4ff" }}>
-                  Desktop notifications
+                  Notificaciones de escritorio
                 </p>
                 <p
                   className="text-xs"
                   style={{ color: "rgba(240,244,255,0.4)" }}
                 >
-                  Receive alerts in your browser
+                  Recibe alertas en tu navegador
                 </p>
               </div>
             </div>
             <Switch
               checked={notifications}
               onCheckedChange={setNotifications}
+              className="data-[state=checked]:!bg-[#9EFF00]"
             />
           </div>
 
           {/* Chat sounds */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-3">
               <div
                 className="flex items-center justify-center rounded-lg size-9"
@@ -214,20 +140,29 @@ export default function ProfilePage() {
               </div>
               <div>
                 <p className="text-sm font-medium" style={{ color: "#f0f4ff" }}>
-                  Chat sounds
+                  Sonidos de chat
                 </p>
                 <p
                   className="text-xs"
                   style={{ color: "rgba(240,244,255,0.4)" }}
                 >
-                  Play sound when you receive messages
+                  Reproducir sonido al recibir mensajes
                 </p>
               </div>
             </div>
-            <Switch checked={sounds} onCheckedChange={setSounds} />
+            <Switch
+              checked={sounds}
+              onCheckedChange={setSounds}
+              className="data-[state=checked]:!bg-[#9EFF00]"
+            />
           </div>
         </div>
-      </Card>
+      </SettingsCard>
+
+      {/* CTA */}
+      <div className="flex justify-end">
+        <SettingsCTAButton>Guardar Cambios</SettingsCTAButton>
+      </div>
     </div>
   );
 }

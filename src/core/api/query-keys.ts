@@ -8,11 +8,14 @@ export const queryKeys = {
   },
   dashboard: {
     metrics: (projectId: string, period: string) =>
-      ['metrics', projectId, period] as const,
+      ['dashboard', 'metrics', projectId, period] as const,
     projects: () => ['projects'] as const,
   },
   kanban: {
     leads: () => ['kanban', 'leads'] as const,
+  },
+  settings: {
+    organization: (slug: string) => ['settings', 'organization', slug] as const,
   },
   calendar: {
     events: () => ['calendar', 'events'] as const,
@@ -22,4 +25,4 @@ export const queryKeys = {
   workflows: {
     byTenant: (tenantId: string) => ['workflows', tenantId] as const,
   },
-}
+};

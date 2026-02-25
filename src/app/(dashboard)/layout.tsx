@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import React, { ReactNode, useState, useEffect } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import React, { ReactNode, useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -13,27 +13,19 @@ import {
   LogOut,
   Menu,
   X,
-} from 'lucide-react'
-import { useAuthStore } from '@/core/store/auth-store'
-import { useLogout } from '@/shared/hooks/useLogout'
-import { ProtectedRoute } from '@/core/routes/ProtectedRoute'
+} from "lucide-react";
+import { useLogout } from "@/shared/hooks/useLogout";
+import { ProtectedRoute } from "@/core/routes/ProtectedRoute";
 
-const SIDEBAR_W = 252
+const SIDEBAR_W = 260;
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Trending', href: '/trending', icon: TrendingUp },
-  { name: 'Chat', href: '/chat', icon: MessageSquare },
-  { name: 'Calendar', href: '/calendar', icon: CalendarDays },
-  { name: 'Contacts', href: '/contacts', icon: Users },
-]
-
-function getInitials(name?: string | null) {
-  if (!name) return 'U'
-  const parts = name.trim().split(/\s+/)
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-}
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Trending", href: "/trending", icon: TrendingUp },
+  { name: "Chat", href: "/chat", icon: MessageSquare },
+  { name: "Calendario", href: "/calendar", icon: CalendarDays },
+  { name: "Contactos", href: "/contacts", icon: Users },
+];
 
 function NavItem({
   href,
@@ -42,89 +34,90 @@ function NavItem({
   active,
   onClick,
 }: {
-  href: string
-  icon: React.ElementType
-  label: string
-  active: boolean
-  onClick?: () => void
+  href: string;
+  icon: React.ElementType;
+  label: string;
+  active: boolean;
+  onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-150"
+      className="flex items-center gap-3.5 rounded-lg text-[14.5px] font-medium transition-colors duration-150"
       style={
         active
           ? {
-              background: 'rgba(158,255,0,0.1)',
-              border: '1px solid rgba(158,255,0,0.3)',
-              padding: '10px 14px 10px 10px',
-              color: '#ffffff',
-              boxShadow: '0 0 10px 0 rgba(158,255,0,0.3)',
+              background: "rgba(158,255,0,0.08)",
+              border: "1px solid rgba(158,255,0,0.18)",
+              padding: "11px 14px",
+              color: "#f0f4ff",
             }
           : {
-              border: '1px solid transparent',
-              color: 'rgba(240,244,255,0.45)',
-              padding: '10px 14px 10px 10px',
+              border: "1px solid transparent",
+              color: "rgba(255,255,255,0.55)",
+              padding: "11px 14px",
             }
       }
       onMouseEnter={(e) => {
         if (!active) {
-          e.currentTarget.style.color = 'rgba(240,244,255,0.85)'
-          e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
+          e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+          e.currentTarget.style.background = "rgba(255,255,255,0.04)";
         }
       }}
       onMouseLeave={(e) => {
         if (!active) {
-          e.currentTarget.style.color = 'rgba(240,244,255,0.45)'
-          e.currentTarget.style.background = 'transparent'
+          e.currentTarget.style.color = "rgba(255,255,255,0.55)";
+          e.currentTarget.style.background = "transparent";
         }
       }}
     >
-      <Icon className="size-[18px] shrink-0" />
+      <Icon
+        className="size-5 shrink-0"
+        style={{ color: active ? "#9EFF00" : "rgba(255,255,255,0.4)" }}
+      />
       {label}
     </Link>
-  )
+  );
 }
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
-  const pathname = usePathname()
-  const { user } = useAuthStore()
-  const { logout } = useLogout()
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const initials = getInitials(user?.fullName)
-  const isSettingsActive = pathname.startsWith('/settings')
-
-  useEffect(() => {
-    if (pathname.startsWith('/settings')) setSettingsOpen(true)
-  }, [pathname])
+  const pathname = usePathname();
+  const { logout } = useLogout();
+  const isSettingsActive = pathname.startsWith("/settings");
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#0d0d0d' }}>
+    <div className="flex flex-col h-full" style={{ background: "#1a1a1a" }}>
+      {/* Company header */}
       <div
         className="flex items-center gap-3 px-5 py-5"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
       >
         <div
-          className="shrink-0 flex items-center justify-center rounded-xl font-bold"
+          className="shrink-0 flex items-center justify-center rounded-full font-bold shadow-[0_10px_20px_-5px_rgba(163,255,18,0.4)]"
           style={{
-            width: 46, height: 46, fontSize: 15,
-            background: 'rgba(158,255,0,0.15)',
-            border: '1px solid rgba(158,255,0,0.3)',
-            color: '#9EFF00',
+            width: 48,
+            height: 48,
+            fontSize: 18,
+            background: "#9EFF00",
+            color: "#1a1a1a",
           }}
         >
-          {initials}
+          N
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-[13px] font-semibold leading-tight truncate" style={{ color: '#f0f4ff' }}>
-            {user?.fullName ?? 'User'}
+          <div
+            className="text-[18px] font-bold leading-tight truncate"
+            style={{ color: "#f0f4ff" }}
+          >
+            Nella Sales
           </div>
-          {user?.email && (
-            <div className="text-[11px] truncate mt-0.5" style={{ color: 'rgba(240,244,255,0.38)' }}>
-              {user.email}
-            </div>
-          )}
+          <div
+            className="text-xs truncate mt-0.5"
+            style={{ color: "rgba(255,255,255,0.35)" }}
+          >
+            Colombia
+          </div>
         </div>
         {onClose && (
           <button
@@ -137,12 +130,13 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         )}
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      {/* Main navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-1">
         {navigation.map((item) => {
           const active =
-            item.href === '/dashboard'
-              ? pathname === item.href || pathname.startsWith('/dashboard')
-              : pathname === item.href || pathname.startsWith(item.href + '/')
+            item.href === "/dashboard"
+              ? pathname === item.href || pathname.startsWith("/dashboard")
+              : pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <NavItem
               key={item.name}
@@ -166,30 +160,38 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         />
         <button
           onClick={logout}
-          className="flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-150 w-full text-left"
-          style={{ border: '1px solid transparent', color: 'rgba(240,244,255,0.45)', padding: '10px 14px 10px 10px' }}
+          className="flex items-center gap-3.5 rounded-lg text-[14.5px] font-medium transition-colors duration-150 w-full text-left"
+          style={{
+            border: "1px solid transparent",
+            color: "rgba(255,255,255,0.55)",
+            padding: "11px 14px",
+          }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#ef4444'
-            e.currentTarget.style.background = 'rgba(239,68,68,0.06)'
+            e.currentTarget.style.color = "#ef4444";
+            e.currentTarget.style.background = "rgba(239,68,68,0.06)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'rgba(240,244,255,0.45)'
-            e.currentTarget.style.background = 'transparent'
+            e.currentTarget.style.color = "rgba(255,255,255,0.55)";
+            e.currentTarget.style.background = "transparent";
           }}
         >
-          <LogOut className="size-[18px] shrink-0" />
+          <LogOut
+            className="size-5 shrink-0"
+            style={{ color: "rgba(255,255,255,0.4)" }}
+          />
           Cerrar sesión
         </button>
       </div>
     </div>
-  )
+  );
 }
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const pathname = usePathname()
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  const isSettings = pathname.startsWith("/settings");
 
-  useEffect(() => setMobileOpen(false), [pathname])
+  useEffect(() => setMobileOpen(false), [pathname]);
 
   return (
     <ProtectedRoute>
@@ -214,11 +216,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         }} />
 
         {/* Desktop sidebar */}
-        <aside className="hidden md:flex flex-col shrink-0" style={{
-          width: SIDEBAR_W, background: '#0d0d0d',
-          borderRight: '1px solid rgba(255,255,255,0.06)',
-          position: 'relative', zIndex: 10,
-        }}>
+        <aside
+          className="hidden md:flex flex-col shrink-0"
+          style={{
+            width: SIDEBAR_W,
+            background: "#1a1a1a",
+            borderRight: "1px solid rgba(255,255,255,0.08)",
+            position: "relative",
+            zIndex: 10,
+          }}
+        >
           <SidebarContent />
         </aside>
 
@@ -256,13 +263,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             >
               <Menu className="size-5" />
             </button>
-            <span className="ml-3 text-base font-bold" style={{ color: '#f0f4ff' }}>
-              Nella<span style={{ color: '#9EFF00' }}>Sales</span>
+            <span
+              className="ml-3 text-base font-bold"
+              style={{ color: "#f0f4ff" }}
+            >
+              Nella<span style={{ color: "#9EFF00" }}>Sales</span>
             </span>
           </div>
           <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </div>
     </ProtectedRoute>
-  )
+  );
 }

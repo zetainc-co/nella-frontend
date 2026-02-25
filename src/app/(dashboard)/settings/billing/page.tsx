@@ -1,92 +1,137 @@
-// src/app/(dashboard)/configuracion/facturacion/page.tsx
-"use client"
+"use client";
 
-import { mockBilling } from '@/lib/mock-data/settings'
-import { Button } from '@/components/ui/button'
-import { CreditCard } from 'lucide-react'
+import { mockBilling } from "@/lib/mock-data/settings";
+import {
+  SettingsPageHeader,
+  SettingsCard,
+  SettingsGhostButton,
+  SettingsLimeBadge,
+} from "@/modules/settings/components/settings-ui";
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(amount);
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("es-CO", {
+    day: "numeric",
+    month: "short",
+  });
+};
 
 export default function FacturacionPage() {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
-    }).format(amount)
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-CO', {
-      day: 'numeric',
-      month: 'short'
-    })
-  }
-
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Facturación</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Gestiona tu plan y métodos de pago
+    <div className="p-6 md:p-6 space-y-6 max-w-5xl mx-auto">
+      <SettingsPageHeader
+        title="Facturación"
+        subtitle="Gestiona tu plan y métodos de pago"
+      />
+
+      <SettingsCard
+        title="Plan Actual"
+        tealGradient
+        action={<SettingsLimeBadge>{mockBilling.plan}</SettingsLimeBadge>}
+      >
+        <p className="text-sm" style={{ color: "rgba(240,244,255,0.4)" }}>
+          Tu suscripción activa
         </p>
-      </div>
 
-      {/* Plan Actual */}
-      <div className="auth-card p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-foreground">Plan Actual</h2>
-          <div className="px-3 py-1 rounded-lg bg-primary/10 border border-primary/30">
-            <span className="text-sm font-semibold text-primary">{mockBilling.plan}</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div
+            className="rounded-xl p-4"
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+            }}
+          >
+            <p className="text-xs" style={{ color: "rgba(240,244,255,0.4)" }}>
+              Precio Mensual
+            </p>
+            <p className="text-2xl font-bold mt-1" style={{ color: "#f0f4ff" }}>
+              {formatCurrency(mockBilling.price)}
+            </p>
+            <p
+              className="text-xs mt-0.5"
+              style={{ color: "rgba(240,244,255,0.4)" }}
+            >
+              {mockBilling.currency}
+            </p>
+          </div>
+
+          <div
+            className="rounded-xl p-4"
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+            }}
+          >
+            <p className="text-xs" style={{ color: "rgba(240,244,255,0.4)" }}>
+              Licencias Incluidas
+            </p>
+            <p className="text-2xl font-bold mt-1" style={{ color: "#f0f4ff" }}>
+              {mockBilling.licenses.total}
+            </p>
+            <p
+              className="text-xs mt-0.5"
+              style={{ color: "rgba(240,244,255,0.4)" }}
+            >
+              usuarios
+            </p>
+          </div>
+
+          <div
+            className="rounded-xl p-4"
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+            }}
+          >
+            <p className="text-xs" style={{ color: "rgba(240,244,255,0.4)" }}>
+              Próxima Factura
+            </p>
+            <p className="text-2xl font-bold mt-1" style={{ color: "#f0f4ff" }}>
+              {formatDate(mockBilling.nextBilling)}
+            </p>
+            <p
+              className="text-xs mt-0.5"
+              style={{ color: "rgba(240,244,255,0.4)" }}
+            >
+              2026
+            </p>
           </div>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-6">Tu suscripción activa</p>
+        <SettingsGhostButton fullWidth>Cambiar Plan</SettingsGhostButton>
+      </SettingsCard>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Precio Mensual</p>
-            <p className="text-2xl font-bold text-foreground">{formatCurrency(mockBilling.price)}</p>
-            <p className="text-xs text-muted-foreground">{mockBilling.currency}</p>
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Licencias Incluidas</p>
-            <p className="text-2xl font-bold text-foreground">{mockBilling.licenses.total}</p>
-            <p className="text-xs text-muted-foreground">usuarios</p>
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Próxima Factura</p>
-            <p className="text-2xl font-bold text-foreground">{formatDate(mockBilling.nextBilling)}</p>
-            <p className="text-xs text-muted-foreground">2026</p>
-          </div>
-        </div>
-
-        <Button variant="outline">Cambiar Plan</Button>
-      </div>
-
-      {/* Método de Pago */}
-      <div className="auth-card p-6">
-        <h2 className="text-lg font-bold text-foreground mb-6">Método de Pago</h2>
-
-        <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card">
+      <SettingsCard title="Método de Pago">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10 border border-blue-500/20">
-              <CreditCard className="h-6 w-6 text-blue-500" />
-            </div>
-
+            <span className="bg-[#3b82f6] rounded px-2 py-1 text-white text-xs font-bold uppercase">
+              {mockBilling.paymentMethod.type}
+            </span>
             <div>
-              <p className="text-sm font-medium text-foreground flex items-center gap-2">
-                <span className="uppercase text-xs font-bold">{mockBilling.paymentMethod.type}</span>
-                <span className="text-muted-foreground">•••• •••• •••• {mockBilling.paymentMethod.last4}</span>
+              <p className="text-sm font-medium" style={{ color: "#f0f4ff" }}>
+                {"···· ···· ···· "}
+                {mockBilling.paymentMethod.last4}
               </p>
-              <p className="text-xs text-muted-foreground">Vence {mockBilling.paymentMethod.expiresAt}</p>
+              <p className="text-xs" style={{ color: "rgba(240,244,255,0.4)" }}>
+                Vence {mockBilling.paymentMethod.expiresAt}
+              </p>
             </div>
           </div>
-
-          <Button variant="outline" size="sm">Actualizar</Button>
+          <button
+            className="text-sm font-medium transition-colors hover:opacity-80"
+            style={{ color: "#9EFF00", background: "none", border: "none" }}
+          >
+            Actualizar
+          </button>
         </div>
-      </div>
+      </SettingsCard>
     </div>
-  )
+  );
 }

@@ -40,3 +40,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI Framework runtime files (auto-added)
+/.claude/*
+!/.claude/rules/
+/CLAUDE.md
+/hooks/*.db
+/hooks/__pycache__/
+/.ralph/
+/.research/

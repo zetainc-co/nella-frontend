@@ -1,108 +1,204 @@
-// src/app/(dashboard)/configuracion/conexiones/page.tsx
-"use client"
+"use client";
 
-import { mockConnections } from '@/lib/mock-data/settings'
-import { Button } from '@/components/ui/button'
-import { MessageCircle, Instagram, Facebook, Calendar, CheckCircle2, Circle } from 'lucide-react'
+import { mockConnections } from "@/lib/mock-data/settings";
+import {
+  SettingsPageHeader,
+  SettingsGhostButton,
+} from "@/modules/settings/components/settings-ui";
+import {
+  MessageCircle,
+  Instagram,
+  Facebook,
+  Calendar,
+  CheckCircle2,
+  Circle,
+  Lock,
+  Phone,
+} from "lucide-react";
 
 const iconMap = {
   whatsapp: MessageCircle,
   instagram: Instagram,
   facebook: Facebook,
-  calendar: Calendar
-}
+  calendar: Calendar,
+};
 
 const colorMap = {
-  whatsapp: 'text-green-500 bg-green-500/10 border-green-500/20',
-  instagram: 'text-pink-500 bg-pink-500/10 border-pink-500/20',
-  facebook: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
-  calendar: 'text-purple-500 bg-purple-500/10 border-purple-500/20'
-}
+  whatsapp: {
+    text: "#22c55e",
+    background: "rgba(34,197,94,0.1)",
+    border: "rgba(34,197,94,0.2)",
+  },
+  instagram: {
+    text: "#ec4899",
+    background: "rgba(236,72,153,0.1)",
+    border: "rgba(236,72,153,0.2)",
+  },
+  facebook: {
+    text: "#3b82f6",
+    background: "rgba(59,130,246,0.1)",
+    border: "rgba(59,130,246,0.2)",
+  },
+  calendar: {
+    text: "#a855f7",
+    background: "rgba(168,85,247,0.1)",
+    border: "rgba(168,85,247,0.2)",
+  },
+};
 
 export default function ConexionesPage() {
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Conexiones</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Administra tus integraciones con canales de comunicación
-        </p>
-      </div>
+    <div className="p-6 md:p-6 space-y-6 max-w-5xl mx-auto">
+      <SettingsPageHeader
+        title="Conexiones"
+        subtitle="Administra tus integraciones con canales de comunicación"
+      />
 
-      {/* Connections */}
       <div className="space-y-4">
         {mockConnections.map((connection) => {
-          const Icon = iconMap[connection.icon as keyof typeof iconMap]
-          const colorClass = colorMap[connection.icon as keyof typeof colorMap]
+          const Icon = iconMap[connection.icon as keyof typeof iconMap];
+          const connectionColors =
+            colorMap[connection.icon as keyof typeof colorMap];
 
           return (
-            <div key={connection.id} className="auth-card p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-start gap-4">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-lg border ${colorClass}`}>
-                    <Icon className="h-6 w-6" />
+            <div
+              key={connection.id}
+              className="rounded-2xl p-7 relative overflow-hidden"
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.07)",
+              }}
+            >
+              {/* Top row: icon + title on left, buttons on right */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex items-center justify-center rounded-full shrink-0"
+                    style={{
+                      width: 48,
+                      height: 48,
+                      background: connectionColors.background,
+                      border: `1px solid ${connectionColors.border}`,
+                    }}
+                  >
+                    <Icon
+                      className="size-5"
+                      style={{ color: connectionColors.text }}
+                    />
                   </div>
-
                   <div>
-                    <h3 className="text-lg font-bold text-foreground">{connection.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{connection.description}</p>
+                    <h3
+                      className="text-lg font-bold"
+                      style={{ color: "#f0f4ff" }}
+                    >
+                      {connection.name}
+                    </h3>
+                    <p
+                      className="text-sm mt-0.5"
+                      style={{ color: "rgba(240,244,255,0.4)" }}
+                    >
+                      {connection.description}
+                    </p>
                   </div>
+                </div>
+
+                <div className="flex flex-col gap-2 shrink-0 ml-4">
+                  {connection.connected ? (
+                    <>
+                      <SettingsGhostButton icon={<Lock className="size-3.5" />}>
+                        Editar Token
+                      </SettingsGhostButton>
+                      <SettingsGhostButton variant="danger">
+                        Desconectar
+                      </SettingsGhostButton>
+                    </>
+                  ) : (
+                    <SettingsGhostButton>Conectar</SettingsGhostButton>
+                  )}
                 </div>
               </div>
 
-              {connection.connected ? (
-                <div className="space-y-3">
+              {/* Status + details below */}
+              <div className="mt-4 space-y-3">
+                {connection.connected ? (
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    <span className="text-sm font-medium text-green-500">Conectado</span>
+                    <CheckCircle2 className="size-4 text-green-500" />
+                    <span className="text-sm font-medium text-green-500">
+                      Conectado
+                    </span>
                   </div>
-
-                  {connection.phone && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>📱</span>
-                      <span>{connection.phone}</span>
-                    </div>
-                  )}
-
-                  {connection.token && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>🔑</span>
-                      <span>Token: {connection.token}</span>
-                    </div>
-                  )}
-
-                  {connection.note && (
-                    <div className="mt-4 p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
-                      <p className="text-xs text-muted-foreground">
-                        <span className="font-semibold text-blue-400">Nota:</span> {connection.note}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm">Editar Token</Button>
-                    <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-400 hover:bg-red-500/10">
-                      Desconectar
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
+                ) : (
                   <div className="flex items-center gap-2">
-                    <Circle className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">No conectado</span>
+                    <Circle
+                      className="size-4"
+                      style={{ color: "rgba(240,244,255,0.3)" }}
+                    />
+                    <span
+                      className="text-sm"
+                      style={{ color: "rgba(240,244,255,0.4)" }}
+                    >
+                      No conectado
+                    </span>
                   </div>
+                )}
 
-                  <Button className="btn-primary">
-                    {connection.id === 'calendar' ? 'Conectar con Google' : 'Conectar'}
-                  </Button>
-                </div>
-              )}
+                {connection.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone
+                      className="size-3.5"
+                      style={{ color: "rgba(240,244,255,0.4)" }}
+                    />
+                    <span
+                      className="text-sm font-mono"
+                      style={{ color: "rgba(240,244,255,0.5)" }}
+                    >
+                      {connection.phone}
+                    </span>
+                  </div>
+                )}
+
+                {connection.token && (
+                  <div className="flex items-center gap-2">
+                    <Lock
+                      className="size-3.5"
+                      style={{ color: "rgba(240,244,255,0.4)" }}
+                    />
+                    <span
+                      className="text-sm font-mono"
+                      style={{ color: "rgba(240,244,255,0.5)" }}
+                    >
+                      {connection.token}
+                    </span>
+                  </div>
+                )}
+
+                {connection.note && (
+                  <div
+                    className="p-3 rounded-lg"
+                    style={{
+                      background: "rgba(59,130,246,0.05)",
+                      border: "1px solid rgba(59,130,246,0.15)",
+                    }}
+                  >
+                    <p
+                      className="text-xs"
+                      style={{ color: "rgba(240,244,255,0.5)" }}
+                    >
+                      <span
+                        className="font-semibold"
+                        style={{ color: "#60a5fa" }}
+                      >
+                        Nota:
+                      </span>{" "}
+                      {connection.note}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
