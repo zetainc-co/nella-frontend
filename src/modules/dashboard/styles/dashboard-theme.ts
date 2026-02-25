@@ -1,5 +1,3 @@
-// src/modules/dashboard/styles/dashboard-theme.ts
-
 export const DASHBOARD_COLORS = {
   primary: '#9EFF00',
   darkBg: '#1a1a1a',
@@ -27,9 +25,9 @@ export const CARD_STYLES = {
 };
 
 export const PERIODS = [
-  { label: 'Últimos 30 días', value: '30d' as const },
-  { label: 'Mes anterior', value: 'prev_month' as const },
-  { label: 'Trimestre', value: 'quarter' as const },
-  { label: 'Año', value: 'year' as const },
-  { label: 'Todo', value: 'all' as const },
-];
+  { label: 'Últimos 30 días', value: '30d' },
+  { label: 'Mes anterior', value: 'prev_month' },
+  { label: 'Trimestre', value: 'quarter' },
+  { label: 'Año', value: 'year' },
+  { label: 'Todo', value: 'all' },
+] as const;
