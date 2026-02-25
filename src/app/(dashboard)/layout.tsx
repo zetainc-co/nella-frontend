@@ -16,7 +16,6 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useAuthStore } from "@/stores/auth-store";
 
 const SIDEBAR_W = 252;
 
@@ -92,7 +91,7 @@ function NavItem({
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -105,16 +104,8 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
     const userRole = localStorage.getItem("user_role");
     setIsAdmin(userRole === "admin");
   }, [pathname]);
-  const { user, logout } = useAuthStore();
+  
   const initials = getInitials(user?.fullName);
-
-  function handleLogout() {
-    logout();
-    const domain = process.env.NEXT_PUBLIC_APP_DOMAIN || "localhost";
-    const port = window.location.port ? `:${window.location.port}` : "";
-    window.location.href = `http://${domain}${port}/login`;
-  }
-
   const isSettingsActive = pathname.startsWith("/settings");
 
   function handleLogout() {
@@ -242,12 +233,6 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   );
 }
 
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-destructive transition-all w-full text-left"
-          >
-            <LogOut className="size-5" />
-            Cerrar Sesión
 /* ── Layout ───────────────────────────────────────────────────── */
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
