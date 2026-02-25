@@ -1,19 +1,15 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/core/api/api-client';
 import { queryKeys } from '@/core/api/query-keys';
 import {
-  mockTeam,
-  mockTrends,
-  mockAiSavings,
   calculatePipelineValue,
   calculateRoas,
-} from '@/lib/mock-data/dashboard-metrics';
+} from '@/modules/dashboard/utils/metrics-calculations';
+import type { Period } from '@/modules/dashboard/hooks/useMetrics';
 
-export type Period = 'all' | '30d' | 'prev_month' | 'quarter' | 'year';
+export type { Period };
 
 export interface BackendMetrics {
   totalLeads: number;
@@ -21,6 +17,27 @@ export interface BackendMetrics {
   revenueMonth: number;
   trafficSources: Array<{ source: string; count: number }>;
   funnel: Array<{ status: string; count: number }>;
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  sales: number;
+  conversionRate: number;
+  responseTime: string;
+  avatar: string;
+}
+
+export interface TrendData {
+  week: string;
+  revenue: number;
+  leads: number;
+}
+
+export interface AiSavingsData {
+  hoursSaved: number;
+  leadsQualified: number;
+  description: string;
 }
 
 export interface DashboardMetrics {
@@ -32,9 +49,9 @@ export interface DashboardMetrics {
 
   pipelineValue: number;
   roas: string;
-  teamPerformance: typeof mockTeam;
-  trends: typeof mockTrends;
-  aiSavings: typeof mockAiSavings;
+  teamPerformance: TeamMember[];
+  trends: TrendData[];
+  aiSavings: AiSavingsData;
 
   period: Period;
   projectId: string;
@@ -49,72 +66,102 @@ export function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   ]);
 }
 
-export function useMetricsData(projectId: string, period: Period = '30d') {
-  const searchParams = useSearchParams();
-  const urlPeriod = (searchParams?.get('period') as Period) || period;
-  const urlProjectId = searchParams?.get('project') || projectId;
-
-  return useQuery<DashboardMetrics>({
-    queryKey: queryKeys.dashboard.metrics(urlProjectId, urlPeriod),
-    queryFn: async () => {
-      try {
-        const response = await withTimeout(
-          apiClient.get<BackendMetrics>(
-            `/api/metrics/project/${urlProjectId}?period=${urlPeriod}`
-          ),
-          5000
-        );
-
-        const pipelineValue = calculatePipelineValue(response.revenueMonth);
-        const roas = calculateRoas(response.revenueMonth);
-
-        return {
-          totalLeads: response.totalLeads,
-          activeLeads: response.activeLeads,
-          totalRevenue: response.revenueMonth,
-          trafficSources: response.trafficSources,
-          funnel: response.funnel,
-          pipelineValue,
-          roas,
-          teamPerformance: mockTeam,
-          trends: mockTrends,
-          aiSavings: mockAiSavings,
-          period: urlPeriod,
-          projectId: urlProjectId,
-        };
-      } catch (error) {
-        const isTimeout = error instanceof Error && error.message === 'Timeout';
-        if (isTimeout) {
-          toast.warning('Timeout al cargar metricas, usando datos de prueba');
-        } else {
-          toast.warning('Error al cargar metricas, usando datos de prueba');
-        }
-
-        return {
-          totalLeads: 1247,
-          activeLeads: 856,
-          totalRevenue: 130800000,
-          trafficSources: [
-            { source: 'Instagram', count: 810 },
-            { source: 'Facebook', count: 437 },
-          ],
-          funnel: [
-            { status: 'new', count: 1247 },
-            { status: 'qualified', count: 856 },
-            { status: 'negotiation', count: 423 },
-            { status: 'closed', count: 189 },
-          ],
-          pipelineValue: calculatePipelineValue(130800000),
-          roas: calculateRoas(130800000),
-          teamPerformance: mockTeam,
-          trends: mockTrends,
-          aiSavings: mockAiSavings,
-          period: urlPeriod,
-          projectId: urlProjectId,
-        };
-      }
+/**
+ * Hardcoded fallback data used as placeholderData so the UI renders immediately
+ * while the real API request is in flight or if it fails.
+ * Pre-computed values: pipelineValue = 130800000 * 1.5 = 196200000, roas = 130800000 / 20000 = 6540.0
+ */
+function buildFallbackMetrics(projectId: string, period: Period): DashboardMetrics {
+  return {
+    totalLeads: 1247,
+    activeLeads: 856,
+    totalRevenue: 130800000,
+    trafficSources: [
+      { source: 'Instagram', count: 810 },
+      { source: 'Facebook', count: 437 },
+    ],
+    funnel: [
+      { status: 'new', count: 1247 },
+      { status: 'qualified', count: 856 },
+      { status: 'negotiation', count: 423 },
+      { status: 'closed', count: 189 },
+    ],
+    pipelineValue: 196200000,
+    roas: '6540.0',
+    teamPerformance: [
+      { id: '1', name: 'Carlos Mendez', sales: 47, conversionRate: 18.5, responseTime: '8 min', avatar: 'CM' },
+      { id: '2', name: 'Maria Garcia', sales: 42, conversionRate: 16.2, responseTime: '12 min', avatar: 'MG' },
+      { id: '3', name: 'Luis Rodriguez', sales: 38, conversionRate: 15.1, responseTime: '15 min', avatar: 'LR' },
+      { id: '4', name: 'Ana Martinez', sales: 35, conversionRate: 14.8, responseTime: '10 min', avatar: 'AM' },
+      { id: '5', name: 'Pedro Sanchez', sales: 27, conversionRate: 12.3, responseTime: '18 min', avatar: 'PS' },
+    ],
+    trends: [
+      { week: 'Sem 1', revenue: 130000, leads: 120 },
+      { week: 'Sem 2', revenue: 135000, leads: 135 },
+      { week: 'Sem 3', revenue: 142000, leads: 150 },
+      { week: 'Sem 4', revenue: 150000, leads: 165 },
+    ],
+    aiSavings: {
+      hoursSaved: 247,
+      leadsQualified: 823,
+      description: 'La IA ha filtrado leads no calificados, ahorrando tiempo valioso al equipo',
     },
-    enabled: !!urlProjectId,
+    period,
+    projectId,
+  };
+}
+
+/**
+ * Fetches dashboard metrics for a specific project and period.
+ * Errors propagate to React Query (no internal catch) -- consumers handle via `error` state.
+ * placeholderData provides hardcoded mock values so the UI never renders empty.
+ */
+export function useMetricsData(projectId: string, period: Period = '30d') {
+  return useQuery<DashboardMetrics>({
+    queryKey: queryKeys.dashboard.metrics(projectId, period),
+    queryFn: async () => {
+      const response = await withTimeout(
+        apiClient.get<BackendMetrics>(
+          `/api/metrics/project/${projectId}?period=${period}`
+        ),
+        5000
+      );
+
+      const pipelineValue = calculatePipelineValue(response.revenueMonth);
+      const roas = calculateRoas(response.revenueMonth);
+
+      return {
+        totalLeads: response.totalLeads,
+        activeLeads: response.activeLeads,
+        totalRevenue: response.revenueMonth,
+        trafficSources: response.trafficSources,
+        funnel: response.funnel,
+        pipelineValue,
+        roas,
+        teamPerformance: [
+          { id: '1', name: 'Carlos Mendez', sales: 47, conversionRate: 18.5, responseTime: '8 min', avatar: 'CM' },
+          { id: '2', name: 'Maria Garcia', sales: 42, conversionRate: 16.2, responseTime: '12 min', avatar: 'MG' },
+          { id: '3', name: 'Luis Rodriguez', sales: 38, conversionRate: 15.1, responseTime: '15 min', avatar: 'LR' },
+          { id: '4', name: 'Ana Martinez', sales: 35, conversionRate: 14.8, responseTime: '10 min', avatar: 'AM' },
+          { id: '5', name: 'Pedro Sanchez', sales: 27, conversionRate: 12.3, responseTime: '18 min', avatar: 'PS' },
+        ],
+        trends: [
+          { week: 'Sem 1', revenue: 130000, leads: 120 },
+          { week: 'Sem 2', revenue: 135000, leads: 135 },
+          { week: 'Sem 3', revenue: 142000, leads: 150 },
+          { week: 'Sem 4', revenue: 150000, leads: 165 },
+        ],
+        aiSavings: {
+          hoursSaved: 247,
+          leadsQualified: 823,
+          description: 'La IA ha filtrado leads no calificados, ahorrando tiempo valioso al equipo',
+        },
+        period,
+        projectId,
+      };
+    },
+    placeholderData: () => buildFallbackMetrics(projectId, period),
+    enabled: !!projectId,
     staleTime: 60000,
     retry: false,
   });
