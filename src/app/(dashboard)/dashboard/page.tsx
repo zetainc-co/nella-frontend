@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { Suspense, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useProjects } from '@/modules/dashboard/hooks/useProjects'
-import { ProjectEmptyState } from '@/modules/dashboard/components/project-empty-state'
-import { CreateProjectModal } from '@/modules/dashboard/components/create-project-modal'
-import { ProjectSelector } from '@/modules/dashboard/components/project-selector'
-import { MetricsDashboard } from '@/modules/dashboard/components/metrics-dashboard'
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useProjects } from "@/modules/dashboard/hooks/useProjects";
+import { ProjectEmptyState } from "@/modules/dashboard/components/project-empty-state";
+import { CreateProjectModal } from "@/modules/dashboard/components/create-project-modal";
+import { ProjectSelector } from "@/modules/dashboard/components/project-selector";
+import { MetricsDashboard } from "@/modules/dashboard/components/metrics-dashboard";
 
 function DashboardSkeleton() {
   return (
@@ -19,46 +19,44 @@ function DashboardSkeleton() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="glass-panel rounded-2xl h-[120px] animate-pulse bg-accent/30" />
+          <div
+            key={i}
+            className="glass-panel rounded-2xl h-[120px] animate-pulse bg-accent/30"
+          />
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 function DashboardContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [modalOpen, setModalOpen] = useState(false)
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const { data: projects, isLoading } = useProjects()
+  const { data: projects, isLoading } = useProjects();
 
-  const urlProjectId = searchParams.get('project')
-  const activeProjectId = urlProjectId ?? projects?.[0]?.id ?? null
+  const urlProjectId = searchParams.get("project");
+  const activeProjectId = urlProjectId ?? projects?.[0]?.id ?? null;
 
   function handleSelectProject(id: string) {
-    router.push(`/dashboard?project=${id}`)
+    router.push(`/dashboard?project=${id}`);
   }
 
   function handleProjectCreated(id: string) {
-    router.push(`/dashboard?project=${id}`)
+    router.push(`/dashboard?project=${id}`);
   }
 
   if (isLoading) {
-    return <DashboardSkeleton />
+    return <DashboardSkeleton />;
   }
 
-  const hasProjects = projects && projects.length > 0
+  const hasProjects = projects && projects.length > 0;
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4 pt-4 md:p-6 md:pt-5 lg:p-8 lg:pt-6 min-h-screen">
+    <div className="flex flex-1 flex-col gap-6 pt-3 min-h-screen ">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h2>
-          <p className="text-muted-foreground mt-1 text-sm tracking-wide">Rendimiento en tiempo real.</p>
-        </div>
-
         {hasProjects && activeProjectId && (
           <ProjectSelector
             projects={projects}
@@ -83,7 +81,7 @@ function DashboardContent() {
         onCreated={handleProjectCreated}
       />
     </div>
-  )
+  );
 }
 
 export default function DashboardPage() {
@@ -91,5 +89,5 @@ export default function DashboardPage() {
     <Suspense fallback={<DashboardSkeleton />}>
       <DashboardContent />
     </Suspense>
-  )
+  );
 }
