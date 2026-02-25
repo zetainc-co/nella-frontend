@@ -1,5 +1,3 @@
-'use client';
-
 const PULSE_CLASS = 'rounded-xl bg-[rgba(255,255,255,0.06)] animate-pulse';
 
 export function MetricsSkeleton() {

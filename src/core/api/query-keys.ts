@@ -25,4 +25,4 @@ export const queryKeys = {
   workflows: {
     byTenant: (tenantId: string) => ['workflows', tenantId] as const,
   },
-}
+};
