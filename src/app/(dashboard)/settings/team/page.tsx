@@ -1,101 +1,166 @@
-// src/app/(dashboard)/configuracion/equipo/page.tsx
-"use client"
+"use client";
 
-import { mockTeam, mockBilling } from '@/lib/mock-data/settings'
-import { Button } from '@/components/ui/button'
-import { UserPlus, Trash2 } from 'lucide-react'
+import { mockTeam, mockBilling } from "@/lib/mock-data/settings";
+import { UserPlus, Trash2 } from "lucide-react";
+import {
+  SettingsPageHeader,
+  SettingsCard,
+  SettingsCTAButton,
+  SettingsLimeBadge,
+  SettingsStatusDot,
+} from "@/modules/settings/components/settings-ui";
 
 export default function EquipoPage() {
-  const licensePercentage = (mockBilling.licenses.used / mockBilling.licenses.total) * 100
+  const licensesUsed = mockBilling.licenses.used;
+  const licensesTotal = mockBilling.licenses.total;
+  const licensePercentage = (licensesUsed / licensesTotal) * 100;
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Equipo y Permisos</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Gestiona quién tiene acceso a tus chats y leads
-        </p>
-      </div>
+    <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
+      <SettingsPageHeader
+        title="Equipo y Permisos"
+        subtitle="Gestiona quién tiene acceso a tus chats y leads"
+      />
 
       {/* Licencias Usadas */}
-      <div className="auth-card p-6">
-        <h2 className="text-lg font-bold text-foreground mb-4">Licencias Usadas</h2>
-
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Estás usando <span className="text-foreground font-semibold">{mockBilling.licenses.used}</span> de{' '}
-            <span className="text-foreground font-semibold">{mockBilling.licenses.total}</span> licencias disponibles
+      <SettingsCard title="Licencias Usadas">
+        <div className="flex items-center justify-between">
+          <p className="text-sm" style={{ color: "rgba(240,244,255,0.4)" }}>
+            Estás usando{" "}
+            <span className="font-bold" style={{ color: "#f0f4ff" }}>
+              {licensesUsed}
+            </span>{" "}
+            de {licensesTotal} licencias disponibles
           </p>
 
-          <div className="relative w-full h-2 bg-muted/30 rounded-full overflow-hidden">
+          <div className="flex flex-col items-end gap-1">
             <div
-              className="absolute h-full bg-primary transition-all"
-              style={{ width: `${licensePercentage}%` }}
-            />
-          </div>
-
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{mockBilling.licenses.used}/{mockBilling.licenses.total}</span>
-            <span>{licensePercentage.toFixed(0)}% usado</span>
+              className="relative h-2 w-40 overflow-hidden rounded-full"
+              style={{ background: "rgba(255,255,255,0.06)" }}
+            >
+              <div
+                className="absolute h-full rounded-full bg-[#9EFF00]"
+                style={{ width: `${licensePercentage}%` }}
+              />
+            </div>
+            <span
+              className="text-xs"
+              style={{ color: "rgba(240,244,255,0.4)" }}
+            >
+              {licensesUsed}/{licensesTotal}
+            </span>
           </div>
         </div>
-      </div>
+      </SettingsCard>
 
       {/* Miembros del Equipo */}
-      <div className="auth-card p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-foreground">Miembros del Equipo</h2>
-          <Button className="btn-primary gap-2">
-            <UserPlus className="h-4 w-4" />
-            Invitar Miembro
-          </Button>
-        </div>
+      <SettingsCard
+        title="Miembros del Equipo"
+        action={
+          <SettingsCTAButton>
+            <UserPlus className="size-4" /> Invitar Miembro
+          </SettingsCTAButton>
+        }
+      >
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th
+                className="pb-3 text-left text-xs font-medium"
+                style={{ color: "rgba(240,244,255,0.4)" }}
+              >
+                Usuario
+              </th>
+              <th
+                className="pb-3 text-left text-xs font-medium"
+                style={{ color: "rgba(240,244,255,0.4)" }}
+              >
+                Rol
+              </th>
+              <th
+                className="pb-3 text-left text-xs font-medium"
+                style={{ color: "rgba(240,244,255,0.4)" }}
+              >
+                Estado
+              </th>
+              <th
+                className="pb-3 text-right text-xs font-medium"
+                style={{ color: "rgba(240,244,255,0.4)" }}
+              >
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {mockTeam.map((member) => (
+              <tr
+                key={member.id}
+                style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+              >
+                {/* Usuario */}
+                <td className="py-4">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                      style={{
+                        width: 36,
+                        height: 36,
+                        background: "#9EFF00",
+                        color: "#0a0a0a",
+                      }}
+                    >
+                      {member.avatar}
+                    </div>
+                    <div>
+                      <p
+                        className="text-sm font-semibold"
+                        style={{ color: "#f0f4ff" }}
+                      >
+                        {member.name}
+                      </p>
+                      <p
+                        className="text-xs"
+                        style={{ color: "rgba(240,244,255,0.4)" }}
+                      >
+                        {member.email}
+                      </p>
+                    </div>
+                  </div>
+                </td>
 
-        <div className="space-y-4">
-          {mockTeam.map((member) => (
-            <div
-              key={member.id}
-              className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent transition-all"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary/40 bg-primary/10 text-sm font-bold text-primary">
-                  {member.avatar}
-                </div>
+                {/* Rol */}
+                <td className="py-4">
+                  <SettingsLimeBadge
+                    variant={
+                      member.role === "Administrador" ? "lime" : "outlined"
+                    }
+                  >
+                    {member.role}
+                  </SettingsLimeBadge>
+                </td>
 
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{member.name}</p>
-                  <p className="text-xs text-muted-foreground">{member.email}</p>
-                </div>
-              </div>
+                {/* Estado */}
+                <td className="py-4">
+                  <SettingsStatusDot
+                    status={member.status === "active" ? "active" : "pending"}
+                  />
+                </td>
 
-              <div className="flex items-center gap-4">
-                <div className="px-3 py-1 rounded-lg bg-primary/10 border border-primary/20">
-                  <span className="text-xs font-medium text-primary">{member.role}</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {member.status === 'active' ? (
-                    <>
-                      <div className="h-2 w-2 rounded-full bg-green-500" />
-                      <span className="text-xs text-green-500">Activo</span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                      <span className="text-xs text-yellow-500">Pendiente</span>
-                    </>
-                  )}
-                </div>
-
-                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-400 hover:bg-red-500/10">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+                {/* Acciones */}
+                <td className="py-4 text-right">
+                  <button
+                    className="inline-flex items-center gap-1.5 text-xs font-medium transition-colors hover:opacity-80"
+                    style={{ color: "#ef4444" }}
+                  >
+                    <Trash2 className="size-3.5" />
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </SettingsCard>
     </div>
-  )
+  );
 }

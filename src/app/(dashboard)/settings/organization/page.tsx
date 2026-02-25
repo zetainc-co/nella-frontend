@@ -1,99 +1,122 @@
-// src/app/(dashboard)/configuracion/organizacion/page.tsx
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { mockOrganization } from '@/lib/mock-data/settings'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
+import {
+  SettingsPageHeader,
+  SettingsCard,
+  SettingsCTAButton,
+} from "@/modules/settings/components/settings-ui";
+import { OrganizationCardSkeleton } from "@/modules/settings/components/settings-skeleton";
+import { useOrganization } from "@/modules/settings/hooks/use-organization";
+
+const inputStyle = {
+  background: "rgba(255,255,255,0.04)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  color: "#f0f4ff",
+};
+
+const labelStyle = { color: "rgba(240,244,255,0.55)" };
 
 export default function OrganizacionPage() {
-  const [org, setOrg] = useState(mockOrganization)
+  const { data: org, isLoading } = useOrganization();
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Organización</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Información de tu empresa
-        </p>
-      </div>
+    <div className="p-6 md:p-6 space-y-6 max-w-5xl mx-auto">
+      <SettingsPageHeader
+        title="Organizaci&#243;n"
+        subtitle="Informaci&#243;n de tu empresa"
+      />
 
-      {/* Datos de la Empresa */}
-      <div className="auth-card p-6">
-        <h2 className="text-lg font-bold text-foreground mb-6">Datos de la Empresa</h2>
+      <SettingsCard title="Datos de la Empresa">
+        {isLoading || !org ? (
+          <OrganizationCardSkeleton />
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[13px] font-semibold" style={labelStyle}>
+                  Nombre de la Empresa
+                </Label>
+                <Input
+                  className="h-11 rounded-xl"
+                  value={org.name}
+                  readOnly
+                  style={inputStyle}
+                />
+              </div>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[13px] font-semibold" style={labelStyle}>
+                  NIT / ID Fiscal
+                </Label>
+                <Input
+                  className="h-11 rounded-xl"
+                  value={org.nit}
+                  readOnly
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[13px] font-semibold" style={labelStyle}>
+                  Industria
+                </Label>
+                <Select value={org.industry} disabled>
+                  <SelectTrigger className="h-11 rounded-xl" style={inputStyle}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Tecnolog&#237;a">
+                      {"Tecnolog\u00eda"}
+                    </SelectItem>
+                    <SelectItem value="Retail">Retail</SelectItem>
+                    <SelectItem value="Servicios">Servicios</SelectItem>
+                    <SelectItem value="Manufactura">Manufactura</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[13px] font-semibold" style={labelStyle}>
+                  {"Tel\u00e9fono"}
+                </Label>
+                <Input
+                  className="h-11 rounded-xl"
+                  value={org.phone}
+                  readOnly
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label>Nombre de la Empresa</Label>
+              <Label className="text-[13px] font-semibold" style={labelStyle}>
+                {"Direcci\u00f3n"}
+              </Label>
               <Input
-                value={org.name}
-                onChange={(e) => setOrg({ ...org, name: e.target.value })}
-                className="auth-input"
+                className="h-11 rounded-xl"
+                value={org.address}
+                readOnly
+                style={inputStyle}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label>NIT / ID Fiscal</Label>
-              <Input
-                value={org.nit}
-                onChange={(e) => setOrg({ ...org, nit: e.target.value })}
-                className="auth-input"
-              />
-            </div>
           </div>
+        )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Industria</Label>
-              <Select value={org.industry} onValueChange={(value) => setOrg({ ...org, industry: value })}>
-                <SelectTrigger className="auth-input">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Tecnología">Tecnología</SelectItem>
-                  <SelectItem value="Retail">Retail</SelectItem>
-                  <SelectItem value="Servicios">Servicios</SelectItem>
-                  <SelectItem value="Manufactura">Manufactura</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Teléfono</Label>
-              <Input
-                value={org.phone}
-                onChange={(e) => setOrg({ ...org, phone: e.target.value })}
-                className="auth-input"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Dirección</Label>
-            <Input
-              value={org.address}
-              onChange={(e) => setOrg({ ...org, address: e.target.value })}
-              className="auth-input"
-            />
-          </div>
-
-          <div className="flex justify-end pt-4">
-            <Button className="btn-primary">
-              Guardar Cambios
-            </Button>
-          </div>
+        <div className="flex justify-end pt-4">
+          <SettingsCTAButton>Guardar Cambios</SettingsCTAButton>
         </div>
-      </div>
+      </SettingsCard>
     </div>
-  )
+  );
 }
