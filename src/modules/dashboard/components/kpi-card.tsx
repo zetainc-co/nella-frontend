@@ -1,11 +1,12 @@
 import type { LucideIcon } from "lucide-react";
+import { DASHBOARD_DESIGN } from "@/modules/dashboard/constants/design-system";
 
 interface KpiCardProps {
   title: string;
   value: string;
   icon: LucideIcon;
   loading?: boolean;
-  accent?: string; // hex color for icon bg tint
+  accent?: string;
 }
 
 export function KpiCard({
@@ -13,26 +14,34 @@ export function KpiCard({
   value,
   icon: Icon,
   loading,
-  accent = "#9EFF00",
+  accent = DASHBOARD_DESIGN.colors.accent.lime,
 }: KpiCardProps) {
+  const { card, text } = DASHBOARD_DESIGN.colors;
+  const { padding, gap, topAccentHeight } = DASHBOARD_DESIGN.spacing.card;
+  const { transition, hover } = DASHBOARD_DESIGN.effects;
+  const skeleton = DASHBOARD_DESIGN.loading.skeleton;
+
   return (
     <div
-      className="relative rounded-2xl p-5 flex flex-col gap-4 overflow-hidden transition-all duration-300 hover:translate-y-[-2px]"
+      className={`relative rounded-2xl flex flex-col overflow-hidden ${transition} ${hover}`}
       style={{
-        background: "rgba(18, 18, 18, 0.85)",
-        border: "1px solid rgba(255,255,255,0.07)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+        padding: `${padding * 0.25}rem`,
+        gap: `${gap * 0.25}rem`,
+        background: card.bg,
+        border: `1px solid ${card.border}`,
+        boxShadow: card.shadow,
       }}
     >
-      {/* subtle top accent line */}
+      {/* Subtle top accent line */}
       <div
-        className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl"
+        className="absolute top-0 left-0 right-0 rounded-t-2xl"
         style={{
+          height: topAccentHeight,
           background: `linear-gradient(90deg, transparent, ${accent}40, transparent)`,
         }}
       />
 
-      {/* icon top-right */}
+      {/* Icon in top-right */}
       <div className="flex items-start justify-between">
         <div />
         <div
@@ -46,25 +55,29 @@ export function KpiCard({
         </div>
       </div>
 
-      {/* value */}
+      {/* Value: Loading skeleton or display */}
       {loading ? (
         <div
-          className="h-9 w-24 rounded-lg animate-pulse"
-          style={{ background: "rgba(255,255,255,0.08)" }}
+          className={`${skeleton.borderRadius} ${skeleton.animate}`}
+          style={{
+            height: skeleton.height,
+            width: skeleton.width,
+            background: skeleton.bg,
+          }}
         />
       ) : (
         <div
           className="text-3xl font-bold tracking-tight"
-          style={{ color: "#f0f4ff" }}
+          style={{ color: text.primary }}
         >
           {value}
         </div>
       )}
 
-      {/* title */}
+      {/* Title/Label */}
       <div
         className="text-sm font-medium"
-        style={{ color: "rgba(240,244,255,0.5)" }}
+        style={{ color: text.secondary }}
       >
         {title}
       </div>

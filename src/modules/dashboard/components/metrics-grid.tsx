@@ -2,6 +2,10 @@
 
 import { Users, UserCheck, DollarSign, TrendingUp } from "lucide-react";
 import { KpiCard } from "./kpi-card";
+import {
+  DASHBOARD_DESIGN,
+  METRIC_ACCENTS,
+} from "@/modules/dashboard/constants/design-system";
 import type { Period } from "@/modules/dashboard/hooks/useMetrics";
 
 interface MetricsData {
@@ -32,22 +36,26 @@ export function MetricsGrid({
 }: MetricsGridProps) {
   const closedLeads =
     data?.funnel.find((f) => f.status === "closed")?.count ?? 0;
+  const { cols, gap } = DASHBOARD_DESIGN.spacing.grid;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div
+      className={`grid ${cols}`}
+      style={{ gap: `${gap * 0.25}rem` }}
+    >
       <KpiCard
         title="Total Leads"
         value={isLoading ? "—" : String(data?.totalLeads ?? 0)}
         icon={Users}
         loading={isLoading}
-        accent="#9EFF00"
+        accent={METRIC_ACCENTS.leads}
       />
       <KpiCard
         title="Active Leads"
         value={isLoading ? "—" : String(data?.activeLeads ?? 0)}
         icon={UserCheck}
         loading={isLoading}
-        accent="#39d353"
+        accent={METRIC_ACCENTS.activeLeads}
       />
       <KpiCard
         title={REVENUE_LABEL[period]}
@@ -58,14 +66,14 @@ export function MetricsGrid({
         }
         icon={DollarSign}
         loading={isLoading}
-        accent="#9EFF00"
+        accent={METRIC_ACCENTS.revenue}
       />
       <KpiCard
         title="Closed Leads"
         value={isLoading ? "—" : String(closedLeads)}
         icon={TrendingUp}
         loading={isLoading}
-        accent="#39d353"
+        accent={METRIC_ACCENTS.closedLeads}
       />
     </div>
   );
