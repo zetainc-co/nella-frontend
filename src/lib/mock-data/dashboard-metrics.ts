@@ -1,6 +1,33 @@
 // src/lib/mock-data/dashboard-metrics.ts
 
-export const MOCK_TEAM = [
+interface TeamMember {
+  id: string;
+  name: string;
+  sales: number;
+  conversionRate: number;
+  responseTime: string;
+  avatar: string;
+}
+
+interface TrendData {
+  week: string;
+  revenue: number;
+  leads: number;
+}
+
+interface AiSavingsData {
+  hoursSaved: number;
+  leadsQualified: number;
+  description: string;
+}
+
+/** Factor applied to current revenue to estimate total pipeline value */
+const PIPELINE_MULTIPLIER = 1.5;
+
+/** Monthly ad spend budget used to calculate ROAS */
+const AD_SPEND_DIVISOR = 20000;
+
+export const mockTeam: TeamMember[] = [
   {
     id: '1',
     name: 'Carlos Mendez',
@@ -43,23 +70,23 @@ export const MOCK_TEAM = [
   },
 ];
 
-export const MOCK_TRENDS = [
+export const mockTrends: TrendData[] = [
   { week: 'Sem 1', revenue: 130000, leads: 120 },
   { week: 'Sem 2', revenue: 135000, leads: 135 },
   { week: 'Sem 3', revenue: 142000, leads: 150 },
   { week: 'Sem 4', revenue: 150000, leads: 165 },
 ];
 
-export const MOCK_AI_SAVINGS = {
-  hourssaved: 247,
+export const mockAiSavings: AiSavingsData = {
+  hoursSaved: 247,
   leadsQualified: 823,
   description: 'La IA ha filtrado leads no calificados, ahorrando tiempo valioso al equipo',
 };
 
 export function calculatePipelineValue(revenue: number): number {
-  return Math.round(revenue * 1.5);
+  return Math.round(revenue * PIPELINE_MULTIPLIER);
 }
 
 export function calculateRoas(revenue: number): string {
-  return (revenue / 20000).toFixed(1);
+  return (revenue / AD_SPEND_DIVISOR).toFixed(1);
 }
