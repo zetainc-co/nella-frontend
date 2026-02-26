@@ -2,6 +2,7 @@
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
+import { ChartCard } from './cards/chart-card'
 
 // Two-tone lime palette matching reference
 const COLORS = ['#9EFF00', '#39d353', '#5a9900', '#2a6e00', '#1a4500']
@@ -9,9 +10,10 @@ const COLORS = ['#9EFF00', '#39d353', '#5a9900', '#2a6e00', '#1a4500']
 interface TrafficSourcesProps {
   sources: ProjectMetrics['trafficSources']
   totalLeads: number
+  isLoading?: boolean
 }
 
-export function TrafficSources({ sources, totalLeads }: TrafficSourcesProps) {
+export function TrafficSources({ sources, totalLeads, isLoading }: TrafficSourcesProps) {
   const data = sources.map((s, i) => ({
     name: s.source,
     value: s.count,
@@ -21,33 +23,24 @@ export function TrafficSources({ sources, totalLeads }: TrafficSourcesProps) {
 
   if (!data.length) {
     return (
-      <div
-        className="rounded-2xl p-6 flex flex-col"
-        style={{
-          background: 'rgba(18,18,18,0.85)',
-          border: '1px solid rgba(255,255,255,0.07)',
-        }}
+      <ChartCard
+        title="Fuentes de Tráfico"
+        description="Distribución de origen de leads"
+        isLoading={isLoading}
+        minHeight="280px"
       >
-        <h3 className="text-lg font-semibold mb-4" style={{ color: '#f0f4ff' }}>Fuentes de Tráfico</h3>
         <p className="text-sm" style={{ color: 'rgba(240,244,255,0.45)' }}>Sin datos de fuente aún.</p>
-      </div>
+      </ChartCard>
     )
   }
 
   return (
-    <div
-      className="rounded-2xl p-6 flex flex-col transition-all duration-300 hover:translate-y-[-2px]"
-      style={{
-        background: 'rgba(18, 18, 18, 0.85)',
-        border: '1px solid rgba(255,255,255,0.07)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
-      }}
+    <ChartCard
+      title="Fuentes de Tráfico"
+      description="Distribución de origen de leads"
+      isLoading={isLoading}
+      minHeight="280px"
     >
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold" style={{ color: '#f0f4ff' }}>Fuentes de Tráfico</h3>
-        <p className="text-xs mt-0.5" style={{ color: 'rgba(240,244,255,0.45)' }}>Distribución de origen de leads</p>
-      </div>
-
       <div className="relative flex-1 min-h-[200px] flex items-center justify-center">
         <ResponsiveContainer width="100%" height={220}>
           <PieChart>
@@ -95,6 +88,6 @@ export function TrafficSources({ sources, totalLeads }: TrafficSourcesProps) {
           </div>
         ))}
       </div>
-    </div>
+    </ChartCard>
   )
 }
