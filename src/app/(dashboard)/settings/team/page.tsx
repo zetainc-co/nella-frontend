@@ -1,7 +1,9 @@
 "use client";
 
-import { mockTeam, mockBilling } from "@/lib/mock-data/settings";
-import { UserPlus, Trash2 } from "lucide-react";
+import { useState, useMemo } from "react";
+import { UserPlus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { useAgents, useDeleteAgent } from "@/modules/team/hooks/useAgents";
+import { InviteMemberModal } from "@/modules/team/components/invite-member-modal";
 import {
   SettingsPageHeader,
   SettingsCard,
@@ -10,157 +12,263 @@ import {
   SettingsStatusDot,
 } from "@/modules/settings/components/settings-ui";
 
+const ITEMS_PER_PAGE = 5;
+
 export default function EquipoPage() {
-  const licensesUsed = mockBilling.licenses.used;
-  const licensesTotal = mockBilling.licenses.total;
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data: agents = [], isLoading } = useAgents();
+  const deleteAgent = useDeleteAgent();
+
+  // Paginación
+  const { paginatedAgents, totalPages } = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return {
+      paginatedAgents: agents.slice(startIndex, endIndex),
+      totalPages: Math.ceil(agents.length / ITEMS_PER_PAGE),
+    };
+  }, [agents, currentPage]);
+
+  // Calcular licencias basado en agents reales
+  const licensesTotal = 5; // Esto debería venir de la configuración del tenant
+  const licensesUsed = agents.length;
   const licensePercentage = (licensesUsed / licensesTotal) * 100;
 
+  const handleDelete = async (agentId: number) => {
+    if (confirm("¿Estás seguro de eliminar este agente?")) {
+      await deleteAgent.mutateAsync(agentId);
+      // Si eliminamos el último item de la página actual, ir a la anterior
+      if (paginatedAgents.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
-      <SettingsPageHeader
-        title="Equipo y Permisos"
-        subtitle="Gestiona quién tiene acceso a tus chats y leads"
-      />
+    <>
+      <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
+        <SettingsPageHeader
+          title="Equipo y Permisos"
+          subtitle="Gestiona quién tiene acceso a tus chats y leads"
+        />
 
-      {/* Licencias Usadas */}
-      <SettingsCard title="Licencias Usadas">
-        <div className="flex items-center justify-between">
-          <p className="text-sm" style={{ color: "rgba(240,244,255,0.4)" }}>
-            Estás usando{" "}
-            <span className="font-bold" style={{ color: "#f0f4ff" }}>
-              {licensesUsed}
-            </span>{" "}
-            de {licensesTotal} licencias disponibles
-          </p>
+        {/* Licencias Usadas */}
+        <SettingsCard title="Licencias Usadas">
+          <div className="flex items-center justify-between">
+            <p className="text-sm" style={{ color: "rgba(240,244,255,0.4)" }}>
+              Estás usando{" "}
+              <span className="font-bold" style={{ color: "#f0f4ff" }}>
+                {licensesUsed}
+              </span>{" "}
+              de {licensesTotal} licencias disponibles
+            </p>
 
-          <div className="flex flex-col items-end gap-1">
-            <div
-              className="relative h-2 w-40 overflow-hidden rounded-full"
-              style={{ background: "rgba(255,255,255,0.06)" }}
-            >
+            <div className="flex flex-col items-end gap-1">
               <div
-                className="absolute h-full rounded-full bg-[#9EFF00]"
-                style={{ width: `${licensePercentage}%` }}
-              />
+                className="relative h-2 w-40 overflow-hidden rounded-full"
+                style={{ background: "rgba(255,255,255,0.06)" }}
+              >
+                <div
+                  className="absolute h-full rounded-full bg-[#9EFF00]"
+                  style={{ width: `${licensePercentage}%` }}
+                />
+              </div>
+              <span
+                className="text-xs"
+                style={{ color: "rgba(240,244,255,0.4)" }}
+              >
+                {licensesUsed}/{licensesTotal}
+              </span>
             </div>
-            <span
-              className="text-xs"
-              style={{ color: "rgba(240,244,255,0.4)" }}
-            >
-              {licensesUsed}/{licensesTotal}
-            </span>
           </div>
-        </div>
-      </SettingsCard>
+        </SettingsCard>
 
-      {/* Miembros del Equipo */}
-      <SettingsCard
-        title="Miembros del Equipo"
-        action={
-          <SettingsCTAButton>
-            <UserPlus className="size-4" /> Invitar Miembro
-          </SettingsCTAButton>
-        }
-      >
-        <table className="w-full">
-          <thead>
-            <tr>
-              <th
-                className="pb-3 text-left text-xs font-medium"
-                style={{ color: "rgba(240,244,255,0.4)" }}
-              >
-                Usuario
-              </th>
-              <th
-                className="pb-3 text-left text-xs font-medium"
-                style={{ color: "rgba(240,244,255,0.4)" }}
-              >
-                Rol
-              </th>
-              <th
-                className="pb-3 text-left text-xs font-medium"
-                style={{ color: "rgba(240,244,255,0.4)" }}
-              >
-                Estado
-              </th>
-              <th
-                className="pb-3 text-right text-xs font-medium"
-                style={{ color: "rgba(240,244,255,0.4)" }}
-              >
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {mockTeam.map((member) => (
-              <tr
-                key={member.id}
-                style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-              >
-                {/* Usuario */}
-                <td className="py-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex shrink-0 items-center justify-center rounded-full text-sm font-bold"
+        {/* Miembros del Equipo */}
+        <SettingsCard
+          title="Miembros del Equipo"
+          action={
+            <SettingsCTAButton onClick={() => setIsInviteModalOpen(true)}>
+              <UserPlus className="size-4" /> Invitar Miembro
+            </SettingsCTAButton>
+          }
+        >
+          {isLoading ? (
+            <div className="py-8 text-center" style={{ color: "rgba(240,244,255,0.4)" }}>
+              Cargando...
+            </div>
+          ) : agents.length === 0 ? (
+            <div className="py-8 text-center" style={{ color: "rgba(240,244,255,0.4)" }}>
+              No hay miembros en el equipo. Invita al primero.
+            </div>
+          ) : (
+            <>
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th
+                      className="pb-3 text-left text-xs font-medium"
+                      style={{ color: "rgba(240,244,255,0.4)" }}
+                    >
+                      Usuario
+                    </th>
+                    <th
+                      className="pb-3 text-left text-xs font-medium"
+                      style={{ color: "rgba(240,244,255,0.4)" }}
+                    >
+                      Rol
+                    </th>
+                    <th
+                      className="pb-3 text-left text-xs font-medium"
+                      style={{ color: "rgba(240,244,255,0.4)" }}
+                    >
+                      Estado
+                    </th>
+                    <th
+                      className="pb-3 text-right text-xs font-medium"
+                      style={{ color: "rgba(240,244,255,0.4)" }}
+                    >
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedAgents.map((agent) => (
+                    <tr
+                      key={agent.id}
+                      style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                    >
+                      {/* Usuario */}
+                      <td className="py-4">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="flex shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                            style={{
+                              width: 36,
+                              height: 36,
+                              background: "#9EFF00",
+                              color: "#0a0a0a",
+                            }}
+                          >
+                            {getInitials(agent.name)}
+                          </div>
+                          <div>
+                            <p
+                              className="text-sm font-semibold"
+                              style={{ color: "#f0f4ff" }}
+                            >
+                              {agent.name}
+                            </p>
+                            <p
+                              className="text-xs"
+                              style={{ color: "rgba(240,244,255,0.4)" }}
+                            >
+                              {agent.email}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Rol */}
+                      <td className="py-4">
+                        <SettingsLimeBadge
+                          variant={
+                            agent.role === "administrator" ? "lime" : "outlined"
+                          }
+                        >
+                          {agent.role === "administrator"
+                            ? "Administrador"
+                            : "Agente"}
+                        </SettingsLimeBadge>
+                      </td>
+
+                      {/* Estado */}
+                      <td className="py-4">
+                        <SettingsStatusDot
+                          status={agent.confirmed ? "active" : "pending"}
+                        />
+                      </td>
+
+                      {/* Acciones */}
+                      <td className="py-4 text-right">
+                        <button
+                          onClick={() => handleDelete(agent.id)}
+                          disabled={deleteAgent.isPending}
+                          className="inline-flex items-center gap-1.5 text-xs font-medium transition-colors hover:opacity-80 disabled:opacity-50"
+                          style={{ color: "#ef4444" }}
+                        >
+                          <Trash2 className="size-3.5" />
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Paginación */}
+              {totalPages > 1 && (
+                <div
+                  className="flex items-center justify-between pt-4"
+                  style={{ borderColor: "rgba(255,255,255,0.06)" }}
+                >
+                  <p className="text-sm" style={{ color: "rgba(240,244,255,0.4)" }}>
+                    Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} a{" "}
+                    {Math.min(currentPage * ITEMS_PER_PAGE, agents.length)} de{" "}
+                    {agents.length} miembros
+                  </p>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-30"
                       style={{
-                        width: 36,
-                        height: 36,
-                        background: "#9EFF00",
-                        color: "#0a0a0a",
+                        background: "rgba(255,255,255,0.05)",
+                        color: "#f0f4ff",
                       }}
                     >
-                      {member.avatar}
-                    </div>
-                    <div>
-                      <p
-                        className="text-sm font-semibold"
-                        style={{ color: "#f0f4ff" }}
-                      >
-                        {member.name}
-                      </p>
-                      <p
-                        className="text-xs"
-                        style={{ color: "rgba(240,244,255,0.4)" }}
-                      >
-                        {member.email}
-                      </p>
-                    </div>
+                      <ChevronLeft className="size-4" />
+                      Anterior
+                    </button>
+
+                    <span className="text-sm" style={{ color: "rgba(240,244,255,0.6)" }}>
+                      Página {currentPage} de {totalPages}
+                    </span>
+
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-30"
+                      style={{
+                        background: "rgba(255,255,255,0.05)",
+                        color: "#f0f4ff",
+                      }}
+                    >
+                      Siguiente
+                      <ChevronRight className="size-4" />
+                    </button>
                   </div>
-                </td>
+                </div>
+              )}
+            </>
+          )}
+        </SettingsCard>
+      </div>
 
-                {/* Rol */}
-                <td className="py-4">
-                  <SettingsLimeBadge
-                    variant={
-                      member.role === "Administrador" ? "lime" : "outlined"
-                    }
-                  >
-                    {member.role}
-                  </SettingsLimeBadge>
-                </td>
-
-                {/* Estado */}
-                <td className="py-4">
-                  <SettingsStatusDot
-                    status={member.status === "active" ? "active" : "pending"}
-                  />
-                </td>
-
-                {/* Acciones */}
-                <td className="py-4 text-right">
-                  <button
-                    className="inline-flex items-center gap-1.5 text-xs font-medium transition-colors hover:opacity-80"
-                    style={{ color: "#ef4444" }}
-                  >
-                    <Trash2 className="size-3.5" />
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </SettingsCard>
-    </div>
+      <InviteMemberModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+      />
+    </>
   );
 }
