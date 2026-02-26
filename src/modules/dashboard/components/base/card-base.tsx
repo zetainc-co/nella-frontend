@@ -39,7 +39,7 @@ export function CardBase({
         className="absolute top-0 left-0 right-0 rounded-t-2xl"
         style={{
           height: topAccentHeight,
-          background: `linear-gradient(90deg, transparent, ${DASHBOARD_DESIGN.colors.accent.lime}40, transparent)`,
+          background: `linear-gradient(90deg, transparent, ${DASHBOARD_DESIGN.colors.accent.lime}60, transparent)`,
         }}
       />
 

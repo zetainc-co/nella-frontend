@@ -9,9 +9,9 @@ export const DASHBOARD_DESIGN = {
   colors: {
     // Card container styling
     card: {
-      bg: "rgba(18, 18, 18, 0.85)",
-      border: "rgba(255,255,255,0.07)",
-      shadow: "0 4px 24px rgba(0,0,0,0.4)",
+      bg: "rgba(18, 18, 18, 0.95)",
+      border: "rgba(255,255,255,0.14)",
+      shadow: "0 8px 32px rgba(0,0,0,0.6)",
     },
 
     // Text hierarchy
@@ -32,10 +32,10 @@ export const DASHBOARD_DESIGN = {
   // Spacing System
   spacing: {
     card: {
-      padding: 5, // p-5 in Tailwind (1.25rem)
+      padding: 6, // p-6 in Tailwind (1.5rem) - increased for better breathing room
       gap: 4, // gap-4 in Tailwind (1rem)
       borderRadius: "1.5rem", // rounded-2xl
-      topAccentHeight: "2px",
+      topAccentHeight: "3px",
       iconSize: 5, // size-5 (1.25rem)
     },
     grid: {
