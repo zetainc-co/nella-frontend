@@ -1,6 +1,7 @@
 'use client'
 
 import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
+import { CardBase } from './base/card-base'
 
 const STATUS_LABELS: Record<string, string> = {
   new: 'Nuevos',
@@ -15,25 +16,18 @@ const BAR_COLORS = ['#9EFF00', '#7acc00', '#5a9900', '#3d6600', '#2a4700']
 
 interface ConversionFunnelProps {
   funnel: ProjectMetrics['funnel']
+  isLoading?: boolean
 }
 
-export function ConversionFunnel({ funnel }: ConversionFunnelProps) {
+export function ConversionFunnel({ funnel, isLoading = false }: ConversionFunnelProps) {
   const maxCount = Math.max(...funnel.map(f => f.count), 1)
 
   return (
-    <div
-      className="w-full rounded-2xl p-6 transition-all duration-300 hover:translate-y-[-2px]"
-      style={{
-        background: 'rgba(18, 18, 18, 0.85)',
-        border: '1px solid rgba(255,255,255,0.07)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
-      }}
+    <CardBase
+      title="El Embudo"
+      description="Conversión de leads a clientes"
+      isLoading={isLoading}
     >
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold" style={{ color: '#f0f4ff' }}>El Embudo</h3>
-        <p className="text-xs mt-0.5" style={{ color: 'rgba(240,244,255,0.45)' }}>Conversión de leads a clientes</p>
-      </div>
-
       <div className="space-y-3">
         {funnel.map((f, i) => {
           const pct = Math.round((f.count / maxCount) * 100)
@@ -55,6 +49,6 @@ export function ConversionFunnel({ funnel }: ConversionFunnelProps) {
           )
         })}
       </div>
-    </div>
+    </CardBase>
   )
 }
