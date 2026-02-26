@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-const CHATWOOT_URL = process.env.CHATWOOT_URL ?? 'http://localhost:3000'
+const CHATWOOT_URL = process.env.CHATWOOT_URL ?? 'http://localhost:4000'
 
 // GET /api/chat/chatwoot-health
 // Proxy health check server-side para evitar CORS desde el browser
@@ -12,11 +12,13 @@ export async function GET() {
     const res = await fetch(`${CHATWOOT_URL}/auth/sign_in`, {
       method: 'HEAD',
       signal: controller.signal,
+      redirect: 'manual', // No seguir redirects, solo verificar que responde
     })
 
     clearTimeout(timeout)
 
-    // Chatwoot devuelve 200 o 401 en rutas protegidas — ambos indican que el server está vivo
+    // Cualquier respuesta < 500 indica que Chatwoot está vivo
+    // (302, 200, 401, etc. son todos válidos)
     if (res.status < 500) {
       return NextResponse.json({ healthy: true }, { status: 200 })
     }
