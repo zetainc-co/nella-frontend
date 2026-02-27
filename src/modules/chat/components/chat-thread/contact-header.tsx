@@ -77,11 +77,12 @@ export function ContactHeader({ conversation }: ContactHeaderProps) {
               disabled={isLoading}
               className="
                 px-4 py-2
-                bg-[#ff6b35]
-                hover:bg-[#ff5722]
-                disabled:bg-[#ff6b35]/50
+                bg-transparent
+                border border-[#ff6b35]
+                hover:bg-[#ff6b35]/10
+                disabled:opacity-50
                 disabled:cursor-not-allowed
-                text-white text-sm font-medium
+                text-[#ff6b35] text-sm font-medium
                 rounded-lg
                 transition-colors
                 flex items-center gap-2
@@ -101,12 +102,13 @@ export function ContactHeader({ conversation }: ContactHeaderProps) {
               onClick={() => toggleAI()}
               disabled={isLoading}
               className="
-                px-4 py-2
-                bg-[#9EFF00]
-                hover:bg-[#8FEF00]
-                disabled:bg-[#9EFF00]/50
+                px-2 py-1
+                bg-transparent
+                border border-[#9EFF00]
+                hover:bg-[#9EFF00]/10
+                disabled:opacity-50
                 disabled:cursor-not-allowed
-                text-[#0a0a0a] text-sm font-medium
+                text-[#9EFF00] text-sm font-medium
                 rounded-lg
                 transition-colors
                 flex items-center gap-2

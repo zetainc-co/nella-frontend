@@ -40,10 +40,10 @@ function ConversationItemComponent({
           <div className="
             absolute -top-1 -right-1
             w-5 h-5
-            bg-[#10b981]
+            bg-[#9EFF00]
             rounded-full
             flex items-center justify-center
-            text-[10px] font-bold text-white
+            text-[10px] font-bold text-[#0a0a0a]
           ">
             {unread_count > 99 ? '99+' : unread_count}
           </div>

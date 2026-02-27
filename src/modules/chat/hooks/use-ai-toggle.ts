@@ -12,27 +12,31 @@ export function useAIToggle({ conversationId, currentMode }: UseAIToggleProps) {
 
   const stopAI = useMutation({
     mutationFn: (agentId: number) => chatwootService.stopAI(conversationId, agentId),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('✅ IA detenida exitosamente:', data)
       toast.success('IA detenida. Un agente humano tomará el control.')
-      // Invalidar queries para actualizar la UI
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
-      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] })
+      // Refetch inmediato para actualizar la UI
+      queryClient.refetchQueries({ queryKey: ['conversations'] })
+      queryClient.refetchQueries({ queryKey: ['conversation', conversationId] })
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al detener la IA')
+      console.error('❌ Error al detener IA:', error)
+      toast.error(error.message || 'Error al detener la IA')
     },
   })
 
   const startAI = useMutation({
     mutationFn: () => chatwootService.startAI(conversationId),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('✅ IA activada exitosamente:', data)
       toast.success('IA activada. El bot continuará la conversación.')
-      // Invalidar queries para actualizar la UI
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
-      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] })
+      // Refetch inmediato para actualizar la UI
+      queryClient.refetchQueries({ queryKey: ['conversations'] })
+      queryClient.refetchQueries({ queryKey: ['conversation', conversationId] })
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al activar la IA')
+      console.error('❌ Error al activar IA:', error)
+      toast.error(error.message || 'Error al activar la IA')
     },
   })
 
