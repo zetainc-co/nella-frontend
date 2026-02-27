@@ -10,7 +10,8 @@
       "Bash(tail:*)",
       "Bash(cd \"C:/Users/Sebinhas/Desktop/Proyectos Z/Nella marketing/nella-frontend\" && npx eslint src/components/booking/booking-layout.tsx 2>&1)",
       "Bash(cd \"C:/Users/Sebinhas/Desktop/Proyectos Z/Nella marketing/nella-frontend\" && npx eslint src/components/booking/ src/types/booking.ts \"src/app/\\(public\\)/book/\" 2>&1)",
-      "Bash(echo Exit: $?:*)"
+      "Bash(echo Exit: $?:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

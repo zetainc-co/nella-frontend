@@ -47,4 +47,40 @@ export const MOCK_AVAILABLE_DAYS = [3, 4, 5, 10, 11, 12, 17, 18, 19, 24, 25, 26,
 export const MOCK_TIME_SLOTS = [
   '09:00', '09:30', '10:00', '10:30',
   '14:00', '14:30', '15:00', '16:00', '17:00',
-]
+];
+
+// --- Public booking API types (Fase 2) ---
+
+// Shape of the availability map from GET /public/book/:token
+export interface BookingAvailability {
+  [dateString: string]: string[]; // key: "YYYY-MM-DD", value: ["HH:mm", ...] (UTC times)
+}
+
+// Response data from GET /public/book/:token (after unwrapping { status, message, data })
+export interface BookingDataResponse {
+  agentName: string;
+  agentRole: string;
+  agentInitials: string;
+  leadName: string;
+  durationMin: number;
+  platform: string;
+  availability: BookingAvailability;
+}
+
+// Response data from POST /public/book/:token/confirm
+export interface BookingConfirmResponse {
+  appointmentId: string;
+  agentName: string;
+  scheduledAt: string; // ISO 8601 UTC, e.g. "2026-02-27T09:00:00.000Z"
+  durationMin: number;
+  platform: string;
+}
+
+// Typed error codes returned by booking API
+export type BookingErrorCode =
+  | 'TENANT_NOT_FOUND'
+  | 'INVITATION_NOT_FOUND'
+  | 'INVITATION_EXPIRED'
+  | 'SLOT_NOT_AVAILABLE'
+  | 'NETWORK_ERROR'
+  | 'UNKNOWN_ERROR';

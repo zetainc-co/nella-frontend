@@ -25,7 +25,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(data, { status: response.status })
     }
 
-    return NextResponse.json(unwrapBackend(data), { status: 200 })
+    const rawData = unwrapBackend(data)
+    // Normalizar: el backend puede devolver el array directo o { data: [...] }
+    const availability = Array.isArray(rawData) ? rawData : []
+    return NextResponse.json({ data: availability }, { status: 200 })
   } catch (error) {
     console.error('[API/calendar/availability GET] Error:', error)
     return NextResponse.json({ error: 'Error al obtener disponibilidad' }, { status: 500 })

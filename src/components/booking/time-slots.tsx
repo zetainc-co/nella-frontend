@@ -1,41 +1,53 @@
+import { MONTH_NAMES } from '@/types/booking'
+
 interface TimeSlotsProps {
-  slots: string[]
-  selectedSlot: string | null
-  onSelectSlot: (slot: string) => void
-  selectedDay: number
-  monthName: string
+  utcSlots: string[]
+  selectedUtcSlot: string | null
+  onSelectSlot: (utcSlot: string) => void
+  selectedDate: string
 }
 
-export function TimeSlots({ slots, selectedSlot, onSelectSlot, selectedDay, monthName }: TimeSlotsProps) {
+// El backend devuelve los horarios en hora local del agente — se muestran tal como vienen.
+function formatSlotDisplay(slot: string): string {
+  return slot
+}
+
+function formatDateDisplay(dateString: string): string {
+  const [year, month, day] = dateString.split('-').map(Number)
+  return `${day} de ${MONTH_NAMES[month - 1]} de ${year}`
+}
+
+export function TimeSlots({ utcSlots, selectedUtcSlot, onSelectSlot, selectedDate }: TimeSlotsProps) {
   return (
     <div
       className="flex flex-col gap-4 px-6 pb-6 md:px-8 md:pb-8"
       style={{ animation: 'slideIn 0.2s ease-out' }}
     >
-      {/* Título del día seleccionado */}
+      {/* Titulo del dia seleccionado */}
       <div>
         <p className="text-sm font-medium" style={{ color: 'rgba(240,244,255,0.55)' }}>
           Horarios disponibles
         </p>
         <p className="text-base font-semibold mt-0.5" style={{ color: '#f0f4ff' }}>
-          {selectedDay} de {monthName}
+          {formatDateDisplay(selectedDate)}
         </p>
       </div>
 
       {/* Grid de slots */}
-      {slots.length === 0 ? (
+      {utcSlots.length === 0 ? (
         <p className="text-sm text-center py-4" style={{ color: 'rgba(240,244,255,0.35)' }}>
-          No hay horarios disponibles para este día.
+          No hay horarios disponibles para este dia.
         </p>
       ) : (
         <div className="grid grid-cols-3 gap-2">
-          {slots.map(slot => {
-          const isSelected = selectedSlot === slot
+          {utcSlots.map(utcSlot => {
+          const isSelected = selectedUtcSlot === utcSlot
+          const localDisplay = formatSlotDisplay(utcSlot)
           return (
             <button
-              key={slot}
-              onClick={() => onSelectSlot(slot)}
-              aria-label={`Seleccionar horario ${slot}`}
+              key={utcSlot}
+              onClick={() => onSelectSlot(utcSlot)}
+              aria-label={`Seleccionar horario ${localDisplay}`}
               className="rounded-lg text-sm font-medium transition-all duration-150 py-2.5"
               style={{
                 background: isSelected ? '#9EFF00' : 'rgba(255,255,255,0.04)',
@@ -60,7 +72,7 @@ export function TimeSlots({ slots, selectedSlot, onSelectSlot, selectedDay, mont
                 }
               }}
             >
-              {slot}
+              {localDisplay}
             </button>
           )
         })}

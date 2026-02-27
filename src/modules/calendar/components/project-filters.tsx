@@ -3,6 +3,7 @@
 
 import { Filter } from 'lucide-react'
 import { useCalendarStore } from '@/modules/calendar/stores/calendar-store'
+import { useAuthStore } from '@/core/store/auth-store'
 import { PROJECT_COLORS, LAYER_CONFIG } from '@/modules/calendar/types/calendar-types'
 import type { ProjectName, CalendarLayer } from '@/modules/calendar/types/calendar-types'
 
@@ -51,6 +52,9 @@ function CheckboxItem({ label, dotColor, checked, onChange }: CheckboxItemProps)
 export function ProjectFilters() {
   const { activeProjectFilters, activeLayerFilters, toggleProjectFilter, toggleLayerFilter } =
     useCalendarStore()
+  const { user } = useAuthStore()
+
+  const isAdmin = user?.role === 'admin'
 
   return (
     <div className="px-3 py-2 space-y-4">
@@ -72,23 +76,25 @@ export function ProjectFilters() {
         </div>
       </div>
 
-      <div>
-        <div className="flex items-center gap-1.5 mb-2">
-          <Filter className="size-3.5 text-muted-foreground" />
-          <span className="text-sm font-semibold text-foreground">Filtros de Capas</span>
+      {isAdmin && (
+        <div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <Filter className="size-3.5 text-muted-foreground" />
+            <span className="text-sm font-semibold text-foreground">Filtros de Capas</span>
+          </div>
+          <div className="space-y-0.5">
+            {ALL_LAYERS.map(layer => (
+              <CheckboxItem
+                key={layer}
+                label={LAYER_CONFIG[layer].label}
+                dotColor={LAYER_CONFIG[layer].dot}
+                checked={activeLayerFilters.includes(layer)}
+                onChange={() => toggleLayerFilter(layer)}
+              />
+            ))}
+          </div>
         </div>
-        <div className="space-y-0.5">
-          {ALL_LAYERS.map(layer => (
-            <CheckboxItem
-              key={layer}
-              label={LAYER_CONFIG[layer].label}
-              dotColor={LAYER_CONFIG[layer].dot}
-              checked={activeLayerFilters.includes(layer)}
-              onChange={() => toggleLayerFilter(layer)}
-            />
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   )
 }
