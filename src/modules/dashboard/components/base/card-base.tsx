@@ -20,7 +20,7 @@ export function CardBase({
   footer,
   className = "",
   bgGradient,
-  titleClassName = "text-sm",
+  titleClassName = "text-2xl",
 }: CardBaseProps) {
   const { card, text } = DASHBOARD_DESIGN.colors;
   const { padding, gap, topAccentHeight } = DASHBOARD_DESIGN.spacing.card;
