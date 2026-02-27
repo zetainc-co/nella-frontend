@@ -75,10 +75,24 @@ function startServer() {
   console.log(`\n🚀 Starting Next.js dev server on port ${PORT}...\n`);
 
   const frontendRoot = path.resolve(__dirname, "..");
-  const result = spawnSync("npx", ["next", "dev", "-p", PORT.toString()], {
-    stdio: "inherit",
+
+  // Use spawn (async) instead of spawnSync for better error handling
+  const { spawn } = require("child_process");
+  const child = spawn("npx", ["next", "dev", "-p", PORT.toString()], {
     cwd: frontendRoot,
+    stdio: "inherit",
+    shell: true,
   });
 
-  process.exit(result.status ?? 1);
+  child.on("error", (err) => {
+    console.error(`❌ Failed to start server: ${err.message}`);
+    process.exit(1);
+  });
+
+  child.on("exit", (code) => {
+    if (code !== 0) {
+      console.error(`❌ Server exited with code ${code}`);
+      process.exit(code);
+    }
+  });
 }
