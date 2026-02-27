@@ -33,6 +33,7 @@ export async function GET(
   } catch (error) {
     console.error('[API/metrics GET]', error)
     // Fallback to mock data when backend unavailable
-    return NextResponse.json(MOCK_METRICS, { status: 200 })
+    const mockData = getMockApiMetricsForProject(projectId)
+    return NextResponse.json(mockData, { status: 200 })
   }
 }
