@@ -1,10 +1,21 @@
-import { User, MoreVertical } from 'lucide-react'
+import { User, MoreVertical, Loader2 } from 'lucide-react'
 import type { ContactHeaderProps } from '../../types'
 import { getInitials } from '@/utils/get-initials'
+import { useAIToggle } from '../../hooks'
 
 export function ContactHeader({ conversation }: ContactHeaderProps) {
-  const { meta, agentMode } = conversation
+  const { meta, agentMode, id } = conversation
   const sender = meta.sender
+
+  // Hook para manejar el toggle de IA
+  const { toggleAI, isLoading } = useAIToggle({
+    conversationId: id,
+    currentMode: agentMode,
+  })
+
+  // TODO: Obtener el agentId del usuario actual logueado
+  // Por ahora usamos un ID de ejemplo
+  const CURRENT_AGENT_ID = 1
 
   // Obtener información adicional del contacto detectada por IA
   const getContactInfo = () => {
@@ -60,20 +71,55 @@ export function ContactHeader({ conversation }: ContactHeaderProps) {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-3">
-          {agentMode === 'ai' && (
-            <button className="
-              px-4 py-2
-              bg-[#ff6b35]
-              hover:bg-[#ff5722]
-              text-white text-sm font-medium
-              rounded-lg
-              transition-colors
-              flex items-center gap-2
-            ">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clipRule="evenodd" />
-              </svg>
+          {agentMode === 'ai' ? (
+            <button
+              onClick={() => toggleAI(CURRENT_AGENT_ID)}
+              disabled={isLoading}
+              className="
+                px-4 py-2
+                bg-[#ff6b35]
+                hover:bg-[#ff5722]
+                disabled:bg-[#ff6b35]/50
+                disabled:cursor-not-allowed
+                text-white text-sm font-medium
+                rounded-lg
+                transition-colors
+                flex items-center gap-2
+              "
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clipRule="evenodd" />
+                </svg>
+              )}
               Detener IA
+            </button>
+          ) : (
+            <button
+              onClick={() => toggleAI()}
+              disabled={isLoading}
+              className="
+                px-4 py-2
+                bg-[#9EFF00]
+                hover:bg-[#8FEF00]
+                disabled:bg-[#9EFF00]/50
+                disabled:cursor-not-allowed
+                text-[#0a0a0a] text-sm font-medium
+                rounded-lg
+                transition-colors
+                flex items-center gap-2
+              "
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              )}
+              Activar IA
             </button>
           )}
 

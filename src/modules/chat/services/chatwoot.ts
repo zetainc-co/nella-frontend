@@ -56,4 +56,16 @@ export const chatwootService = {
     apiClient.get<any>(
       `/chatwoot-conversations/contacts/${contactId}/conversations`
     ),
+
+  stopAI: (conversationId: number, agentId: number) =>
+    apiClient.post<any>(
+      `/chatwoot-conversations/conversations/${conversationId}/stop-ai`,
+      { agent_id: agentId }
+    ),
+
+  startAI: (conversationId: number) =>
+    apiClient.post<any>(
+      `/chatwoot-conversations/conversations/${conversationId}/start-ai`,
+      {}
+    ),
 }

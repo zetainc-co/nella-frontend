@@ -25,15 +25,11 @@ export function useConversations() {
     select: (data) => {
       let conversations = data.payload
 
-      // Filtrar por modo agente basado en labels
+      // Filtrar por modo agente basado en status
       if (filter === 'ai_active') {
-        conversations = conversations.filter(
-          (c) => !c.labels.includes('requiere_atencion') && !c.labels.includes('handoff')
-        )
+        conversations = conversations.filter((c) => c.status === 'pending')
       } else if (filter === 'human') {
-        conversations = conversations.filter(
-          (c) => c.labels.includes('requiere_atencion') || c.labels.includes('handoff')
-        )
+        conversations = conversations.filter((c) => c.status === 'open')
       }
 
       // Búsqueda local por nombre/teléfono
@@ -46,12 +42,10 @@ export function useConversations() {
         )
       }
 
-      // Enriquecer con agentMode
+      // Enriquecer con agentMode basado en status de Chatwoot
       return conversations.map((c) => ({
         ...c,
-        agentMode: (c.labels.includes('requiere_atencion') || c.labels.includes('handoff'))
-          ? 'human'
-          : 'ai',
+        agentMode: c.status === 'pending' ? 'ai' : 'human',
         lastMessage: c.last_non_activity_message?.content || c.meta.sender.phone_number || '',
       })) as ConversationWithMode[]
     },
