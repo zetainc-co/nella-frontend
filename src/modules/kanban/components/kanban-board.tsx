@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   useSensor,
   useSensors,
@@ -13,27 +14,33 @@ import {
   useKanbanDragDrop,
   useKanbanConstants
 } from '@/modules/kanban/hooks'
+import { useKanbanStore } from '@/modules/kanban/stores/kanban-store'
 import { LeadCard } from './lead-card'
 import { KanbanColumn } from './kanban-column'
 import { KanbanFilters } from './kanban-filters'
 import { KanbanSkeleton } from './kanban-skeleton'
+import { LeadDetailsPanel } from './lead-details-panel'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function KanbanBoard() {
-  // Configurar sensores para distinguir entre click y drag
+  const [panelOpen, setPanelOpen] = useState(false)
+  const setSelectedLead = useKanbanStore(state => state.setSelectedLead)
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // Requiere mover 8px antes de iniciar drag
-      },
+      activationConstraint: { distance: 8 },
     })
   )
 
-  // Hooks personalizados
   const isLoading = useKanbanSSE()
   const { filteredLeads, getStageCount, getLeadsForStage } = useKanbanData()
   const { activeLead, handleDragStart, handleDragEnd } = useKanbanDragDrop()
   const { KANBAN_COLUMNS } = useKanbanConstants()
+
+  const handleLeadClick = (leadId: number) => {
+    setSelectedLead(leadId)
+    setPanelOpen(true)
+  }
 
   if (isLoading) {
     return <KanbanSkeleton />
@@ -41,10 +48,9 @@ export function KanbanBoard() {
 
   return (
     <div className="space-y-6">
-      {/* Filtros */}
       <KanbanFilters />
 
-      {/* Desktop/Tablet: Drag and Drop Kanban */}
+      {/* Desktop/Tablet */}
       <div className="hidden md:block">
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div className="flex overflow-x-auto snap-x snap-mandatory 2xl:grid 2xl:grid-cols-4 gap-4 custom-scrollbar pb-4">
@@ -54,7 +60,7 @@ export function KanbanBoard() {
                 stage={stage}
                 title={title}
                 leads={filteredLeads}
-                onLeadClick={() => {}}
+                onLeadClick={handleLeadClick}
               />
             ))}
           </div>
@@ -67,7 +73,7 @@ export function KanbanBoard() {
         </DndContext>
       </div>
 
-      {/* Mobile: Tabs (sin drag-and-drop) */}
+      {/* Mobile: Tabs */}
       <div className="md:hidden">
         <Tabs defaultValue="new" className="w-full">
           <TabsList className="w-full grid grid-cols-4">
@@ -94,7 +100,7 @@ export function KanbanBoard() {
                     <LeadCard
                       key={lead.id}
                       lead={lead}
-                      onClick={() => {}}
+                      onClick={() => handleLeadClick(lead.id)}
                     />
                   ))
                 )}
@@ -103,6 +109,14 @@ export function KanbanBoard() {
           })}
         </Tabs>
       </div>
+
+      <LeadDetailsPanel
+        open={panelOpen}
+        onClose={() => {
+          setPanelOpen(false)
+          setSelectedLead(null)
+        }}
+      />
     </div>
   )
 }

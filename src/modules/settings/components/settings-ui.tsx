@@ -154,12 +154,14 @@ export function SettingsGhostButton({
   fullWidth,
   icon,
   variant = "default",
+  disabled = false,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
   fullWidth?: boolean;
   icon?: React.ReactNode;
   variant?: "default" | "danger";
+  disabled?: boolean;
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -167,14 +169,15 @@ export function SettingsGhostButton({
     variant === "danger" ? ghostDangerStyles : ghostDefaultStyles;
   const hoverStyles =
     variant === "danger" ? ghostDangerHoverStyles : ghostDefaultHoverStyles;
-  const currentStyles = isHovered ? hoverStyles : baseStyles;
+  const currentStyles = isHovered && !disabled ? hoverStyles : baseStyles;
 
   return (
     <button
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
+      onClick={disabled ? undefined : onClick}
+      onMouseEnter={() => !disabled && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`text-sm px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2${fullWidth ? " w-full" : ""}`}
+      disabled={disabled}
+      className={`text-sm px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed${fullWidth ? " w-full" : ""}`}
       style={currentStyles}
     >
       {icon}

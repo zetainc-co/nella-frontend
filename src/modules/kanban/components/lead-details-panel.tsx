@@ -6,10 +6,11 @@ import {
   SheetHeader,
   SheetContent,
 } from '@/components/ui/sheet'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useKanbanStore } from '@/modules/kanban/stores/kanban-store'
 import type { LeadDetailsPanelProps } from '@/modules/kanban/types/kanban-types'
-import { Phone, Mail } from 'lucide-react'
+import { Phone, Mail, Sparkles, User } from 'lucide-react'
 
 const stageLabels = {
   new: 'Nuevo',
@@ -25,81 +26,113 @@ export function LeadDetailsPanel({ open, onClose }: LeadDetailsPanelProps) {
 
   if (!lead) return null
 
+  const getInitials = (name: string | null) => {
+    if (!name) return '?'
+    const parts = name.split(' ')
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    return name.substring(0, 2).toUpperCase()
+  }
+
   return (
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <SheetContent className="w-full sm:w-[500px] glass-panel overflow-y-auto custom-scrollbar">
-        <SheetHeader>
-          <SheetTitle className="text-xl text-foreground">
-            {lead.name || 'Sin nombre'}
-          </SheetTitle>
+      <SheetContent className="w-full sm:w-[480px] flex flex-col gap-0 p-0 overflow-hidden">
+
+        {/* Header con identidad del lead */}
+        <SheetHeader className="px-6 pt-6 pb-4 border-b border-border shrink-0">
+          <div className="flex items-center gap-4">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center text-black text-sm font-bold shrink-0"
+              style={{ backgroundColor: '#8BD21D' }}
+            >
+              {getInitials(lead.name)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <SheetTitle className="text-lg text-foreground truncate">
+                {lead.name || 'Sin nombre'}
+              </SheetTitle>
+              <p className="text-sm text-muted-foreground">{lead.phone}</p>
+            </div>
+            <span className="px-3 py-1 bg-[#8BD21D]/10 text-[#8BD21D] text-xs font-medium rounded-full shrink-0">
+              {stageLabels[lead.stage]}
+            </span>
+          </div>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Contacto
-            </h3>
+        {/* Contenido scrollable */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-5 space-y-6">
 
-            <div className="flex items-center gap-3 text-foreground">
-              <Phone className="w-4 h-4 text-[#CEF25D]" />
-              <span>{lead.phone}</span>
-            </div>
-
-            {lead.email && (
-              <div className="flex items-center gap-3 text-foreground">
-                <Mail className="w-4 h-4 text-[#CEF25D]" />
-                <span>{lead.email}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Estado
-            </h3>
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-foreground">
-                {lead.lead_status || 'Sin clasificar'}
-              </span>
-
-              <span className="px-3 py-1 bg-[#CEF25D]/10 text-[#CEF25D] text-xs rounded-full">
-                {stageLabels[lead.stage]}
+          {/* Resumen IA — protagonista */}
+          <div className="rounded-xl border border-[#8BD21D]/20 bg-[#8BD21D]/5 p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#8BD21D]" />
+              <span className="text-xs font-semibold text-[#8BD21D] uppercase tracking-wider">
+                Resumen IA
               </span>
             </div>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Resumen IA
-            </h3>
-            <p className="text-sm text-foreground leading-relaxed">
-              {lead.ai_summary || 'Sin resumen disponible'}
+            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
+              {lead.ai_summary || 'Sin resumen disponible.'}
             </p>
           </div>
 
-          <div className="space-y-2 pt-4 border-t border-border">
-            <Button
-              variant="outline"
-              className="w-full justify-start hover:bg-[#CEF25D]/10 hover:text-[#CEF25D] hover:border-[#CEF25D]/30"
-              onClick={() => {
-                console.log('Ver perfil:', lead.id)
-              }}
-            >
-              Ver perfil completo
-            </Button>
+          {/* Información de contacto */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Contacto
+            </h3>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 text-sm text-foreground">
+                <Phone className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span>{lead.phone}</span>
+              </div>
+              {lead.email ? (
+                <div className="flex items-center gap-3 text-sm text-foreground">
+                  <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="truncate">{lead.email}</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 text-sm text-muted-foreground/50">
+                  <Mail className="w-4 h-4 shrink-0" />
+                  <span>Sin email</span>
+                </div>
+              )}
+            </div>
+          </div>
 
-            <Button
-              variant="outline"
-              className="w-full justify-start hover:bg-[#CEF25D]/10 hover:text-[#CEF25D] hover:border-[#CEF25D]/30"
-              onClick={() => {
-                console.log('Ir al chat:', lead.id)
-              }}
-            >
-              Ir al chat
-            </Button>
+          {/* Estado */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Estado
+            </h3>
+            <div className="flex items-center gap-2 flex-wrap">
+              {lead.lead_status && (
+                <Badge variant={lead.probability_label} size="default">
+                  {lead.lead_status}
+                </Badge>
+              )}
+              {lead.handoff_active && (
+                <span className="px-2.5 py-0.5 bg-amber-500/10 text-amber-400 text-xs rounded-full font-medium">
+                  Handoff activo
+                </span>
+              )}
+              {!lead.lead_status && !lead.handoff_active && (
+                <span className="text-sm text-muted-foreground">Sin clasificar</span>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Acciones fijas en el pie */}
+        <div className="px-6 py-4 border-t border-border shrink-0 space-y-2">
+          <Button
+            variant="outline"
+            className="w-full justify-start hover:bg-[#8BD21D]/10 hover:text-[#8BD21D] hover:border-[#8BD21D]/30"
+            onClick={() => console.log('Ver perfil:', lead.id)}
+          >
+            <User className="w-4 h-4 mr-2" />
+            Ver perfil completo
+          </Button>
+        </div>
+
       </SheetContent>
     </Sheet>
   )

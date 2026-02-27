@@ -19,16 +19,6 @@ export const mockOrganization = {
 
 export const mockConnections = [
   {
-    id: "whatsapp",
-    name: "WhatsApp Business API",
-    description: "Conecta tu cuenta de WhatsApp Business para gestionar conversaciones",
-    icon: "whatsapp",
-    connected: true,
-    phone: "+57 310 234 5678",
-    token: "EAAbz....XYZ123",
-    note: "La conexión con WhatsApp Business API requiere una cuenta verificada de Meta Business. Los mensajes se sincronizarán automáticamente con tu bandeja de entrada."
-  },
-  {
     id: "instagram",
     name: "Instagram Direct",
     description: "Gestiona mensajes directos desde tu cuenta de Instagram Business",

@@ -4,6 +4,7 @@ export interface BackendContact {
   name: string
   email: string
   lead_status: string
+  status: string | null
   handoff_active: boolean
   ai_summary: string
   last_interaction_at: string
@@ -22,7 +23,8 @@ export interface ContactsQuery {
 export interface UpdateContactPayload {
   name?: string
   email?: string
-  lead_status?: string
+  lead_status?: string | null
+  status?: string
   handoff_active?: boolean
   ai_summary?: string
   referral_code?: string

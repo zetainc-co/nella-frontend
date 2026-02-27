@@ -25,4 +25,10 @@ export const queryKeys = {
   workflows: {
     byTenant: (tenantId: string) => ['workflows', tenantId] as const,
   },
+  dify: {
+    agents: (tenantId: string) => ['dify', 'agents', tenantId] as const,
+  },
+  whatsapp: {
+    config: () => ['whatsapp', 'config'] as const,
+  },
 };
