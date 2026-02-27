@@ -8,6 +8,8 @@ interface CardBaseProps {
   isLoading?: boolean;
   footer?: ReactNode;
   className?: string;
+  bgGradient?: string;
+  titleClassName?: string;
 }
 
 export function CardBase({
@@ -17,6 +19,8 @@ export function CardBase({
   isLoading = false,
   footer,
   className = "",
+  bgGradient,
+  titleClassName = "text-sm",
 }: CardBaseProps) {
   const { card, text } = DASHBOARD_DESIGN.colors;
   const { padding, gap, topAccentHeight } = DASHBOARD_DESIGN.spacing.card;
@@ -29,30 +33,23 @@ export function CardBase({
       style={{
         padding: `${padding * 0.25}rem`,
         gap: `${gap * 0.25}rem`,
-        background: card.bg,
+        background: bgGradient || card.bg,
         border: `1px solid ${card.border}`,
         boxShadow: card.shadow,
       }}
     >
-      {/* Subtle top accent line */}
-      <div
-        className="absolute top-0 left-0 right-0 rounded-t-2xl"
-        style={{
-          height: topAccentHeight,
-          background: `linear-gradient(90deg, transparent, ${DASHBOARD_DESIGN.colors.accent.lime}60, transparent)`,
-        }}
-      />
+      {/* Subtle top accent line - removed for simpler design */}
 
       {/* Header: Title + Description */}
       <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-semibold" style={{ color: text.primary }}>
+        <h3
+          className={`${titleClassName} font-bold`}
+          style={{ color: text.primary }}
+        >
           {title}
         </h3>
         {description && (
-          <p
-            className="text-xs"
-            style={{ color: text.secondary }}
-          >
+          <p className="text-xs" style={{ color: text.secondary }}>
             {description}
           </p>
         )}
@@ -74,10 +71,7 @@ export function CardBase({
 
       {/* Footer (optional) */}
       {footer && (
-        <div
-          className="text-xs"
-          style={{ color: text.tertiary }}
-        >
+        <div className="text-xs" style={{ color: text.tertiary }}>
           {footer}
         </div>
       )}

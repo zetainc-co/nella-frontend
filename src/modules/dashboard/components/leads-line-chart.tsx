@@ -8,31 +8,25 @@ import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
 import { ChartCard } from './cards/chart-card'
 
 interface LeadsLineChartProps {
-  revenueMonth: ProjectMetrics['revenueMonth']
+  revenueMonth?: ProjectMetrics['revenueMonth']
+  monthlyData?: Array<{ month: string; revenue: number }>
   isLoading?: boolean
 }
 
-function generateMonthlyData(revenueMonth: number) {
-  const weights = [0.2, 0.25, 0.3, 0.25]
-  const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']
-  return weeks.map((week, i) => ({
-    week,
-    revenue: Math.round(revenueMonth * weights[i]),
-  }))
-}
-
-export function LeadsLineChart({ revenueMonth, isLoading }: LeadsLineChartProps) {
-  const data = useMemo(() => generateMonthlyData(revenueMonth), [revenueMonth])
+export function LeadsLineChart({ revenueMonth, monthlyData, isLoading }: LeadsLineChartProps) {
+  const data = useMemo(() => monthlyData || [], [monthlyData])
 
   return (
     <ChartCard
       title="Tendencia de Ingresos vs Leads"
-      description={`Evolución mensual del rendimiento — $${revenueMonth.toLocaleString()}`}
+      description="Evolución mensual del rendimiento"
       isLoading={isLoading}
       minHeight="280px"
+      bgGradient="radial-gradient(ellipse at top right, rgba(23,32,33,0.5) 0%, rgba(21,21,23,0.3) 60%, transparent 80%)"
+      titleClassName="text-base"
     >
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+      <ResponsiveContainer width="100%" height={280}>
+        <AreaChart data={data} margin={{ top: 10, right: 30, left: 60, bottom: 0 }}>
           <defs>
             <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#9EFF00" stopOpacity={0.35} />
@@ -41,7 +35,7 @@ export function LeadsLineChart({ revenueMonth, isLoading }: LeadsLineChartProps)
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
           <XAxis
-            dataKey="week"
+            dataKey="month"
             stroke="rgba(240,244,255,0.3)"
             fontSize={12}
             tickLine={false}

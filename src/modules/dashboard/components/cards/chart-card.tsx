@@ -9,6 +9,8 @@ interface ChartCardProps {
   children: ReactNode;
   isLoading?: boolean;
   minHeight?: string;
+  bgGradient?: string;
+  titleClassName?: string;
 }
 
 export function ChartCard({
@@ -17,13 +19,16 @@ export function ChartCard({
   children,
   isLoading = false,
   minHeight = "300px",
+  bgGradient,
+  titleClassName,
 }: ChartCardProps) {
   return (
     <CardBase
       title={title}
       description={description}
       isLoading={isLoading}
-      className="lg:col-span-2"
+      bgGradient={bgGradient}
+      titleClassName={titleClassName}
     >
       <div style={{ minHeight }}>
         {children}
