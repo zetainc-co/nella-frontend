@@ -34,7 +34,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       <aside
         className="hidden md:flex flex-col shrink-0 overflow-y-auto"
         style={{
-          width: 345,
+          width: 280,
           background: "#1a1a1a",
           borderRight: "1px solid rgba(255,255,255,0.08)",
         }}

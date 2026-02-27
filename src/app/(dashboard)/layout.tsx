@@ -123,7 +123,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           <button
             onClick={onClose}
             className="shrink-0 p-1 rounded-lg transition-colors"
-            style={{ color: "rgba(255,255,255,0.35)" }}
+            style={{ color: 'rgba(240,244,255,0.35)' }}
           >
             <X className="size-4" />
           </button>
@@ -146,15 +146,11 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               active={active}
               onClick={onClose}
             />
-          );
+          )
         })}
       </nav>
 
-      {/* Bottom section */}
-      <div
-        className="px-3 py-4 space-y-1"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
-      >
+      <div className="px-3 py-4 space-y-0.5" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <NavItem
           href="/settings"
           icon={Settings}
@@ -201,47 +197,23 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     <ProtectedRoute>
       <div
         className="flex h-screen overflow-hidden"
-        style={{ background: isSettings ? "#121212" : "#151515", position: "relative" }}
+        style={{ background: '#151515', position: 'relative' }}
       >
-        {/* Background orbs — hidden on settings pages */}
-        {!isSettings && (
-          <>
-            <div
-              aria-hidden
-              style={{
-                position: "fixed",
-                top: "72%",
-                right: "-8%",
-                width: "720px",
-                height: "720px",
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle at 50% 50%, rgba(0,205,190,0.22) 0%, rgba(0,175,162,0.09) 38%, rgba(0,140,130,0.03) 60%, transparent 75%)",
-                filter: "blur(65px)",
-                animation: "orb-breathe 7s ease-in-out infinite",
-                pointerEvents: "none",
-                zIndex: 0,
-              }}
-            />
-            <div
-              aria-hidden
-              style={{
-                position: "fixed",
-                bottom: "-8%",
-                left: `${SIDEBAR_W}px`,
-                width: "600px",
-                height: "600px",
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle at 50% 50%, rgba(65,60,220,0.15) 0%, rgba(45,40,175,0.06) 42%, transparent 70%)",
-                filter: "blur(80px)",
-                animation: "orb-breathe-slow 9s ease-in-out infinite",
-                pointerEvents: "none",
-                zIndex: 0,
-              }}
-            />
-          </>
-        )}
+        {/* Background orbs */}
+        <div aria-hidden style={{
+          position: 'fixed', top: '-18%', right: '-8%',
+          width: '720px', height: '720px', borderRadius: '50%',
+          background: 'radial-gradient(circle at 50% 50%, rgba(0,205,190,0.22) 0%, rgba(0,175,162,0.09) 38%, rgba(0,140,130,0.03) 60%, transparent 75%)',
+          filter: 'blur(65px)', animation: 'orb-breathe 7s ease-in-out infinite',
+          pointerEvents: 'none', zIndex: 0,
+        }} />
+        <div aria-hidden style={{
+          position: 'fixed', bottom: '-18%', left: `${SIDEBAR_W}px`,
+          width: '600px', height: '600px', borderRadius: '50%',
+          background: 'radial-gradient(circle at 50% 50%, rgba(65,60,220,0.15) 0%, rgba(45,40,175,0.06) 42%, transparent 70%)',
+          filter: 'blur(80px)', animation: 'orb-breathe-slow 9s ease-in-out infinite',
+          pointerEvents: 'none', zIndex: 0,
+        }} />
 
         {/* Desktop sidebar */}
         <aside
@@ -261,7 +233,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {mobileOpen && (
           <div
             className="fixed inset-0 z-40 md:hidden"
-            style={{ background: "rgba(0,0,0,0.65)" }}
+            style={{ background: 'rgba(0,0,0,0.65)' }}
             onClick={() => setMobileOpen(false)}
           />
         )}
@@ -270,31 +242,24 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <aside
           className="fixed top-0 left-0 z-50 h-full md:hidden flex flex-col transition-transform duration-200"
           style={{
-            width: SIDEBAR_W,
-            background: "#1a1a1a",
-            borderRight: "1px solid rgba(255,255,255,0.08)",
-            transform: mobileOpen ? "translateX(0)" : "translateX(-100%)",
+            width: SIDEBAR_W, background: '#0d0d0d',
+            borderRight: '1px solid rgba(255,255,255,0.06)',
+            transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
           }}
         >
           <SidebarContent onClose={() => setMobileOpen(false)} />
         </aside>
 
         {/* Main content */}
-        <div
-          className="flex flex-col flex-1 overflow-hidden"
-          style={{ position: "relative", zIndex: 1 }}
-        >
-          <div
-            className="flex md:hidden items-center px-4 h-14 shrink-0"
-            style={{
-              background: "#1a1a1a",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
+        <div className="flex flex-col flex-1 overflow-hidden" style={{ position: 'relative', zIndex: 1 }}>
+          <div className="flex md:hidden items-center px-4 h-14 shrink-0" style={{
+            background: '#0d0d0d',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+          }}>
             <button
               onClick={() => setMobileOpen(true)}
               className="p-2 rounded-lg"
-              style={{ color: "rgba(255,255,255,0.6)" }}
+              style={{ color: 'rgba(240,244,255,0.6)' }}
             >
               <Menu className="size-5" />
             </button>

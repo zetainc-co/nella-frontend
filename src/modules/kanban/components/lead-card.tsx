@@ -17,6 +17,10 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
       }
     : undefined
 
+  const handleClick = () => {
+    if (!isDragging) onClick()
+  }
+
   const getInitials = (name: string | null) => {
     if (!name) return '?'
     const parts = name.split(' ')
@@ -45,7 +49,7 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
       style={style}
       {...attributes}
       {...listeners}
-      onClick={onClick}
+      onClick={handleClick}
       className={cn(
         'bg-[#1a1a1a] border-2 rounded-lg p-4 cursor-grab transition-all relative',
         'border-gray-800 hover:border-gray-700',
@@ -57,7 +61,7 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
         {lead.name || lead.phone}
       </h3>
 
-      <p className="text-sm text-gray-400 mb-3">&nbsp;</p>
+      <p className="text-sm text-gray-400 mb-3">{lead.phone}</p>
 
       <p className="text-sm text-gray-300 mb-4 line-clamp-2">
         {lead.ai_summary || 'Sin resumen disponible'}

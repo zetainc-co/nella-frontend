@@ -6,48 +6,30 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ContactDetailModal } from "./contact-detail-modal"
 import type { ContactDetail } from "@/modules/contacts/types/contact-types"
-import { useContacts } from "@/modules/contacts/hooks/useContacts"
+import { useContacts, useContactsSSE } from "@/modules/contacts/hooks/useContacts"
 import type { BackendContact } from "@/modules/contacts/types/contacts"
+import { STATUS_TO_STAGE, mapLeadStatusToStage, STAGE_BADGE } from "@/modules/kanban/hooks/use-kanban-constants"
+import type { LeadStage } from "@/modules/kanban/types/kanban-types"
 
-// Mapea lead_status (ai_clasificacion de n8n) a la categoría del UI
-// Lead = conversación activa (COLD LEAD, WARM LEAD, HOT LEAD, SOPORTE HUMANO)
-// Cliente = cerró/convirtió (AGENDADO, CIERRE GANADO)
-// Inactivo = descartado/perdido (DESCARTADO, CIERRE PERDIDO, null)
-const LEAD_STATUSES = ['COLD', 'COLD LEAD', 'WARM', 'WARM LEAD', 'HOT', 'HOT LEAD', 'HUMAN_ATTENTION', 'SOPORTE HUMANO']
-const CLIENTE_STATUSES = ['AGENDADO', 'CIERRE GANADO', 'CLOSED', 'CONVERTED']
-const INACTIVE_STATUSES = ['DESCARTADO', 'CIERRE PERDIDO', 'INACTIVE']
+// ── Fuente única de verdad: stage del kanban determina badge y probabilidad ───
+// new       → 25%  → "Nuevo"
+// contacted → 50%  → "Calificado"
+// proposal  → 75%  → "Negociación"
+// closed    → 100% → "Lead"
 
-function mapLeadStatusToStage(status: string | null): string {
-    if (!status) return 'Inactivo'
-    const upper = status.toUpperCase()
-    if (LEAD_STATUSES.includes(upper)) return 'Lead'
-    if (CLIENTE_STATUSES.includes(upper)) return 'Cliente'
-    if (INACTIVE_STATUSES.includes(upper)) return 'Inactivo'
-    return 'Lead'
-}
-
-// Score IA basado en lead_status (ai_clasificacion de n8n)
-const SCORE_MAP: Record<string, { score: number; label: string }> = {
-    'WARM LEAD':        { score: 90, label: 'Alto' },
-    'HOT LEAD':         { score: 60, label: 'Calificado' },
-    'HOT':              { score: 60, label: 'Calificado' },
-    'HUMAN_ATTENTION':  { score: 75, label: 'Atención' },
-    'SOPORTE HUMANO':   { score: 75, label: 'Atención' },
-    'COLD LEAD':        { score: 20, label: 'Bajo' },
-    'COLD':             { score: 20, label: 'Bajo' },
-    'AGENDADO':         { score: 95, label: 'Cerrado' },
-    'CIERRE GANADO':    { score: 100, label: 'Ganado' },
-    'DESCARTADO':       { score: 5, label: 'Descartado' },
-    'CIERRE PERDIDO':   { score: 5, label: 'Perdido' },
-}
-
-function mapLeadStatusToScore(status: string | null): { score: number; label: string } {
-    if (!status) return { score: 0, label: '-' }
-    return SCORE_MAP[status.toUpperCase()] || { score: 0, label: '-' }
+function getContactStage(status: string | null, lead_status: string | null): LeadStage {
+    if (status) {
+        const mapped = STATUS_TO_STAGE[status.toLowerCase()]
+        if (mapped) return mapped
+    }
+    return mapLeadStatusToStage(lead_status)
 }
 
 // Mapea un contacto del backend al tipo que usa la UI
 function mapBackendContact(c: BackendContact): ContactDetail {
+    const stage = getContactStage(c.status, c.lead_status)
+    const { probability, displayLabel } = STAGE_BADGE[stage]
+
     return {
         id: String(c.id),
         name: c.name || c.phone,
@@ -58,15 +40,15 @@ function mapBackendContact(c: BackendContact): ContactDetail {
         handoff_active: c.handoff_active,
         ai_summary: c.ai_summary || '',
         last_interaction_at: c.last_interaction_at,
-        stage: mapLeadStatusToStage(c.lead_status),
+        stage: displayLabel,
         time: c.last_interaction_at
             ? new Date(c.last_interaction_at).toLocaleDateString('es', { day: 'numeric', month: 'short' })
             : '-',
         company: '-',
         role: '-',
         location: '-',
-        score: mapLeadStatusToScore(c.lead_status).score,
-        scoreLabel: mapLeadStatusToScore(c.lead_status).label,
+        score: probability,
+        scoreLabel: displayLabel,
         channel: 'WhatsApp',
         channelDetail: '-',
         lastConversation: c.ai_summary || '-',
@@ -76,15 +58,17 @@ function mapBackendContact(c: BackendContact): ContactDetail {
 const ITEMS_PER_PAGE = 5
 
 const stageVariants = {
-    "Cliente": "cliente",
-    "Lead": "lead",
-    "Inactivo": "inactivo",
+    "Nuevo":       "low",
+    "Calificado":  "medium",
+    "Negociación": "medium",
+    "Lead":        "high",
 } as const
 
 const stageLabels = {
-    "Cliente": "Cliente",
-    "Lead": "Lead",
-    "Inactivo": "Inactivo",
+    "Nuevo":       "Nuevo",
+    "Calificado":  "Calificado",
+    "Negociación": "Negociación",
+    "Lead":        "Lead",
 }
 
 export function ContactsTable() {
@@ -94,6 +78,7 @@ export function ContactsTable() {
     const [selectedContact, setSelectedContact] = useState<ContactDetail | null>(null)
 
     const { data: backendContacts = [], isLoading } = useContacts()
+    useContactsSSE()
 
     const contacts = useMemo(() => backendContacts.map(mapBackendContact), [backendContacts])
 
@@ -122,7 +107,7 @@ export function ContactsTable() {
     )
 
     const stageCounts = useMemo(() => {
-        const counts = { Cliente: 0, Lead: 0, Inactivo: 0 }
+        const counts = { Nuevo: 0, Calificado: 0, Negociación: 0, Lead: 0 }
         filteredContacts.forEach(c => {
             if (c.stage in counts) counts[c.stage as keyof typeof counts]++
         })
@@ -177,7 +162,7 @@ export function ContactsTable() {
             <div className="flex items-center justify-between gap-4 mb-6">
                 {/* Tabs de filtro */}
                 <div className="flex items-center gap-2">
-                    {["Todos", "Cliente", "Lead", "Inactivo"].map((stage) => (
+                    {["Todos", "Nuevo", "Calificado", "Negociación", "Lead"].map((stage) => (
                         <button
                             key={stage}
                             onClick={() => handleStageChange(stage)}
@@ -292,12 +277,22 @@ export function ContactsTable() {
                     {/* Stats por etapa */}
                     <div className="flex items-center gap-4 text-sm">
                         <span className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-[#8BD21D]" />
-                            <span className="text-gray-400">Clientes:</span>
-                            <span className="font-bold text-white">{stageCounts.Cliente}</span>
+                            <span className="w-2 h-2 rounded-full bg-gray-500" />
+                            <span className="text-gray-400">Nuevos:</span>
+                            <span className="font-bold text-white">{stageCounts.Nuevo}</span>
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-yellow-500" />
+                            <span className="text-gray-400">Calificados:</span>
+                            <span className="font-bold text-white">{stageCounts.Calificado}</span>
                         </span>
                         <span className="flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-blue-500" />
+                            <span className="text-gray-400">Negociación:</span>
+                            <span className="font-bold text-white">{stageCounts["Negociación"]}</span>
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-[#8BD21D]" />
                             <span className="text-gray-400">Leads:</span>
                             <span className="font-bold text-white">{stageCounts.Lead}</span>
                         </span>
