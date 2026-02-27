@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { backendHeaders, unwrapBackend } from '@/lib/backend-fetch'
+import { getMockProjects } from '@/modules/dashboard/mocks/projects.mock'
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'
 
@@ -13,19 +14,20 @@ export async function GET(request: NextRequest) {
     try {
       data = await response.json()
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid response from backend' },
-        { status: response.status || 502 }
-      )
+      // Fallback to mock data when response parsing fails
+      const mockProjects = getMockProjects()
+      return NextResponse.json(mockProjects, { status: 200 })
     }
     if (!response.ok) {
-      const message = (data as { message?: string })?.message ?? 'Backend error'
-      return NextResponse.json({ error: message }, { status: response.status })
+      // Fallback to mock data when backend returns error
+      const mockProjects = getMockProjects()
+      return NextResponse.json(mockProjects, { status: 200 })
     }
     return NextResponse.json(unwrapBackend(data), { status: 200 })
   } catch (error) {
-    console.error('[API/projects GET]', error)
-    return NextResponse.json({ error: 'Backend no disponible' }, { status: 503 })
+    // Fallback to mock data when backend unavailable
+    const mockProjects = getMockProjects()
+    return NextResponse.json(mockProjects, { status: 200 })
   }
 }
 

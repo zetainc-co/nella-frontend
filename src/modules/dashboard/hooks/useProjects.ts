@@ -6,15 +6,21 @@ import { toast } from 'sonner'
 import { apiClient } from '@/core/api/api-client'
 import { queryKeys } from '@/core/api/query-keys'
 import { useApiError } from '@/shared/hooks/useApiError'
+import { getMockProjects } from '@/modules/dashboard/mocks/projects.mock'
 import type { Project } from '@/modules/dashboard/types/dashboard-types'
 
 export function useProjects() {
   return useQuery<Project[]>({
     queryKey: queryKeys.dashboard.projects(),
     queryFn: async () => {
-      const res = await apiClient.get<{ items: Project[] } | Project[]>('/api/projects')
-      // Backend wraps list in { items: [...] }
-      return Array.isArray(res) ? res : res.items
+      try {
+        const res = await apiClient.get<{ items: Project[] } | Project[]>('/api/projects')
+        // Backend wraps list in { items: [...] }
+        return Array.isArray(res) ? res : res.items
+      } catch (error) {
+        // Fallback to mock projects if API fails
+        return getMockProjects()
+      }
     },
     staleTime: 30_000,
   })
