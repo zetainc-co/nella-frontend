@@ -12,13 +12,14 @@ interface ApiError extends Error {
 
 function getMessageForStatus(error: ApiError, fallback?: string): string {
   const status = error.status
-  if (status === 400) return 'Datos inválidos, revisa el formulario'
+  const backendMessage = error.message && error.message !== 'Error en la solicitud' ? error.message : null
+  if (status === 400) return backendMessage ?? 'Datos inválidos, revisa el formulario'
   if (status === 401) return 'Tu sesión expiró, inicia sesión nuevamente'
-  if (status === 403) return 'No tienes permisos para realizar esta acción'
-  if (status === 404) return 'El recurso solicitado no existe'
-  if (status && status >= 500) return 'Error interno, intenta de nuevo'
+  if (status === 403) return backendMessage ?? 'No tienes permisos para realizar esta acción'
+  if (status === 404) return backendMessage ?? 'El recurso solicitado no existe'
+  if (status && status >= 500) return backendMessage ?? 'Error interno, intenta de nuevo'
   if (typeof navigator !== 'undefined' && !navigator.onLine) return 'No hay conexión con el servidor'
-  return error.message ?? fallback ?? 'Ocurrió un error inesperado'
+  return backendMessage ?? fallback ?? 'Ocurrió un error inesperado'
 }
 
 export function useApiError() {

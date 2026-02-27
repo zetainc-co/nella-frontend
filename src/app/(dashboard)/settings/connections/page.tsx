@@ -5,30 +5,24 @@ import {
   SettingsPageHeader,
   SettingsGhostButton,
 } from "@/modules/settings/components/settings-ui";
+import { DifyAgentCard } from "@/modules/settings/components/dify-agent-card";
+import { WhatsappCard } from "@/modules/settings/components/whatsapp-card";
 import {
-  MessageCircle,
   Instagram,
   Facebook,
   Calendar,
   CheckCircle2,
   Circle,
   Lock,
-  Phone,
 } from "lucide-react";
 
 const iconMap = {
-  whatsapp: MessageCircle,
   instagram: Instagram,
   facebook: Facebook,
   calendar: Calendar,
 };
 
 const colorMap = {
-  whatsapp: {
-    text: "#22c55e",
-    background: "rgba(34,197,94,0.1)",
-    border: "rgba(34,197,94,0.2)",
-  },
   instagram: {
     text: "#ec4899",
     background: "rgba(236,72,153,0.1)",
@@ -55,6 +49,8 @@ export default function ConexionesPage() {
       />
 
       <div className="space-y-4">
+        <DifyAgentCard />
+        <WhatsappCard />
         {mockConnections.map((connection) => {
           const Icon = iconMap[connection.icon as keyof typeof iconMap];
           const connectionColors =
@@ -142,58 +138,6 @@ export default function ConexionesPage() {
                   </div>
                 )}
 
-                {connection.phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone
-                      className="size-3.5"
-                      style={{ color: "rgba(240,244,255,0.4)" }}
-                    />
-                    <span
-                      className="text-sm font-mono"
-                      style={{ color: "rgba(240,244,255,0.5)" }}
-                    >
-                      {connection.phone}
-                    </span>
-                  </div>
-                )}
-
-                {connection.token && (
-                  <div className="flex items-center gap-2">
-                    <Lock
-                      className="size-3.5"
-                      style={{ color: "rgba(240,244,255,0.4)" }}
-                    />
-                    <span
-                      className="text-sm font-mono"
-                      style={{ color: "rgba(240,244,255,0.5)" }}
-                    >
-                      {connection.token}
-                    </span>
-                  </div>
-                )}
-
-                {connection.note && (
-                  <div
-                    className="p-3 rounded-lg"
-                    style={{
-                      background: "rgba(59,130,246,0.05)",
-                      border: "1px solid rgba(59,130,246,0.15)",
-                    }}
-                  >
-                    <p
-                      className="text-xs"
-                      style={{ color: "rgba(240,244,255,0.5)" }}
-                    >
-                      <span
-                        className="font-semibold"
-                        style={{ color: "#60a5fa" }}
-                      >
-                        Nota:
-                      </span>{" "}
-                      {connection.note}
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
           );
