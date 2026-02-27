@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { io } from 'socket.io-client'
 import { toast } from 'sonner'
 import { apiClient } from '@/core/api/api-client'
 import { queryKeys } from '@/core/api/query-keys'
@@ -12,6 +14,9 @@ import type {
   CreateContactPayload,
 } from '@/modules/contacts/types/contacts'
 
+// URL directa al backend NestJS — evita el proxy de Next.js que no soporta WS upgrade
+const BACKEND_WS_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
+
 export function useContacts(query?: ContactsQuery) {
   const params = new URLSearchParams()
   if (query?.phone) params.set('phone', query.phone)
@@ -20,9 +25,39 @@ export function useContacts(query?: ContactsQuery) {
 
   return useQuery<BackendContact[]>({
     queryKey: [...queryKeys.contacts.all(), query],
-    queryFn: () =>
-      apiClient.get<BackendContact[]>(`/api/contacts${qs ? `?${qs}` : ''}`),
+    queryFn: async () => {
+      const res = await apiClient.get<{ items: BackendContact[] } | BackendContact[]>(
+        `/api/contacts${qs ? `?${qs}` : ''}`,
+      )
+      return Array.isArray(res) ? res : (res as { items: BackendContact[] }).items ?? []
+    },
+    // Stale time alta — el socket invalida el cache en tiempo real
+    staleTime: 30_000,
   })
+}
+
+export function useContactsSSE() {
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    // Conectar directamente al backend (CORS: origin: '*') — el proxy de Next.js
+    // no soporta WebSocket upgrade, causando 404 en polling infinito
+    const socket = io(`${BACKEND_WS_URL}/contacts`, {
+      transports: ['websocket', 'polling'],
+    })
+
+    socket.on('contact:updated', () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.contacts.all() })
+    })
+
+    socket.on('connect_error', (err) => {
+      console.debug('contacts socket connect_error:', err.message)
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [queryClient])
 }
 
 export function useContact(id: number) {
