@@ -11,7 +11,7 @@ export const DASHBOARD_DESIGN = {
     card: {
       bg: "rgba(18, 18, 18, 0.95)",
       border: "rgba(255,255,255,0.14)",
-      shadow: "0 8px 32px rgba(0,0,0,0.6)",
+      shadow: "0 2px 2px rgba(0,0,0,0.6)",
     },
 
     // Text hierarchy
@@ -73,4 +73,33 @@ export const METRIC_ACCENTS = {
   closedLeads: DASHBOARD_DESIGN.colors.accent.green,
   pipeline: DASHBOARD_DESIGN.colors.accent.lime,
   roas: DASHBOARD_DESIGN.colors.accent.green,
+} as const;
+
+// Select Filter Component Styles
+export const SELECT_FILTER_STYLES = {
+  trigger: {
+    base: "border border-[rgba(255,255,255,0.14)] bg-[rgba(18,18,18,0.95)] text-[#f0f4ff] py-2 px-3 rounded-md hover:bg-[rgba(30,30,35,0.95)] transition-all duration-200",
+    widths: {
+      auto: "w-auto",
+      full: "w-full",
+      sm: "w-40",
+      md: "w-52",
+      lg: "w-64",
+    },
+  },
+  content: {
+    base: "border border-[rgba(255,255,255,0.14)] bg-[rgba(18,18,18,0.95)]",
+  },
+  item: {
+    selected: {
+      backgroundColor: "#9EFF00",
+      color: "#000000",
+      fontWeight: "500",
+    },
+    unselected: {
+      backgroundColor: "transparent",
+      color: "rgba(240,244,255,0.75)",
+      fontWeight: "500",
+    },
+  },
 } as const;
