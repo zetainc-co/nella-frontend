@@ -1,7 +1,7 @@
 // src/components/calendario/modals/new-event-modal.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import { Modal } from '@/components/shared/modal/modal'
@@ -57,6 +57,15 @@ export function NewEventModal({ open, onClose, initialDate, initialTime, onEvent
   const [endTime, setEndTime] = useState(() =>
     initialTime ? incrementHour(initialTime) : '10:00'
   )
+
+  // Sync date/time props every time the modal opens
+  useEffect(() => {
+    if (open) {
+      setDate(initialDate ?? getTodayISO())
+      setStartTime(initialTime ?? '09:00')
+      setEndTime(initialTime ? incrementHour(initialTime) : '10:00')
+    }
+  }, [open, initialDate, initialTime])
   const [location, setLocation] = useState('')
   const [videoCallLink, setVideoCallLink] = useState('')
   const [confirmationStatus, setConfirmationStatus] = useState<ConfirmationStatus>('pending')

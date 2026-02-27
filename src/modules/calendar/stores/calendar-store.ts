@@ -32,6 +32,7 @@ interface CalendarStore {
   goToNextWeek: () => void
   goToPrevWeek: () => void
   goToToday: () => void
+  goToDate: (date: Date) => void
 
   // API-driven actions
   setEvents: (events: CalendarEvent[]) => void
@@ -65,6 +66,9 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
 
   goToToday: () =>
     set({ currentWeekStart: startOfWeek(new Date(), { weekStartsOn: 1 }) }),
+
+  goToDate: (date) =>
+    set({ currentWeekStart: startOfWeek(date, { weekStartsOn: 1 }) }),
 
   setEvents: (events) => set({ events }),
 
