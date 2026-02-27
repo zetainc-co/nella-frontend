@@ -14,8 +14,8 @@ export interface TeamMember {
 }
 
 export interface ChartDataPoint {
-  date: string
-  value: number
+  month: string
+  revenue: number
 }
 
 export interface AIOptimizationMetric {
@@ -70,16 +70,13 @@ export function getTeamPerformanceMockData(projectId: string): TeamMember[] {
 }
 
 export function getLeadsChartMockData(projectId: string): ChartDataPoint[] {
+  const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
   const data: ChartDataPoint[] = []
-  const baseDate = new Date('2025-02-01')
 
-  for (let i = 0; i < 30; i++) {
-    const date = new Date(baseDate)
-    date.setDate(date.getDate() + i)
-
+  for (let i = 0; i < 12; i++) {
     data.push({
-      date: date.toISOString().split('T')[0],
-      value: Math.round(randomRange(50, 150, `${projectId}-chart-${i}`)),
+      month: monthNames[i],
+      revenue: Math.round(randomRange(50000000, 150000000, `${projectId}-chart-${i}`)),
     })
   }
 

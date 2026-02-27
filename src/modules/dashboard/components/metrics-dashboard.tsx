@@ -94,7 +94,7 @@ export function MetricsDashboard({ projectId }: MetricsDashboardProps) {
         style={{ gap: `${DASHBOARD_DESIGN.spacing.grid.gap * 0.25}rem` }}
       >
         <LeadsLineChart
-          monthlyData={leadsChart.map(d => ({ month: d.date, revenue: d.value }))}
+          monthlyData={leadsChart}
           revenueMonth={kpiData.revenueMonth}
           isLoading={isLoading}
         />
