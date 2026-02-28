@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        // Handshake raíz de socket.io (sin path), ej: /socket.io?EIO=4&transport=polling
+        source: "/socket.io",
+        destination: `${BACKEND_URL}/socket.io`,
+      },
+      {
+        // Cualquier subruta de socket.io (fallback)
         source: "/socket.io/:path*",
         destination: `${BACKEND_URL}/socket.io/:path*`,
       },
@@ -18,10 +24,8 @@ const nextConfig: NextConfig = {
         source: "/chatwoot-conversations/:path*",
         destination: `${BACKEND_URL}/chatwoot-conversations/:path*`,
       },
-      {
-        source: "/api/:path*",
-        destination: `${BACKEND_URL}/api/:path*`,
-      },
+      // NOTA: No proxear /api/* a NestJS — esas rutas son Next.js API Route Handlers.
+      // NestJS no tiene prefijo /api/. Sus rutas son: /auth, /dify, /chatwoot, /booking, etc.
     ];
   },
   turbopack: {
