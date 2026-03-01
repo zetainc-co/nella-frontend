@@ -1,6 +1,12 @@
 import { create } from 'zustand'
 
-export type ConversationFilter = 'all' | 'ai_active' | 'human' | 'resolved'
+export type ConversationFilter =
+  | 'all'
+  | 'mine'        // NEW: My assigned conversations
+  | 'unassigned'  // NEW: Unassigned conversations
+  | 'ai_active'
+  | 'human'
+  | 'resolved'
 
 interface ChatStore {
   selectedConversationId: number | null

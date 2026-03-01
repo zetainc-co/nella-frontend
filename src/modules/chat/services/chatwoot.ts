@@ -68,4 +68,22 @@ export const chatwootService = {
       `/chatwoot-conversations/conversations/${conversationId}/start-ai`,
       {}
     ),
+
+  assignConversation: (conversationId: number, assigneeId: number, teamId?: number) =>
+    apiClient.post<any>(
+      `/chatwoot-conversations/conversations/${conversationId}/assign`,
+      {
+        assignee_id: assigneeId,
+        ...(teamId && { team_id: teamId })
+      }
+    ),
+
+  updateConversationStatus: (
+    conversationId: number,
+    data: { assignee_id?: number | null; status?: string; snoozed_until?: string }
+  ) =>
+    apiClient.patch<any>(
+      `/chatwoot-conversations/conversations/${conversationId}/status`,
+      data
+    ),
 }

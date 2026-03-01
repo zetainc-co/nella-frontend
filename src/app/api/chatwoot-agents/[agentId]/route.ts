@@ -3,15 +3,16 @@ import { backendHeaders, unwrapBackend } from '@/lib/backend-fetch'
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'
 
+type RouteContext = {
+  params: Promise<{ agentId: string }>
+}
+
 /**
  * PATCH /api/chatwoot-agents/:agentId - Update an agent
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ agentId: string }> },
-) {
+export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
-    const { agentId } = await params
+    const { agentId } = await context.params
 
     let body: unknown
     try {
@@ -26,6 +27,20 @@ export async function PATCH(
       body: JSON.stringify(body),
     })
 
+    if (!response.ok) {
+      let data: unknown
+      try {
+        data = await response.json()
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid response from backend' },
+          { status: response.status || 502 },
+        )
+      }
+      const message = (data as { message?: string })?.message ?? 'Backend error'
+      return NextResponse.json({ error: message }, { status: response.status })
+    }
+
     let data: unknown
     try {
       data = await response.json()
@@ -34,11 +49,6 @@ export async function PATCH(
         { error: 'Invalid response from backend' },
         { status: response.status || 502 },
       )
-    }
-
-    if (!response.ok) {
-      const message = (data as { message?: string })?.message ?? 'Backend error'
-      return NextResponse.json({ error: message }, { status: response.status })
     }
 
     return NextResponse.json(unwrapBackend(data), { status: 200 })
@@ -51,12 +61,9 @@ export async function PATCH(
 /**
  * DELETE /api/chatwoot-agents/:agentId - Delete an agent
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ agentId: string }> },
-) {
+export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
-    const { agentId } = await params
+    const { agentId } = await context.params
 
     const response = await fetch(`${BACKEND_URL}/chatwoot-agents/${agentId}`, {
       method: 'DELETE',

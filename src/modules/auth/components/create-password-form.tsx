@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { createPasswordSchema, calculatePasswordStrength, CreatePasswordFormData } from '@/lib/validations/create-password-schema';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Eye, EyeOff } from 'lucide-react';
 
 interface CreatePasswordFormProps {
   token: string;
@@ -19,6 +19,8 @@ export function CreatePasswordForm({ token, email }: CreatePasswordFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tokenExpired, setTokenExpired] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -69,8 +71,21 @@ export function CreatePasswordForm({ token, email }: CreatePasswordFormProps) {
         return;
       }
 
-      // Success - redirect to login
-      router.push(`/login?email=${encodeURIComponent(email)}&message=account-activated`);
+      // Success - redirect to tenant login
+      const { tenantSlug } = result.data;
+      if (!tenantSlug) {
+        setError('Error al obtener información del tenant');
+        return;
+      }
+
+      // Build tenant-specific login URL
+      const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost';
+      const port = appDomain === 'localhost' ? ':3001' : '';
+      const protocol = appDomain === 'localhost' ? 'http' : 'https';
+      const loginUrl = `${protocol}://${tenantSlug}.${appDomain}${port}/login?email=${encodeURIComponent(email)}&message=account-activated`;
+
+      // Redirect to tenant login
+      window.location.href = loginUrl;
     } catch (err) {
       setError('Error de conexión. Intenta nuevamente');
     } finally {
@@ -132,13 +147,27 @@ export function CreatePasswordForm({ token, email }: CreatePasswordFormProps) {
           <label htmlFor="password" className="tech-label">
             Contraseña <span className="text-destructive">*</span>
           </label>
-          <input
-            id="password"
-            type="password"
-            {...register('password')}
-            placeholder="••••••••"
-            className={`tech-input ${errors.password ? 'border-destructive' : ''}`}
-          />
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              {...register('password')}
+              placeholder="••••••••"
+              className={`tech-input pr-12 ${errors.password ? 'border-destructive' : ''}`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
           {errors.password && (
             <p className="text-sm text-destructive">{errors.password.message}</p>
           )}
@@ -177,13 +206,27 @@ export function CreatePasswordForm({ token, email }: CreatePasswordFormProps) {
           <label htmlFor="confirmPassword" className="tech-label">
             Confirmar contraseña <span className="text-destructive">*</span>
           </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            {...register('confirmPassword')}
-            placeholder="••••••••"
-            className={`tech-input ${errors.confirmPassword ? 'border-destructive' : ''}`}
-          />
+          <div className="relative">
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
+              {...register('confirmPassword')}
+              placeholder="••••••••"
+              className={`tech-input pr-12 ${errors.confirmPassword ? 'border-destructive' : ''}`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
           {errors.confirmPassword && (
             <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
           )}

@@ -1,8 +1,10 @@
 'use client'
-import { memo } from 'react'
+import { memo, useState } from 'react'
+import { MoreVertical } from 'lucide-react'
 import type { ConversationItemProps } from '../../types'
 import { formatRelativeTime } from '@/utils/format-relative-time'
 import { getInitials } from '@/utils/get-initials'
+import { ConversationContextMenu } from './conversation-context-menu'
 
 function ConversationItemComponent({
   conversation,
@@ -10,10 +12,26 @@ function ConversationItemComponent({
   onClick,
 }: ConversationItemProps) {
   const { meta, agentMode, lastMessage, unread_count, timestamp } = conversation
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setMenuPosition({ x: e.clientX, y: e.clientY })
+    setMenuOpen(true)
+  }
+
+  const handleMenuButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent conversation selection
+    const rect = e.currentTarget.getBoundingClientRect()
+    setMenuPosition({ x: rect.left, y: rect.bottom })
+    setMenuOpen(true)
+  }
 
   return (
     <button
       onClick={onClick}
+      onContextMenu={handleContextMenu}
       className={`
         w-full px-4 py-3
         flex items-start gap-3
@@ -66,7 +84,8 @@ function ConversationItemComponent({
         </p>
 
         {/* Badge */}
-        <div className="flex items-center">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
           {agentMode === 'ai' ? (
             <span className="
               inline-flex items-center gap-1.5
@@ -97,8 +116,31 @@ function ConversationItemComponent({
               Humano
             </span>
           )}
+          </div>
+
+          {/* 3-dots menu button */}
+          <button
+            onClick={handleMenuButtonClick}
+            className="
+              ml-auto p-2 rounded
+              text-[#f0f4ff]/40 hover:text-[#f0f4ff]
+              hover:bg-white/[0.05]
+              transition-colors
+            "
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
         </div>
       </div>
+
+      {/* Context menu */}
+      {menuOpen && (
+        <ConversationContextMenu
+          conversationId={conversation.id}
+          position={menuPosition}
+          onClose={() => setMenuOpen(false)}
+        />
+      )}
     </button>
   )
 }
