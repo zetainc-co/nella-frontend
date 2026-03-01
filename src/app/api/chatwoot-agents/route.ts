@@ -74,3 +74,93 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Backend no disponible' }, { status: 503 })
   }
 }
+
+/**
+ * PATCH /api/chatwoot-agents?id=X - Update an agent
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    const agentId = request.nextUrl.searchParams.get('id')
+    if (!agentId) {
+      return NextResponse.json({ error: 'Agent ID is required' }, { status: 400 })
+    }
+
+    let body: unknown
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    }
+
+    const response = await fetch(`${BACKEND_URL}/chatwoot-agents/${agentId}`, {
+      method: 'PATCH',
+      headers: backendHeaders(request),
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) {
+      let data: unknown
+      try {
+        data = await response.json()
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid response from backend' },
+          { status: response.status || 502 },
+        )
+      }
+      const message = (data as { message?: string })?.message ?? 'Backend error'
+      return NextResponse.json({ error: message }, { status: response.status })
+    }
+
+    let data: unknown
+    try {
+      data = await response.json()
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid response from backend' },
+        { status: response.status || 502 },
+      )
+    }
+
+    return NextResponse.json(unwrapBackend(data), { status: 200 })
+  } catch (error) {
+    console.error('[API/chatwoot-agents PATCH]', error)
+    return NextResponse.json({ error: 'Backend no disponible' }, { status: 503 })
+  }
+}
+
+/**
+ * DELETE /api/chatwoot-agents?id=X - Delete an agent
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    const agentId = request.nextUrl.searchParams.get('id')
+    if (!agentId) {
+      return NextResponse.json({ error: 'Agent ID is required' }, { status: 400 })
+    }
+
+    const response = await fetch(`${BACKEND_URL}/chatwoot-agents/${agentId}`, {
+      method: 'DELETE',
+      headers: backendHeaders(request),
+    })
+
+    if (!response.ok) {
+      let data: unknown
+      try {
+        data = await response.json()
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid response from backend' },
+          { status: response.status || 502 },
+        )
+      }
+      const message = (data as { message?: string })?.message ?? 'Backend error'
+      return NextResponse.json({ error: message }, { status: response.status })
+    }
+
+    return NextResponse.json({ success: true }, { status: 200 })
+  } catch (error) {
+    console.error('[API/chatwoot-agents DELETE]', error)
+    return NextResponse.json({ error: 'Backend no disponible' }, { status: 503 })
+  }
+}

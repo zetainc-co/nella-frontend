@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { UserPlus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-import { useAgents, useDeleteAgent } from "@/modules/team/hooks/useAgents";
+import { UserPlus, Trash2, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import { useAgents, useDeleteAgent, useUpdateAgent } from "@/modules/team/hooks/useAgents";
 import { InviteMemberModal } from "@/modules/team/components/invite-member-modal";
+import { DeleteAgentModal } from "@/modules/team/components/delete-agent-modal";
+import { EditAgentModal } from "@/modules/team/components/edit-agent-modal";
 import {
   SettingsPageHeader,
   SettingsCard,
@@ -11,14 +13,20 @@ import {
   SettingsLimeBadge,
   SettingsStatusDot,
 } from "@/modules/settings/components/settings-ui";
+import type { Agent } from "@/modules/team/types/team-types";
 
 const ITEMS_PER_PAGE = 5;
 
 export default function EquipoPage() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [agentToDelete, setAgentToDelete] = useState<{ id: number; name: string } | null>(null);
+  const [agentToEdit, setAgentToEdit] = useState<Agent | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const { data: agents = [], isLoading } = useAgents();
   const deleteAgent = useDeleteAgent();
+  const updateAgent = useUpdateAgent();
 
   // Paginación
   const { paginatedAgents, totalPages } = useMemo(() => {
@@ -35,13 +43,34 @@ export default function EquipoPage() {
   const licensesUsed = agents.length;
   const licensePercentage = (licensesUsed / licensesTotal) * 100;
 
-  const handleDelete = async (agentId: number) => {
-    if (confirm("¿Estás seguro de eliminar este agente?")) {
-      await deleteAgent.mutateAsync(agentId);
+  const handleEdit = (agent: Agent) => {
+    setAgentToEdit(agent);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async (agentId: number, data: { name?: string; role?: 'agent' | 'administrator' }) => {
+    await updateAgent.mutateAsync({ agentId, data });
+    setEditModalOpen(false);
+    setAgentToEdit(null);
+  };
+
+  const handleDelete = (agentId: number, agentName: string) => {
+    setAgentToDelete({ id: agentId, name: agentName });
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!agentToDelete) return;
+
+    try {
+      await deleteAgent.mutateAsync(agentToDelete.id);
       // Si eliminamos el último item de la página actual, ir a la anterior
       if (paginatedAgents.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
+    } finally {
+      setDeleteConfirmOpen(false);
+      setAgentToDelete(null);
     }
   };
 
@@ -200,15 +229,23 @@ export default function EquipoPage() {
 
                       {/* Acciones */}
                       <td className="py-4 text-right">
-                        <button
-                          onClick={() => handleDelete(agent.id)}
-                          disabled={deleteAgent.isPending}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium transition-colors hover:opacity-80 disabled:opacity-50"
-                          style={{ color: "#ef4444" }}
-                        >
-                          <Trash2 className="size-3.5" />
-                          Eliminar
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleEdit(agent)}
+                            className="rounded-lg p-2 transition-colors hover:bg-white/5"
+                            title="Editar agente"
+                          >
+                            <Pencil className="size-4" style={{ color: "rgba(240,244,255,0.6)" }} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(agent.id, agent.name)}
+                            disabled={deleteAgent.isPending}
+                            className="rounded-lg p-2 transition-colors hover:bg-white/5 disabled:opacity-50"
+                            title="Eliminar agente"
+                          >
+                            <Trash2 className="size-4" style={{ color: "#ef4444" }} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -268,6 +305,25 @@ export default function EquipoPage() {
       <InviteMemberModal
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
+      />
+
+      <EditAgentModal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setAgentToEdit(null);
+        }}
+        onSave={handleSaveEdit}
+        agent={agentToEdit}
+        isSaving={updateAgent.isPending}
+      />
+
+      <DeleteAgentModal
+        isOpen={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        agentName={agentToDelete?.name || ''}
+        isDeleting={deleteAgent.isPending}
       />
     </>
   );
