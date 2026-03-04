@@ -9,7 +9,7 @@ import { calculatePasswordStrength } from '@/lib/registration-validations'
 import { RegistrationFormData } from '@/modules/auth/types/auth-types'
 import { Button } from '@/components/ui/button'
 import { CountryPhoneSelector } from '@/modules/auth/components/country-phone-selector'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react'
 
 interface RegistrationStep2Props {
   initialData: Partial<RegistrationFormData>
@@ -23,6 +23,8 @@ export function RegistrationStep2({
   onBack,
 }: RegistrationStep2Props) {
   const [passwordStrength, setPasswordStrength] = useState(0)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const {
     register,
@@ -114,13 +116,27 @@ export function RegistrationStep2({
           <label htmlFor="password" className="tech-label">
             Contraseña <span className="text-destructive">*</span>
           </label>
-          <input
-            id="password"
-            type="password"
-            {...register('password')}
-            placeholder="••••••••"
-            className={`tech-input ${errors.password ? 'border-destructive' : ''}`}
-          />
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              {...register('password')}
+              placeholder="••••••••"
+              className={`tech-input pr-12 ${errors.password ? 'border-destructive' : ''}`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
           {errors.password && (
             <p className="text-sm text-destructive">{errors.password.message}</p>
           )}
@@ -159,13 +175,27 @@ export function RegistrationStep2({
           <label htmlFor="confirmPassword" className="tech-label">
             Confirmar contraseña <span className="text-destructive">*</span>
           </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            {...register('confirmPassword')}
-            placeholder="••••••••"
-            className={`tech-input ${errors.confirmPassword ? 'border-destructive' : ''}`}
-          />
+          <div className="relative">
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
+              {...register('confirmPassword')}
+              placeholder="••••••••"
+              className={`tech-input pr-12 ${errors.confirmPassword ? 'border-destructive' : ''}`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
           {errors.confirmPassword && (
             <p className="text-sm text-destructive">
               {errors.confirmPassword.message}

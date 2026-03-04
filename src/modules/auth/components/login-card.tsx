@@ -1,4 +1,5 @@
-import { LogIn } from 'lucide-react'
+import { LogIn, Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
 
 interface LoginCardProps {
   email: string
@@ -19,6 +20,8 @@ export function LoginCard({
   message,
   handleLogin,
 }: LoginCardProps) {
+  const [showPassword, setShowPassword] = useState(false)
+
   return (
     <div className="relative glass-panel rounded-2xl p-8 shadow-[0_0_60px_-10px_rgba(206,242,93,0.08)] hover:shadow-[0_0_80px_-10px_rgba(206,242,93,0.12)] transition-shadow duration-500">
       {/* HUD Corner Frames */}
@@ -58,14 +61,28 @@ export function LoginCard({
 
         <div className="space-y-2">
           <label className="tech-label">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="tech-input"
-            placeholder="••••••••"
-            required
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="tech-input pr-12"
+              placeholder="••••••••"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
         </div>
 
         <button

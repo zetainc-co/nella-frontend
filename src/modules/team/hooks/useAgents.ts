@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { teamService } from '../services/team-service'
 import { useApiError } from '@/shared/hooks/useApiError'
 import type { CreateAgentDto, UpdateAgentDto } from '../types/team-types'
@@ -51,6 +52,7 @@ export function useUpdateAgent() {
       teamService.updateAgent(agentId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+      toast.success('Miembro actualizado correctamente')
     },
     onError: (error: Error) => {
       handleError(error, {
@@ -72,6 +74,7 @@ export function useDeleteAgent() {
     mutationFn: (agentId: number) => teamService.deleteAgent(agentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+      toast.success('Miembro eliminado correctamente')
     },
     onError: (error: Error) => {
       handleError(error, {

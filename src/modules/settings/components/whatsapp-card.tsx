@@ -9,6 +9,8 @@ import {
   MessageSquare,
   Phone,
   ShieldCheck,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Modal } from "@/shared/components/modal/modal";
 import {
@@ -395,6 +397,8 @@ function SecretField({
   hasExistingValue: boolean;
   placeholder: string;
 }) {
+  const [showSecret, setShowSecret] = useState(false);
+
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
@@ -411,27 +415,48 @@ function SecretField({
           </span>
         )}
       </div>
-      <input
-        type="password"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={hasExistingValue ? "••••••••  (dejar en blanco para conservar)" : placeholder}
-        className="w-full px-3 py-2.5 rounded-lg text-sm font-mono outline-none transition-all"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border:     "1px solid rgba(255,255,255,0.1)",
-          color:      "#f0f4ff",
-          caretColor: "#25D366",
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.borderColor = "rgba(37,211,102,0.4)";
-          e.currentTarget.style.background  = "rgba(255,255,255,0.07)";
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-          e.currentTarget.style.background  = "rgba(255,255,255,0.04)";
-        }}
-      />
+      <div className="relative">
+        <input
+          type={showSecret ? "text" : "password"}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={hasExistingValue ? "••••••••  (dejar en blanco para conservar)" : placeholder}
+          className="w-full px-3 py-2.5 pr-12 rounded-lg text-sm font-mono outline-none transition-all"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border:     "1px solid rgba(255,255,255,0.1)",
+            color:      "#f0f4ff",
+            caretColor: "#25D366",
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "rgba(37,211,102,0.4)";
+            e.currentTarget.style.background  = "rgba(255,255,255,0.07)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+            e.currentTarget.style.background  = "rgba(255,255,255,0.04)";
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => setShowSecret(!showSecret)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+          style={{ color: "rgba(240,244,255,0.4)" }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "rgba(240,244,255,0.7)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "rgba(240,244,255,0.4)";
+          }}
+          tabIndex={-1}
+        >
+          {showSecret ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
+        </button>
+      </div>
     </div>
   );
 }

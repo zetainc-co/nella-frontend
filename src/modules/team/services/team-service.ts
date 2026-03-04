@@ -20,14 +20,14 @@ export const teamService = {
    * Update an agent
    */
   async updateAgent(agentId: number, data: UpdateAgentDto): Promise<Agent> {
-    return apiClient.patch<Agent>(`/api/chatwoot-agents/${agentId}`, data)
+    return apiClient.patch<Agent>(`/api/chatwoot-agents?id=${agentId}`, data)
   },
 
   /**
    * Delete an agent
    */
   async deleteAgent(agentId: number): Promise<void> {
-    return apiClient.delete<void>(`/api/chatwoot-agents/${agentId}`)
+    return apiClient.delete<void>(`/api/chatwoot-agents?id=${agentId}`)
   },
 
   /**
