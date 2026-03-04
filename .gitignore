@@ -42,8 +42,7 @@ yarn-error.log*
 next-env.d.ts
 
 # AI Framework runtime files (auto-added)
-/.claude/*
-!/.claude/rules/
+/.claude/
 /CLAUDE.md
 /hooks/*.db
 /hooks/__pycache__/
