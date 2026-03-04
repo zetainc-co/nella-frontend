@@ -174,6 +174,33 @@ export function RegistrationSummary({
         </div>
       </div>
 
+      {/* Sección: WhatsApp */}
+      <div className="space-y-3 rounded-lg border bg-card p-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">WhatsApp Business</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onEdit(4)}
+            className="gap-1"
+          >
+            <Edit2 className="h-3 w-3" />
+            Editar
+          </Button>
+        </div>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Número:</span>
+            <span className="font-medium">{formData.whatsappNumber}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span className="text-muted-foreground">Número verificado</span>
+          </div>
+        </div>
+      </div>
+
       {/* Slug del Tenant — generado automáticamente por el backend */}
       {/*
       //<div className="space-y-3 rounded-lg border border-primary/50 bg-primary/5 p-4">

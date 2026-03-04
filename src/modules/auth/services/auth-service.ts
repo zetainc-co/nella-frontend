@@ -88,32 +88,4 @@ export const authService = {
 
     return { user: response.user, session }
   },
-
-  async forgotPassword(email: string): Promise<void> {
-    const tenantSlug = getTenantSubdomain()
-
-    await fetch('/api/auth/forgot-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, tenantSlug }),
-    })
-
-    // Always resolves — endpoint always returns 200 regardless of email existence
-  },
-
-  async resetPassword(email: string, code: string, newPassword: string): Promise<void> {
-    const tenantSlug = getTenantSubdomain()
-
-    const res = await fetch('/api/auth/reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, code, newPassword, tenantSlug }),
-    })
-
-    const data = await res.json()
-
-    if (!res.ok) {
-      throw new Error(data.error ?? 'Código inválido o expirado')
-    }
-  },
 }

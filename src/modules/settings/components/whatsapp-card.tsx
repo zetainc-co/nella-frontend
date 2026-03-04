@@ -133,10 +133,10 @@ export function WhatsappCard() {
             </div>
             <div>
               <h3 className="text-lg font-bold" style={{ color: "#f0f4ff" }}>
-                WhatsApp API
+                WhatsApp Business API
               </h3>
               <p className="text-sm mt-0.5" style={{ color: "rgba(240,244,255,0.4)" }}>
-                Conecta tu cuenta de WhatsApp para gestionar conversaciones
+                Conecta tu cuenta de WhatsApp Business para gestionar conversaciones
               </p>
             </div>
           </div>
@@ -195,7 +195,7 @@ export function WhatsappCard() {
         open={modalOpen}
         onOpenChange={setModalOpen}
         size="sm"
-        title={isConnected ? "Editar credenciales" : "Conectar WhatsApp API"}
+        title={isConnected ? "Editar credenciales" : "Conectar WhatsApp Business"}
         description={
           step === "input"
             ? isConnected
@@ -328,7 +328,7 @@ function ConnectedDetails({ config }: { config: WhatsappConfigData }) {
       >
         <p className="text-xs" style={{ color: "rgba(240,244,255,0.5)" }}>
           <span className="font-semibold" style={{ color: "#60a5fa" }}>Nota:</span>{" "}
-          La conexión con WhatsApp API requiere una cuenta verificada de Meta.
+          La conexión con WhatsApp Business API requiere una cuenta verificada de Meta Business.
           Los mensajes se sincronizarán automáticamente con tu bandeja de entrada.
         </p>
       </div>

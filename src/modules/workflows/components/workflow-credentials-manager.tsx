@@ -185,7 +185,7 @@ export function WorkflowCredentialsManager({
       <div className="space-y-6">
         {/* WhatsApp Token */}
         <CredentialInput
-          label="WhatsApp API Token"
+          label="WhatsApp Business API Token"
           field="whatsapp"
           value={formData.whatsapp_token}
           onChange={(value) => handleInputChange('whatsapp_token', value)}
