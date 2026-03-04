@@ -10,7 +10,7 @@ import {
   clearRegistrationProgress,
 } from '@/lib/registration-storage'
 
-type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 // Steps 1-4, Summary (5), EmailVerification (6)
+type WizardStep = 1 | 2 | 3 | 4 | 5 // Steps 1-3, Summary (4), EmailVerification (5)
 
 export function useRegistrationWizard() {
   const router = useRouter()
@@ -33,8 +33,8 @@ export function useRegistrationWizard() {
 
   // Auto-guardar progreso cuando cambia
   useEffect(() => {
-    if (currentStep < 6) {
-      // No guardar en step 6 (verificación)
+    if (currentStep < 5) {
+      // No guardar en step 5 (verificación)
       saveRegistrationProgress(currentStep, completedSteps, formData)
     }
   }, [currentStep, completedSteps, formData])
@@ -56,7 +56,7 @@ export function useRegistrationWizard() {
       updateStepData(currentStep, data)
     }
 
-    if (currentStep < 6) {
+    if (currentStep < 5) {
       setCurrentStep((currentStep + 1) as WizardStep)
     }
   }

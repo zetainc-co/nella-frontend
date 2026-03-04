@@ -24,7 +24,7 @@ export function CountryPhoneSelector({
   value,
   onChange,
   error,
-  label = "Número de WhatsApp Business",
+  label = "Número de WhatsApp",
 }: CountryPhoneSelectorProps) {
   const [selectedCountry, setSelectedCountry] = useState(LATAM_COUNTRIES[4]); // Colombia por defecto
   const [localNumber, setLocalNumber] = useState("");
