@@ -6,6 +6,7 @@ import { useRegistrationWizard } from "@/modules/auth/hooks/useRegistrationWizar
 import { RegistrationStep1 } from "@/modules/auth/components/registration-step-1";
 import { RegistrationStep2 } from "@/modules/auth/components/registration-step-2";
 import { RegistrationStep3 } from "@/modules/auth/components/registration-step-3";
+import { RegistrationStep4 } from "@/modules/auth/components/registration-step-4";
 import { RegistrationSummary } from "@/modules/auth/components/registration-summary";
 import { EmailVerification } from "@/modules/auth/components/email-verification";
 
@@ -39,15 +40,15 @@ export function RegistrationWizard() {
         </p>
       </div>
 
-      {/* Progress bar — only in steps 1-3 */}
-      {currentStep <= 3 && (
+      {/* Progress bar — only in steps 1-4 */}
+      {currentStep <= 4 && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs" style={{ color: 'rgba(240,244,255,0.35)' }}>
-              Paso {currentStep} de 3
+              Paso {currentStep} de 4
             </span>
             <span className="text-xs" style={{ color: 'rgba(240,244,255,0.35)' }}>
-              {Math.round((currentStep / 3) * 100)}%
+              {Math.round((currentStep / 4) * 100)}%
             </span>
           </div>
           <div
@@ -56,7 +57,7 @@ export function RegistrationWizard() {
           >
             <div
               className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${(currentStep / 3) * 100}%`, background: '#9EFF00' }}
+              style={{ width: `${(currentStep / 4) * 100}%`, background: '#9EFF00' }}
             />
           </div>
         </div>
@@ -103,22 +104,36 @@ export function RegistrationWizard() {
         </div>
       )}
 
-      {/* Step 4: Resumen */}
+      {/* Step 4: Conexión WhatsApp */}
       {currentStep === 4 && (
+        <div className="animate-[fadeIn_0.3s_ease-in-out]">
+          <RegistrationStep4
+            initialData={formData}
+            onNext={(data) => {
+              updateStepData(4, data);
+              goToNextStep();
+            }}
+            onBack={goToPreviousStep}
+          />
+        </div>
+      )}
+
+      {/* Step 5: Resumen */}
+      {currentStep === 5 && (
         <div className="animate-[fadeIn_0.3s_ease-in-out]">
           <RegistrationSummary
             formData={formData}
             onConfirm={confirmRegistration}
             onBack={goToPreviousStep}
-            onEdit={(step) => goToStep(step as 1 | 2 | 3)}
+            onEdit={(step) => goToStep(step as 1 | 2 | 3 | 4)}
             isCreatingWorkflow={isCreatingWorkflow}
             workflowError={workflowError}
           />
         </div>
       )}
 
-      {/* Step 5: Verificación de Email */}
-      {currentStep === 5 && (
+      {/* Step 6: Verificación de Email */}
+      {currentStep === 6 && (
         <div className="animate-[fadeIn_0.3s_ease-in-out]">
           <EmailVerification
             email={formData.email || ""}
@@ -128,8 +143,8 @@ export function RegistrationWizard() {
         </div>
       )}
 
-      {/* Footer link — inside card, only on steps 1-3 */}
-      {currentStep <= 3 && (
+      {/* Footer link — inside card, only on steps 1-4 */}
+      {currentStep <= 4 && (
         <div
           className="text-center text-sm pt-5 mt-2"
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
