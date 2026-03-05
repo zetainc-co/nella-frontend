@@ -1,7 +1,9 @@
 'use client'
-import { Search } from 'lucide-react'
+import { Search, ChevronDown } from 'lucide-react'
 import { ConversationItem } from './conversation-item'
-import { ConversationTabs } from './conversation-tabs'
+import { useConversations } from '../../hooks/use-conversations'
+import { useChatStore, type ConversationFilter } from '../../store/chat-store'
+import { useCurrentUserId } from '../../hooks/use-current-user-id'
 import type { ConversationListProps } from '../../types'
 
 export function ConversationList({
@@ -10,6 +12,26 @@ export function ConversationList({
   selectedId,
   onSelect,
 }: ConversationListProps) {
+  const filter = useChatStore((s) => s.filter)
+  const setFilter = useChatStore((s) => s.setFilter)
+  const { data: allConversations } = useConversations()
+  const userId = useCurrentUserId()
+
+  // Calcular counts
+  const counts = {
+    mine: allConversations?.filter(c => c.meta?.assignee?.id === userId).length ?? 0,
+    unassigned: allConversations?.filter(c => !c.meta?.assignee).length ?? 0,
+    all: allConversations?.length ?? 0,
+  }
+
+  const filterOptions: Array<{ value: ConversationFilter; label: string; count: number }> = [
+    { value: 'mine', label: 'Mías', count: counts.mine },
+    { value: 'unassigned', label: 'Sin asignar', count: counts.unassigned },
+    { value: 'all', label: 'Todas', count: counts.all },
+  ]
+
+  const currentFilter = filterOptions.find(opt => opt.value === filter) || filterOptions[2]
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -20,15 +42,39 @@ export function ConversationList({
 
   return (
     <div className="flex flex-col h-full bg-[#151515]">
-      {/* Header */}
+      {/* Header con select */}
       <div className="px-4 py-4 border-b border-white/[0.06]">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-[#f0f4ff]">Inbox</h2>
+
+          {/* Select compacto */}
+          <div className="relative">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as ConversationFilter)}
+              className="
+                appearance-none
+                pl-3 pr-8 py-1.5
+                bg-[#0a0a0a]
+                border border-white/[0.06]
+                rounded-lg
+                text-xs font-medium text-[#f0f4ff]/80
+                hover:border-[#9EFF00]/30
+                focus:outline-none focus:border-[#9EFF00]/50
+                transition-colors
+                cursor-pointer
+              "
+            >
+              {filterOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label} ({opt.count})
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#f0f4ff]/40 pointer-events-none" />
+          </div>
         </div>
       </div>
-
-      {/* Tabs */}
-      <ConversationTabs />
 
       {/* Search bar */}
       <div className="px-4 py-4 border-b border-white/[0.06]">

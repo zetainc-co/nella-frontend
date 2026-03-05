@@ -5,7 +5,7 @@ import { User, Tag, ChevronRight } from 'lucide-react'
 import { AgentSelectorSubmenu } from '../shared/agent-selector-submenu'
 
 interface ConversationContextMenuProps {
-  conversationId: number
+  conversationId: string
   position: { x: number; y: number }
   onClose: () => void
 }
@@ -16,7 +16,32 @@ export function ConversationContextMenu({
   onClose
 }: ConversationContextMenuProps) {
   const [submenuOpen, setSubmenuOpen] = useState<string | null>(null)
+  const [adjustedPosition, setAdjustedPosition] = useState(position)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  // Adjust position to prevent menu from going off-screen
+  useEffect(() => {
+    if (menuRef.current) {
+      const menuRect = menuRef.current.getBoundingClientRect()
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+
+      let newX = position.x
+      let newY = position.y
+
+      // Adjust horizontal position if menu goes off right edge
+      if (position.x + menuRect.width > viewportWidth) {
+        newX = position.x - menuRect.width
+      }
+
+      // Adjust vertical position if menu goes off bottom edge
+      if (position.y + menuRect.height > viewportHeight) {
+        newY = viewportHeight - menuRect.height - 10
+      }
+
+      setAdjustedPosition({ x: newX, y: newY })
+    }
+  }, [position])
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -53,8 +78,8 @@ export function ConversationContextMenu({
         py-1
       "
       style={{
-        top: position.y,
-        left: position.x,
+        top: adjustedPosition.y,
+        left: adjustedPosition.x,
       }}
     >
       {/* Asignar un agente */}
@@ -101,8 +126,8 @@ export function ConversationContextMenu({
             onClose()
           }}
           position={{
-            x: position.x + 220, // Menu width
-            y: position.y
+            x: adjustedPosition.x - 320, // Menu width
+            y: adjustedPosition.y - 300
           }}
         />
       )}

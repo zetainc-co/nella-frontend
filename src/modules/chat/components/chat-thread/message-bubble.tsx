@@ -6,12 +6,14 @@ import { formatMessageTime } from '@/utils/format-message-time'
 export const MessageBubble = memo(function MessageBubble({
   message,
 }: MessageBubbleProps) {
-  const isOutgoing = message.message_type === 'outgoing'
+  // isOutgoing = mensaje enviado por nosotros (agente o bot)
+  // from_customer = true significa mensaje del cliente, false = mensaje nuestro
+  const isOutgoing = !message.from_customer
   const isBot = message.sender?.type === 'agent_bot'
-  const isPending = message._pending
+  const isPending = (message as any)._pending
 
   // Mensajes privados (notas internas) - Siempre a la derecha (son nuestros)
-  if (message.private) {
+  if ((message as any).private) {
     return (
       <div className="flex justify-end">
         <div className="

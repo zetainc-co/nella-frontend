@@ -12,8 +12,8 @@ export function ConversationTabs() {
 
   // Calculate counts for each tab
   const counts = {
-    mine: conversations?.filter(c => c.meta.assignee?.id === userId).length ?? 0,
-    unassigned: conversations?.filter(c => !c.meta.assignee).length ?? 0,
+    mine: conversations?.filter(c => c.meta?.assignee?.id === userId).length ?? 0,
+    unassigned: conversations?.filter(c => !c.meta?.assignee).length ?? 0,
     all: conversations?.length ?? 0,
   }
 
