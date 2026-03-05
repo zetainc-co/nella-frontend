@@ -3,31 +3,39 @@ import type { Agent, CreateAgentDto, UpdateAgentDto, Inbox } from '../types/team
 
 export const teamService = {
   /**
-   * List all agents
+   * List all agents (users with role='agent')
    */
   async listAgents(): Promise<Agent[]> {
-    return apiClient.get<Agent[]>('/api/chatwoot-agents')
+    return apiClient.get<Agent[]>('/users?role=agent')
   },
 
   /**
-   * Create a new agent
+   * List all users (any role)
+   */
+  async listUsers(role?: string): Promise<Agent[]> {
+    const queryParam = role ? `?role=${role}` : ''
+    return apiClient.get<Agent[]>(`/users${queryParam}`)
+  },
+
+  /**
+   * Create a new agent/user
    */
   async createAgent(data: CreateAgentDto): Promise<Agent> {
-    return apiClient.post<Agent>('/api/chatwoot-agents', data)
+    return apiClient.post<Agent>('/users', data)
   },
 
   /**
-   * Update an agent
+   * Update an agent/user
    */
-  async updateAgent(agentId: number, data: UpdateAgentDto): Promise<Agent> {
-    return apiClient.patch<Agent>(`/api/chatwoot-agents?id=${agentId}`, data)
+  async updateAgent(userId: string, data: UpdateAgentDto): Promise<Agent> {
+    return apiClient.patch<Agent>(`/users/${userId}`, data)
   },
 
   /**
-   * Delete an agent
+   * Delete an agent/user
    */
-  async deleteAgent(agentId: number): Promise<void> {
-    return apiClient.delete<void>(`/api/chatwoot-agents?id=${agentId}`)
+  async deleteAgent(userId: string): Promise<void> {
+    return apiClient.delete<void>(`/users/${userId}`)
   },
 
   /**

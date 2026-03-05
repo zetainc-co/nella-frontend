@@ -11,9 +11,14 @@ function ConversationItemComponent({
   isSelected,
   onClick,
 }: ConversationItemProps) {
-  const { meta, agentMode, lastMessage, unread_count, timestamp } = conversation
+  const { meta, agentMode, lastMessage, last_message_at } = conversation
+  // unread_count no está implementado aún en Nella - podría venir de metadata
+  const unread_count = conversation.metadata?.unread_count as number || 0
   const [menuOpen, setMenuOpen] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
+
+  // Si no hay meta, no renderizar nada
+  if (!meta?.sender) return null
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -29,7 +34,7 @@ function ConversationItemComponent({
   }
 
   return (
-    <button
+    <div
       onClick={onClick}
       onContextMenu={handleContextMenu}
       className={`
@@ -37,6 +42,7 @@ function ConversationItemComponent({
         flex items-start gap-3
         hover:bg-white/[0.03]
         transition-colors
+        cursor-pointer
         ${isSelected ? 'bg-white/[0.06]' : ''}
       `}
     >
@@ -75,7 +81,7 @@ function ConversationItemComponent({
             {meta.sender.name}
           </h3>
           <span className="text-xs text-[#f0f4ff]/40 flex-shrink-0">
-            {formatRelativeTime(timestamp)}
+            {last_message_at ? formatRelativeTime(last_message_at) : ''}
           </span>
         </div>
 
@@ -141,7 +147,7 @@ function ConversationItemComponent({
           onClose={() => setMenuOpen(false)}
         />
       )}
-    </button>
+    </div>
   )
 }
 

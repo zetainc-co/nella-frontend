@@ -7,10 +7,9 @@ import type { CreateAgentDto, InviteMemberModalProps } from '../types/team-types
 
 export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
   const [formData, setFormData] = useState<CreateAgentDto>({
-    name: '',
+    full_name: '',
     email: '',
     role: 'agent',
-    availability_status: 'offline',
   })
 
   const createAgent = useCreateAgent()
@@ -24,10 +23,9 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
 
     // Reset form and close
     setFormData({
-      name: '',
+      full_name: '',
       email: '',
       role: 'agent',
-      availability_status: 'offline',
     })
     onClose()
   }
@@ -72,8 +70,8 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
               id="name"
               type="text"
               required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              value={formData.full_name}
+              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
               className="w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none"
               style={{
                 background: 'rgba(255,255,255,0.05)',
@@ -122,7 +120,7 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  role: e.target.value as 'agent' | 'administrator',
+                  role: e.target.value as 'admin' | 'agent' | 'viewer',
                 })
               }
               className="w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none"
@@ -133,7 +131,8 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
               }}
             >
               <option value="agent">Agente</option>
-              <option value="administrator">Administrador</option>
+              <option value="admin">Administrador</option>
+              <option value="viewer">Viewer</option>
             </select>
           </div>
 

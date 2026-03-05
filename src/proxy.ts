@@ -39,9 +39,9 @@ export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)
 
   if (tenantSlug) {
-    requestHeaders.set('x-tenant-slug', tenantSlug)
+    requestHeaders.set('X-Tenant-Id', tenantSlug)
   } else {
-    requestHeaders.delete('x-tenant-slug')
+    requestHeaders.delete('X-Tenant-Id')
   }
 
   return NextResponse.next({ request: { headers: requestHeaders } })

@@ -21,6 +21,34 @@ const nextConfig: NextConfig = {
         destination: `${BACKEND_URL}/socket.io/:path*`,
       },
       {
+        source: "/chat/:path*",
+        destination: `${BACKEND_URL}/chat/:path*`,
+      },
+      {
+        source: "/conversations/:path*",
+        destination: `${BACKEND_URL}/conversations/:path*`,
+      },
+      {
+        source: "/messages/:path*",
+        destination: `${BACKEND_URL}/messages/:path*`,
+      },
+      {
+        source: "/labels/:path*",
+        destination: `${BACKEND_URL}/labels/:path*`,
+      },
+      {
+        source: "/inboxes/:path*",
+        destination: `${BACKEND_URL}/inboxes/:path*`,
+      },
+      {
+        source: "/assignments/:path*",
+        destination: `${BACKEND_URL}/assignments/:path*`,
+      },
+      {
+        source: "/users/:path*",
+        destination: `${BACKEND_URL}/users/:path*`,
+      },
+      {
         source: "/chatwoot-conversations/:path*",
         destination: `${BACKEND_URL}/chatwoot-conversations/:path*`,
       },

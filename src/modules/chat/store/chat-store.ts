@@ -9,10 +9,10 @@ export type ConversationFilter =
   | 'resolved'
 
 interface ChatStore {
-  selectedConversationId: number | null
+  selectedConversationId: string | null
   filter: ConversationFilter
   searchQuery: string
-  setSelected: (id: number | null) => void
+  setSelected: (id: string | null) => void
   setFilter: (filter: ConversationFilter) => void
   setSearch: (query: string) => void
 }

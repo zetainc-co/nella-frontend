@@ -1,21 +1,29 @@
+import { useState } from 'react'
 import { User, MoreVertical, Loader2 } from 'lucide-react'
 import type { ContactHeaderProps } from '../../types'
 import { getInitials } from '@/utils/get-initials'
-import { useAIToggle } from '../../hooks'
+import { useAIToggle, useCurrentUserId } from '../../hooks'
+import { ContactProfileDrawer } from './contact-profile-drawer'
 
 export function ContactHeader({ conversation }: ContactHeaderProps) {
-  const { meta, agentMode, id } = conversation
-  const sender = meta.sender
+  const { meta, agentMode, id, contact_id, assigned_agent_id, metadata } = conversation
+  const currentUserId = useCurrentUserId()
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Get agent data from conversation metadata
+  const agentName = metadata?.assigned_agent_name || null
+
+  // Construir sender con fallback
+  const sender = meta?.sender || {
+    name: `Contact ${contact_id}`,
+    phone_number: null,
+  }
 
   // Hook para manejar el toggle de IA
   const { toggleAI, isLoading } = useAIToggle({
     conversationId: id,
     currentMode: agentMode,
   })
-
-  // TODO: Obtener el agentId del usuario actual logueado
-  // Por ahora usamos un ID de ejemplo
-  const CURRENT_AGENT_ID = 1
 
   // Obtener información adicional del contacto detectada por IA
   const getContactInfo = () => {
@@ -73,8 +81,8 @@ export function ContactHeader({ conversation }: ContactHeaderProps) {
         <div className="flex items-center gap-3">
           {agentMode === 'ai' ? (
             <button
-              onClick={() => toggleAI(CURRENT_AGENT_ID)}
-              disabled={isLoading}
+              onClick={() => currentUserId && toggleAI(currentUserId)}
+              disabled={isLoading || !currentUserId}
               className="
                 px-4 py-2
                 bg-transparent
@@ -125,16 +133,19 @@ export function ContactHeader({ conversation }: ContactHeaderProps) {
             </button>
           )}
 
-          <button className="
-            w-9 h-9
-            rounded-lg
-            bg-white/[0.06]
-            hover:bg-white/[0.1]
-            flex items-center justify-center
-            text-[#f0f4ff]/60
-            hover:text-[#f0f4ff]
-            transition-colors
-          ">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="
+              w-9 h-9
+              rounded-lg
+              bg-white/[0.06]
+              hover:bg-white/[0.1]
+              flex items-center justify-center
+              text-[#f0f4ff]/60
+              hover:text-[#f0f4ff]
+              transition-colors
+            "
+          >
             <User className="w-5 h-5" />
           </button>
 
@@ -152,6 +163,27 @@ export function ContactHeader({ conversation }: ContactHeaderProps) {
           </button>
         </div>
       </div>
+
+      {/* Contact Profile Drawer */}
+      <ContactProfileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        contact={contact_id ? {
+          id: contact_id,
+          name: metadata?.contact_name || sender.name,
+          phone: metadata?.contact_phone || sender.phone_number || '',
+          email: metadata?.contact_email || null,
+          lead_status: metadata?.contact_lead_status || undefined,
+          handoff_active: metadata?.contact_handoff_active || undefined,
+          ai_summary: metadata?.contact_ai_summary || null,
+          tags: metadata?.contact_tags || undefined,
+          last_interaction_at: metadata?.contact_last_interaction_at || null,
+          source: metadata?.contact_source || null,
+          next_purchase_prediction: metadata?.contact_next_purchase_prediction || null,
+        } : null}
+        assignedAgentId={assigned_agent_id}
+        agentName={agentName}
+      />
     </div>
   )
 }

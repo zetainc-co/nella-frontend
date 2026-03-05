@@ -5,6 +5,7 @@ export interface BackendContact {
   email: string
   lead_status: string
   status: string | null
+  source: string | null
   handoff_active: boolean
   ai_summary: string
   last_interaction_at: string

@@ -1,4 +1,14 @@
-// Chatwoot API Types
+// ============= Nella Native API Types =============
+export * from './nella-api'
+
+// Import and re-export types from hooks (con tipos de Nella)
+import type { ConversationWithMode } from '../hooks/use-conversations'
+import type { MessageWithCompat } from '../hooks/use-messages'
+export type { ConversationWithMode, MessageWithCompat }
+
+// ============= Legacy Chatwoot API Types =============
+// ⚠️ DEPRECATED - Solo para compatibilidad temporal
+// Migrar componentes a usar tipos de Nella Native API
 
 export type ConversationStatus = 'open' | 'resolved' | 'pending' | 'snoozed'
 export type MessageType = 'incoming' | 'outgoing' | 'activity'
@@ -80,18 +90,13 @@ export interface ContactsSearchResponse {
   payload: ChatwootContact[]
 }
 
-// Enriched types for UI
-export interface ConversationWithMode extends ChatwootConversation {
-  agentMode: AgentMode
-  lastMessage?: string
-}
-
 // Component Props Types
+// Nota: ConversationWithMode ahora viene de '../hooks/use-conversations' (usa tipos de Nella con id: string)
 export interface ConversationListProps {
   conversations: ConversationWithMode[]
   isLoading: boolean
-  selectedId: number | null
-  onSelect: (id: number) => void
+  selectedId: string | null
+  onSelect: (id: string) => void
 }
 
 export interface ConversationItemProps {
@@ -102,7 +107,7 @@ export interface ConversationItemProps {
 
 export interface ChatThreadProps {
   conversation: ConversationWithMode | null
-  messages: ChatwootMessage[]
+  messages: MessageWithCompat[]
   isLoading: boolean
   isSending: boolean
   onSendMessage: (content: string) => void
@@ -113,7 +118,7 @@ export interface ContactHeaderProps {
 }
 
 export interface MessageBubbleProps {
-  message: ChatwootMessage
+  message: MessageWithCompat
 }
 
 export interface MessageInputProps {

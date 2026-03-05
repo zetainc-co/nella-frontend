@@ -4,7 +4,7 @@ import { useAssignAgent } from '../../hooks/use-assign-agent'
 import { User, Loader2 } from 'lucide-react'
 
 interface AgentSelectorSubmenuProps {
-  conversationId: number
+  conversationId: string
   onSelect: () => void
   position?: { x: number; y: number }
 }
@@ -17,7 +17,7 @@ export function AgentSelectorSubmenu({
   const { data: agents, isLoading } = useAgents()
   const { assignAgent, isAssigning } = useAssignAgent(conversationId)
 
-  const handleSelect = (agentId: number | null) => {
+  const handleSelect = (agentId: string | null) => {
     assignAgent(agentId)
     onSelect()
   }
@@ -75,7 +75,7 @@ export function AgentSelectorSubmenu({
             "
           >
             <User className="w-4 h-4 text-[#f0f4ff]/60" />
-            <span>{agent.name}</span>
+            <span>{agent.full_name || agent.email}</span>
           </button>
         ))
       ) : (

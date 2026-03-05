@@ -11,7 +11,7 @@ export function InboxChat() {
   const { selectedConversationId, setSelected } = useChatStore()
 
   // Conectar a Socket.io para actualizaciones en tiempo real
-  useConversationsSocket()
+  useConversationsSocket(selectedConversationId)
 
   const { data: conversations, isLoading: loadingConvs } = useConversations()
 

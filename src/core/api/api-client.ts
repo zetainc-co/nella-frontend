@@ -81,6 +81,10 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
         })
 
         if (retryResponse.ok) {
+          // Handle 204 No Content
+          if (retryResponse.status === 204) {
+            return undefined as T
+          }
           const data = await retryResponse.json()
           return data as T
         }
@@ -99,6 +103,11 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
     }
 
     forceLogout()
+  }
+
+  // Handle 204 No Content (e.g., DELETE requests)
+  if (response.status === 204) {
+    return undefined as T
   }
 
   let data: unknown

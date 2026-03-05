@@ -48,7 +48,7 @@ export function useUpdateAgent() {
   const { handleError } = useApiError()
 
   return useMutation({
-    mutationFn: ({ agentId, data }: { agentId: number; data: UpdateAgentDto }) =>
+    mutationFn: ({ agentId, data }: { agentId: string; data: UpdateAgentDto }) =>
       teamService.updateAgent(agentId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
@@ -71,7 +71,7 @@ export function useDeleteAgent() {
   const { handleError } = useApiError()
 
   return useMutation({
-    mutationFn: (agentId: number) => teamService.deleteAgent(agentId),
+    mutationFn: (agentId: string) => teamService.deleteAgent(agentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
       toast.success('Miembro eliminado correctamente')

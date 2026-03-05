@@ -1,30 +1,25 @@
-// Agent types - based on nella_backend DTOs
+// Agent/User types - based on nella_backend UserResponseDto
 export interface Agent {
-  id: number
-  account_id: number
-  availability_status: 'available' | 'busy' | 'offline'
-  auto_offline: boolean
-  confirmed: boolean
+  id: string // UUID
   email: string
-  provider: string
-  available_name: string
-  name: string
-  role: 'agent' | 'administrator'
-  thumbnail: string
-  custom_role_id: number | null
+  full_name: string
+  role: 'admin' | 'agent' | 'viewer'
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }
 
 export interface CreateAgentDto {
-  name: string
   email: string
-  role: 'agent' | 'administrator'
-  availability_status?: 'available' | 'busy' | 'offline'
-  auto_offline?: boolean
+  full_name: string
+  role: 'admin' | 'agent' | 'viewer'
+  password?: string // Optional - if not provided, activation email is sent
 }
 
 export interface UpdateAgentDto {
-  role?: 'agent' | 'administrator'
-  availability?: 'available' | 'busy' | 'offline'
+  full_name?: string
+  role?: 'admin' | 'agent' | 'viewer'
+  is_active?: boolean
 }
 
 export interface InboxMember {

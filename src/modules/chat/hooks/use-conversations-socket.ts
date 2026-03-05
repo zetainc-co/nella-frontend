@@ -1,137 +1,92 @@
 'use client'
 import { useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { io, type Socket } from 'socket.io-client'
-import { useAuthStore } from '@/core/store/auth-store'
-import type { ConversationsListResponse, MessagesResponse, ChatwootMessage, ChatwootConversation } from '../types'
+import { chatWebSocket } from '../services/nella-api'
+import { useCurrentUserId } from './use-current-user-id'
 
-// queryFn stores response.data (already unwrapped), so cache holds this inner shape
-type ConversationsCacheEntry = ConversationsListResponse['data']
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
-
-export function useConversationsSocket() {
+export function useConversationsSocket(currentConversationId: string | null) {
   const queryClient = useQueryClient()
-  const tenantId = useAuthStore((s) => s.session?.tenantId)
-  const socketRef = useRef<Socket | null>(null)
+  const userId = useCurrentUserId()
 
   useEffect(() => {
-    if (!tenantId) return
+    // Conectar al WebSocket
+    chatWebSocket.connect()
 
-    const socket = io(`${BACKEND_URL}/chat-conversations`, {
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 10,
-    })
-    socketRef.current = socket
-
-    // Join tenant room on every connect/reconnect
-    socket.on('connect', () => {
-      console.log('🟢 Socket connected — joining tenant', tenantId)
-      socket.emit('join-tenant', tenantId)
-    })
-
-    socket.on('disconnect', () => {
-      console.log('🔴 Socket disconnected from chat-conversations')
-    })
-
-    socket.on('connect_error', (err) => {
-      console.warn('⚠️ Socket connection error:', err.message)
-    })
-
-    // ── message:created ──────────────────────────────────────────────────────
-    socket.on('message:created', (message: ChatwootMessage) => {
-      const convId = message.conversation_id
-      if (!convId) return
-
-      // 1. Append to messages cache (with dedup guard)
-      queryClient.setQueryData<MessagesResponse>(
-        ['messages', convId],
-        (prev) => {
-          if (!prev) return prev
-          if (prev.payload.some((m) => m.id === message.id)) return prev
-          return { ...prev, payload: [...prev.payload, message] }
-        }
-      )
-
-      // 2. Update last_non_activity_message in all conversations caches
-      if (message.message_type !== 'activity') {
-        queryClient.setQueriesData<ConversationsCacheEntry>(
-          { queryKey: ['conversations'] },
-          (prev) => {
-            if (!prev) return prev
-            return {
-              ...prev,
-              payload: prev.payload.map((c) =>
-                c.id === convId
-                  ? {
-                      ...c,
-                      last_non_activity_message: message,
-                      unread_count:
-                        message.message_type === 'incoming'
-                          ? c.unread_count + 1
-                          : c.unread_count,
-                    }
-                  : c
-              ),
-            }
-          }
-        )
-      }
-    })
-
-    // ── conversation:updated ─────────────────────────────────────────────────
-    socket.on('conversation:updated', (conversation: ChatwootConversation) => {
-      queryClient.setQueriesData<ConversationsCacheEntry>(
-        { queryKey: ['conversations'] },
-        (prev) => {
-          if (!prev) return prev
-          return {
-            ...prev,
-            payload: prev.payload.map((c) => (c.id === conversation.id ? conversation : c)),
-          }
-        }
-      )
-    })
-
-    // ── conversation:created ─────────────────────────────────────────────────
-    socket.on('conversation:created', (conversation: ChatwootConversation) => {
-      queryClient.setQueriesData<ConversationsCacheEntry>(
-        { queryKey: ['conversations'] },
-        (prev) => {
-          if (!prev) return prev
-          if (prev.payload.some((c) => c.id === conversation.id)) return prev
-          return { ...prev, payload: [conversation, ...prev.payload] }
-        }
-      )
-    })
-
-    // ── conversation:status-changed ──────────────────────────────────────────
-    socket.on(
-      'conversation:status-changed',
-      ({ conversationId, status }: { conversationId: number; status: string }) => {
-        queryClient.setQueriesData<ConversationsCacheEntry>(
-          { queryKey: ['conversations'] },
-          (prev) => {
-            if (!prev) return prev
-            return {
-              ...prev,
-              payload: prev.payload.map((c) =>
-                c.id === conversationId ? { ...c, status: status as ChatwootConversation['status'] } : c
-              ),
-            }
-          }
-        )
-      }
-    )
-
-    return () => {
-      socket.removeAllListeners()
-      socket.disconnect()
-      socketRef.current = null
+    // Unirse a la conversación actual si existe
+    if (currentConversationId && userId) {
+      chatWebSocket.joinConversation(currentConversationId, userId)
     }
-  }, [tenantId, queryClient])
 
-  return { socket: socketRef.current }
+    // Escuchar nuevos mensajes
+    const handleNewMessage = (data: any) => {
+      console.log('💬 New message:', data.message.id)
+
+      // Invalidar mensajes de esa conversación
+      queryClient.invalidateQueries({
+        queryKey: ['messages', data.conversationId],
+      })
+
+      // Invalidar conversaciones (para actualizar lastMessage)
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    }
+
+    // Escuchar actualizaciones de conversación
+    const handleConversationUpdate = (data: any) => {
+      console.log('🔄 Conversation updated:', data.conversationId)
+
+      // Invalidar conversaciones
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    }
+
+    // Escuchar cambios de estado
+    const handleStatusChanged = (data: any) => {
+      console.log(
+        `🔔 Conversation ${data.conversationId} status changed to ${data.status}`
+      )
+
+      // Invalidar conversaciones
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    }
+
+    // Escuchar asignaciones de agente
+    const handleAgentAssigned = (data: any) => {
+      console.log(
+        `👤 Agent ${data.agentId} assigned to conversation ${data.conversationId}`
+      )
+
+      // Invalidar conversaciones
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    }
+
+    // Escuchar cambios de labels
+    const handleLabelsUpdated = (data: any) => {
+      console.log(`🏷️  Labels updated for conversation ${data.conversationId}`)
+
+      // Invalidar conversaciones
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    }
+
+    // Registrar listeners
+    chatWebSocket.onNewMessage(handleNewMessage)
+    chatWebSocket.onConversationUpdate(handleConversationUpdate)
+    chatWebSocket.onStatusChanged(handleStatusChanged)
+    chatWebSocket.onAgentAssigned(handleAgentAssigned)
+    chatWebSocket.onLabelsUpdated(handleLabelsUpdated)
+
+    // Cleanup
+    return () => {
+      if (currentConversationId) {
+        chatWebSocket.leaveConversation(currentConversationId)
+      }
+
+      chatWebSocket.offNewMessage(handleNewMessage)
+      // Note: no hay métodos off para los otros eventos aún,
+      // pero el servicio los limpiará al desconectar
+    }
+  }, [queryClient, currentConversationId, userId])
+
+  return {
+    socket: chatWebSocket.getSocket(),
+    isConnected: chatWebSocket.isConnected(),
+  }
 }

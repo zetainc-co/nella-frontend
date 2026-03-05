@@ -1,3 +1,16 @@
+/**
+ * @deprecated Este servicio está OBSOLETO y será eliminado en la próxima versión
+ *
+ * ⚠️ NO USAR - El sistema ahora usa 100% PostgreSQL (Nella Native Backend)
+ *
+ * Migrar a:
+ * - conversationsService para conversaciones
+ * - messagesService para mensajes
+ * - assignmentsService para asignaciones
+ *
+ * Ver: src/modules/chat/services/nella-api/
+ */
+
 import { apiClient } from '@/core/api/api-client'
 import type {
   ConversationsListResponse,

@@ -1,23 +1,31 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { chatwootService } from '../services/chatwoot'
+import { conversationsService } from '../services/nella-api'
 import { toast } from 'sonner'
 
 interface UseAIToggleProps {
-  conversationId: number
+  conversationId: string
   currentMode: 'ai' | 'human'
 }
 
+/**
+ * Hook para alternar entre modo AI y Human en una conversación
+ * Actualiza el campo metadata.agent_mode en la conversación
+ */
 export function useAIToggle({ conversationId, currentMode }: UseAIToggleProps) {
   const queryClient = useQueryClient()
 
   const stopAI = useMutation({
-    mutationFn: (agentId: number) => chatwootService.stopAI(conversationId, agentId),
+    mutationFn: (agentId: string) =>
+      conversationsService.update(conversationId, {
+        assigned_agent_id: agentId,
+        metadata: { agent_mode: 'human' },
+      }),
     onSuccess: (data) => {
       console.log('✅ IA detenida exitosamente:', data)
       toast.success('IA detenida. Un agente humano tomará el control.')
-      // Refetch inmediato para actualizar la UI
-      queryClient.refetchQueries({ queryKey: ['conversations'] })
-      queryClient.refetchQueries({ queryKey: ['conversation', conversationId] })
+      // Invalidar queries para actualizar la UI
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] })
     },
     onError: (error: any) => {
       console.error('❌ Error al detener IA:', error)
@@ -26,13 +34,17 @@ export function useAIToggle({ conversationId, currentMode }: UseAIToggleProps) {
   })
 
   const startAI = useMutation({
-    mutationFn: () => chatwootService.startAI(conversationId),
+    mutationFn: () =>
+      conversationsService.update(conversationId, {
+        assigned_agent_id: null, // Desasignar agente humano
+        metadata: { agent_mode: 'ai' },
+      }),
     onSuccess: (data) => {
       console.log('✅ IA activada exitosamente:', data)
       toast.success('IA activada. El bot continuará la conversación.')
-      // Refetch inmediato para actualizar la UI
-      queryClient.refetchQueries({ queryKey: ['conversations'] })
-      queryClient.refetchQueries({ queryKey: ['conversation', conversationId] })
+      // Invalidar queries para actualizar la UI
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] })
     },
     onError: (error: any) => {
       console.error('❌ Error al activar IA:', error)
@@ -40,7 +52,7 @@ export function useAIToggle({ conversationId, currentMode }: UseAIToggleProps) {
     },
   })
 
-  const toggleAI = (agentId?: number) => {
+  const toggleAI = (agentId?: string) => {
     if (currentMode === 'ai') {
       // Detener IA - necesitamos el agentId
       if (!agentId) {

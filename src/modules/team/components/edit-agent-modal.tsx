@@ -7,7 +7,7 @@ import type { Agent } from '../types/team-types'
 interface EditAgentModalProps {
   isOpen: boolean
   onClose: () => void
-  onSave: (agentId: number, data: { name?: string; role?: 'agent' | 'administrator' }) => Promise<void>
+  onSave: (agentId: string, data: { full_name?: string; role?: 'admin' | 'agent' | 'viewer'; is_active?: boolean }) => Promise<void>
   agent: Agent | null
   isSaving: boolean
 }
@@ -19,13 +19,13 @@ export function EditAgentModal({
   agent,
   isSaving,
 }: EditAgentModalProps) {
-  const [name, setName] = useState('')
-  const [role, setRole] = useState<'agent' | 'administrator'>('agent')
+  const [fullName, setFullName] = useState('')
+  const [role, setRole] = useState<'admin' | 'agent' | 'viewer'>('agent')
 
   useEffect(() => {
     if (agent) {
-      setName(agent.name)
-      setRole(agent.role as 'agent' | 'administrator')
+      setFullName(agent.full_name || agent.email)
+      setRole(agent.role)
     }
   }, [agent])
 
@@ -33,7 +33,7 @@ export function EditAgentModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await onSave(agent.id, { name, role })
+    await onSave(agent.id, { full_name: fullName, role })
     onClose()
   }
 
@@ -79,8 +79,8 @@ export function EditAgentModal({
               id="name"
               type="text"
               required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               disabled={isSaving}
               className="w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none disabled:opacity-50"
               style={{
@@ -127,7 +127,7 @@ export function EditAgentModal({
             <select
               id="role"
               value={role}
-              onChange={(e) => setRole(e.target.value as 'agent' | 'administrator')}
+              onChange={(e) => setRole(e.target.value as 'admin' | 'agent' | 'viewer')}
               disabled={isSaving}
               className="w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none disabled:opacity-50"
               style={{
@@ -137,7 +137,8 @@ export function EditAgentModal({
               }}
             >
               <option value="agent">Agente</option>
-              <option value="administrator">Administrador</option>
+              <option value="admin">Administrador</option>
+              <option value="viewer">Viewer</option>
             </select>
           </div>
 
