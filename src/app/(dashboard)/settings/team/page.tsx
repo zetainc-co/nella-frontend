@@ -21,7 +21,7 @@ export default function EquipoPage() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [agentToDelete, setAgentToDelete] = useState<{ id: number; name: string } | null>(null);
+  const [agentToDelete, setAgentToDelete] = useState<{ id: string; name: string } | null>(null);
   const [agentToEdit, setAgentToEdit] = useState<Agent | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const { data: agents = [], isLoading } = useAgents();
@@ -48,13 +48,13 @@ export default function EquipoPage() {
     setEditModalOpen(true);
   };
 
-  const handleSaveEdit = async (agentId: number, data: { name?: string; role?: 'agent' | 'administrator' }) => {
+  const handleSaveEdit = async (agentId: string, data: { full_name?: string; role?: 'admin' | 'agent' | 'viewer'; is_active?: boolean }) => {
     await updateAgent.mutateAsync({ agentId, data });
     setEditModalOpen(false);
     setAgentToEdit(null);
   };
 
-  const handleDelete = (agentId: number, agentName: string) => {
+  const handleDelete = (agentId: string, agentName: string) => {
     setAgentToDelete({ id: agentId, name: agentName });
     setDeleteConfirmOpen(true);
   };
@@ -188,14 +188,14 @@ export default function EquipoPage() {
                               color: "#0a0a0a",
                             }}
                           >
-                            {getInitials(agent.name)}
+                            {getInitials(agent.full_name || agent.email)}
                           </div>
                           <div>
                             <p
                               className="text-sm font-semibold"
                               style={{ color: "#f0f4ff" }}
                             >
-                              {agent.name}
+                              {agent.full_name || agent.email}
                             </p>
                             <p
                               className="text-xs"
@@ -211,19 +211,21 @@ export default function EquipoPage() {
                       <td className="py-4">
                         <SettingsLimeBadge
                           variant={
-                            agent.role === "administrator" ? "lime" : "outlined"
+                            agent.role === "admin" ? "lime" : "outlined"
                           }
                         >
-                          {agent.role === "administrator"
+                          {agent.role === "admin"
                             ? "Administrador"
-                            : "Agente"}
+                            : agent.role === "agent"
+                            ? "Agente"
+                            : "Viewer"}
                         </SettingsLimeBadge>
                       </td>
 
                       {/* Estado */}
                       <td className="py-4">
                         <SettingsStatusDot
-                          status={agent.confirmed ? "active" : "pending"}
+                          status={agent.is_active ? "active" : "pending"}
                         />
                       </td>
 
@@ -238,7 +240,7 @@ export default function EquipoPage() {
                             <Pencil className="size-4" style={{ color: "rgba(240,244,255,0.6)" }} />
                           </button>
                           <button
-                            onClick={() => handleDelete(agent.id, agent.name)}
+                            onClick={() => handleDelete(agent.id, agent.full_name || agent.email)}
                             disabled={deleteAgent.isPending}
                             className="rounded-lg p-2 transition-colors hover:bg-white/5 disabled:opacity-50"
                             title="Eliminar agente"
