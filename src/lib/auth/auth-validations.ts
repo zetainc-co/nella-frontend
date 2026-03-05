@@ -83,6 +83,26 @@ export const forgotPasswordSchema = z.object({
   email: z.string().min(1, 'El email es requerido').email('Email inválido'),
 })
 
+// Reset Password With Code Schema (forgot-password flow)
+export const resetPasswordWithCodeSchema = z.object({
+  code: z
+    .string()
+    .length(6, 'El código debe tener 6 dígitos')
+    .regex(/^[0-9]+$/, 'El código solo puede contener números'),
+  newPassword: z
+    .string()
+    .min(8, 'La contraseña debe tener al menos 8 caracteres')
+    .max(100, 'La contraseña no puede superar 100 caracteres')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      'Debe contener al menos una mayúscula, una minúscula y un número'
+    ),
+  confirmPassword: z.string().min(1, 'Confirma tu contraseña'),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Las contraseñas no coinciden',
+  path: ['confirmPassword'],
+})
+
 // Reset Password Schema
 export const resetPasswordSchema = z.object({
   password: z
@@ -112,5 +132,6 @@ export type RegistrationStep2Data = z.infer<typeof registrationStep2Schema>
 export type RegistrationStep3Data = z.infer<typeof registrationStep3Schema>
 export type RegistrationStep4Data = z.infer<typeof registrationStep4Schema>
 export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
+export type ResetPasswordWithCodeData = z.infer<typeof resetPasswordWithCodeSchema>
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>
 export type EmailVerificationData = z.infer<typeof emailVerificationSchema>
