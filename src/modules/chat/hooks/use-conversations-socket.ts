@@ -1,81 +1,92 @@
 'use client'
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { io, Socket } from 'socket.io-client'
+import { chatWebSocket } from '../services/nella-api'
+import { useCurrentUserId } from './use-current-user-id'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
-
-let socket: Socket | null = null
-
-export function useConversationsSocket() {
+export function useConversationsSocket(currentConversationId: string | null) {
   const queryClient = useQueryClient()
+  const userId = useCurrentUserId()
 
   useEffect(() => {
-    // Conectar al namespace de chat-conversations
-    if (!socket) {
-      socket = io(`${BACKEND_URL}/chat-conversations`, {
-        transports: ['websocket', 'polling'],
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 5,
-      })
+    // Conectar al WebSocket
+    chatWebSocket.connect()
 
-      socket.on('connect', () => {
-        console.log('🟢 Socket.io connected to chat-conversations')
-      })
-
-      socket.on('disconnect', () => {
-        console.log('🔴 Socket.io disconnected from chat-conversations')
-      })
-
-      socket.on('connect_error', (err) => {
-        console.warn('⚠️ Socket.io connection error:', err.message)
-      })
+    // Unirse a la conversación actual si existe
+    if (currentConversationId && userId) {
+      chatWebSocket.joinConversation(currentConversationId, userId)
     }
 
-    // Escuchar eventos de conversaciones
-    socket.on('conversation:created', (conversation) => {
-      console.log('📬 New conversation created:', conversation.id)
-      // Invalidar cache para refrescar la lista
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
-    })
+    // Escuchar nuevos mensajes
+    const handleNewMessage = (data: any) => {
+      console.log('💬 New message:', data.message.id)
 
-    socket.on('conversation:updated', (conversation) => {
-      console.log('🔄 Conversation updated:', conversation.id)
-      // Invalidar cache para refrescar
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
-      // También invalidar mensajes de esa conversación
-      queryClient.invalidateQueries({
-        queryKey: ['messages', conversation.id],
-      })
-    })
-
-    socket.on('message:created', (message) => {
-      console.log('💬 New message created:', message.id)
-      // Invalidar conversaciones (para actualizar lastMessage)
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
       // Invalidar mensajes de esa conversación
       queryClient.invalidateQueries({
-        queryKey: ['messages', message.conversation_id],
+        queryKey: ['messages', data.conversationId],
       })
-    })
 
-    socket.on('conversation:status-changed', ({ conversationId, status }) => {
-      console.log(`🔔 Conversation ${conversationId} status changed to ${status}`)
-      // Invalidar conversaciones para refrescar el estado
+      // Invalidar conversaciones (para actualizar lastMessage)
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
-    })
-
-    return () => {
-      // Limpiar listeners al desmontar
-      if (socket) {
-        socket.off('conversation:created')
-        socket.off('conversation:updated')
-        socket.off('message:created')
-        socket.off('conversation:status-changed')
-      }
     }
-  }, [queryClient])
 
-  return { socket }
+    // Escuchar actualizaciones de conversación
+    const handleConversationUpdate = (data: any) => {
+      console.log('🔄 Conversation updated:', data.conversationId)
+
+      // Invalidar conversaciones
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    }
+
+    // Escuchar cambios de estado
+    const handleStatusChanged = (data: any) => {
+      console.log(
+        `🔔 Conversation ${data.conversationId} status changed to ${data.status}`
+      )
+
+      // Invalidar conversaciones
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    }
+
+    // Escuchar asignaciones de agente
+    const handleAgentAssigned = (data: any) => {
+      console.log(
+        `👤 Agent ${data.agentId} assigned to conversation ${data.conversationId}`
+      )
+
+      // Invalidar conversaciones
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    }
+
+    // Escuchar cambios de labels
+    const handleLabelsUpdated = (data: any) => {
+      console.log(`🏷️  Labels updated for conversation ${data.conversationId}`)
+
+      // Invalidar conversaciones
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    }
+
+    // Registrar listeners
+    chatWebSocket.onNewMessage(handleNewMessage)
+    chatWebSocket.onConversationUpdate(handleConversationUpdate)
+    chatWebSocket.onStatusChanged(handleStatusChanged)
+    chatWebSocket.onAgentAssigned(handleAgentAssigned)
+    chatWebSocket.onLabelsUpdated(handleLabelsUpdated)
+
+    // Cleanup
+    return () => {
+      if (currentConversationId) {
+        chatWebSocket.leaveConversation(currentConversationId)
+      }
+
+      chatWebSocket.offNewMessage(handleNewMessage)
+      // Note: no hay métodos off para los otros eventos aún,
+      // pero el servicio los limpiará al desconectar
+    }
+  }, [queryClient, currentConversationId, userId])
+
+  return {
+    socket: chatWebSocket.getSocket(),
+    isConnected: chatWebSocket.isConnected(),
+  }
 }

@@ -11,9 +11,9 @@ interface JwtPayload {
 
 /**
  * Extract current user ID from JWT access token
- * @returns userId as number or null if not available
+ * @returns userId as string (UUID) or null if not available
  */
-export function useCurrentUserId(): number | null {
+export function useCurrentUserId(): string | null {
   const token = useAuthStore.getState().session?.accessToken
 
   if (!token) {
@@ -23,14 +23,7 @@ export function useCurrentUserId(): number | null {
 
   try {
     const decoded = jwtDecode<JwtPayload>(token)
-    const userId = parseInt(decoded.sub, 10)
-
-    if (isNaN(userId)) {
-      console.error('Invalid userId in JWT:', decoded.sub)
-      return null
-    }
-
-    return userId
+    return decoded.sub // Return UUID string directly
   } catch (error) {
     console.error('Error decoding JWT:', error)
     return null

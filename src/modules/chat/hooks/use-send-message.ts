@@ -1,20 +1,29 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { chatwootService } from '../services/chatwoot'
-import type { ChatwootMessage } from '../types'
+import { messagesService } from '../services/nella-api'
+import type { Message } from '../types/nella-api'
+import type { MessageWithCompat } from './use-messages'
 
-export function useSendMessage(conversationId: number | null) {
+export function useSendMessage(conversationId: string | null) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (payload: {
       content: string
-      message_type: 'incoming' | 'outgoing'
+      message_type?: 'incoming' | 'outgoing'
       private?: boolean
     }) => {
       if (!conversationId) throw new Error('No conversation selected')
-      const response = await chatwootService.sendMessage(conversationId, payload)
-      return response.data
+
+      const fromCustomer = payload.message_type === 'incoming'
+
+      const response = await messagesService.sendText(
+        conversationId,
+        payload.content,
+        fromCustomer
+      )
+      // El apiClient devuelve directamente el data de la respuesta
+      return Array.isArray(response) ? response[0] : response.data || response
     },
 
     onMutate: async (payload) => {
@@ -24,22 +33,29 @@ export function useSendMessage(conversationId: number | null) {
 
       const previous = queryClient.getQueryData(queryKey)
 
-      const optimisticMsg: ChatwootMessage = {
-        id: Date.now(),
-        content: payload.content,
-        message_type: 'outgoing',
-        content_type: 'text',
-        private: payload.private ?? false,
-        created_at: Math.floor(Date.now() / 1000),
+      const optimisticMsg: MessageWithCompat = {
+        id: `temp-${Date.now()}`,
         conversation_id: conversationId!,
-        sender: { id: 0, name: 'Agent', type: 'user' },
-        attachments: [],
+        body: payload.content,
+        content: payload.content, // alias
+        media_url: null,
+        media_type: null,
+        from_customer: payload.message_type === 'incoming',
+        sender_id: null,
+        message_type: 'text',
+        attachments: null,
+        is_ai_response: false,
+        ai_intent: null,
+        metadata: null,
+        created_at: new Date().toISOString(),
+        sender: null,
         _pending: true,
-      }
+      } as any
 
-      queryClient.setQueryData<{ payload: ChatwootMessage[] }>(queryKey, (old) => ({
-        payload: [...(old?.payload ?? []), optimisticMsg],
-      }))
+      queryClient.setQueryData<MessageWithCompat[]>(queryKey, (old) => [
+        ...(old ?? []),
+        optimisticMsg,
+      ])
 
       return { previous }
     },
@@ -53,7 +69,8 @@ export function useSendMessage(conversationId: number | null) {
       }
     },
 
-    onSettled: () => {
+    onSuccess: () => {
+      // El mensaje real vendrá por WebSocket, pero invalidamos por si acaso
       queryClient.invalidateQueries({
         queryKey: ['messages', conversationId],
       })
