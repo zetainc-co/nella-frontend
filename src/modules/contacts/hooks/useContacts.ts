@@ -43,7 +43,7 @@ export function useContactsSSE() {
     // Conectar directamente al backend (CORS: origin: '*') — el proxy de Next.js
     // no soporta WebSocket upgrade, causando 404 en polling infinito
     const socket = io(`${BACKEND_WS_URL}/contacts`, {
-      transports: ['websocket', 'polling'],
+      transports: ['websocket'],
     })
 
     socket.on('contact:updated', () => {

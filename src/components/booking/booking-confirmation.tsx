@@ -1,29 +1,34 @@
-import { CheckCircle2, CalendarDays, Clock, Video } from 'lucide-react'
-import { BookingAgent, BookingLead, MONTH_NAMES } from '@/types/booking'
+import { CheckCircle2, CalendarDays, Clock, Video, User } from 'lucide-react';
+import type { BookingConfirmResponse } from '@/types/booking';
+import { MONTH_NAMES } from '@/types/booking';
 
 interface BookingConfirmationProps {
-  agent: BookingAgent
-  lead: BookingLead
-  selectedDay: number
-  selectedSlot: string
-  month: number
-  year: number
+  confirmData: BookingConfirmResponse;
+  leadName: string;
+}
+
+// El backend devuelve scheduledAt con la hora local del agente en formato ISO.
+// Se extrae la fecha y hora directamente del string sin conversión de zona horaria.
+function formatScheduledAt(isoString: string): { date: string; time: string } {
+  const [datePart, timePart] = isoString.split('T')
+  const [year, month, day] = datePart.split('-').map(Number)
+  const time = timePart.substring(0, 5) // "09:00"
+  const date = `${day} de ${MONTH_NAMES[month - 1]} de ${year}`
+  return { date, time }
 }
 
 export function BookingConfirmation({
-  agent,
-  lead,
-  selectedDay,
-  selectedSlot,
-  month,
-  year,
+  confirmData,
+  leadName,
 }: BookingConfirmationProps) {
+  const { date: localDate, time: localTime } = formatScheduledAt(confirmData.scheduledAt);
+
   return (
     <div
       className="flex flex-col items-center gap-6 p-8 text-center"
       style={{ animation: 'fadeIn 0.3s ease-out' }}
     >
-      {/* Ícono de éxito */}
+      {/* Icono de exito */}
       <div
         className="flex items-center justify-center rounded-full"
         style={{
@@ -37,13 +42,13 @@ export function BookingConfirmation({
         <CheckCircle2 size={36} style={{ color: '#9EFF00' }} />
       </div>
 
-      {/* Título */}
+      {/* Titulo */}
       <div>
         <h2 className="text-xl font-bold" style={{ color: '#f0f4ff' }}>
-          ¡Reunión agendada!
+          ¡Reunion agendada!
         </h2>
         <p className="text-sm mt-1" style={{ color: 'rgba(240,244,255,0.55)' }}>
-          Te esperamos, {lead.name}.
+          Te esperamos, {leadName}.
         </p>
       </div>
 
@@ -58,28 +63,29 @@ export function BookingConfirmation({
         <div className="flex items-center gap-3">
           <CalendarDays size={16} className="shrink-0" style={{ color: '#9EFF00' }} />
           <span className="text-sm" style={{ color: '#f0f4ff' }}>
-            {selectedDay} de {MONTH_NAMES[month]} de {year}
+            {localDate} — {localTime}
           </span>
         </div>
         <div className="flex items-center gap-3">
           <Clock size={16} className="shrink-0" style={{ color: '#9EFF00' }} />
           <span className="text-sm" style={{ color: '#f0f4ff' }}>
-            {selectedSlot} — {agent.duration} minutos
+            {confirmData.durationMin} minutos
           </span>
         </div>
         <div className="flex items-center gap-3">
           <Video size={16} className="shrink-0" style={{ color: '#9EFF00' }} />
           <span className="text-sm" style={{ color: '#f0f4ff' }}>
-            {agent.platform}
+            {confirmData.platform}
           </span>
         </div>
       </div>
 
       {/* Agente */}
-      <p className="text-sm" style={{ color: 'rgba(240,244,255,0.45)' }}>
-        Tu reunión es con{' '}
-        <span style={{ color: 'rgba(240,244,255,0.75)' }}>{agent.name}</span>
+      <p className="text-sm flex items-center gap-2" style={{ color: 'rgba(240,244,255,0.45)' }}>
+        <User size={14} className="shrink-0" />
+        Tu reunion es con{' '}
+        <span style={{ color: 'rgba(240,244,255,0.75)' }}>{confirmData.agentName}</span>
       </p>
     </div>
-  )
+  );
 }

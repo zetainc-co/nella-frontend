@@ -11,11 +11,13 @@ import {
   addMonths,
   subMonths,
   isSameMonth,
+  isSameWeek,
   isToday,
   format,
 } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useCalendarStore } from '@/modules/calendar/stores/calendar-store'
 
 const DAY_NAMES = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
 
@@ -33,10 +35,19 @@ function getMonthGrid(month: Date): Date[] {
 
 export function MiniCalendar() {
   const [viewMonth, setViewMonth] = useState(() => new Date())
+  const { currentWeekStart, goToDate } = useCalendarStore()
 
   const monthDays = getMonthGrid(viewMonth)
   const monthLabel = format(viewMonth, 'MMMM yyyy', { locale: es })
   const capitalizedLabel = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)
+
+  function handleDayClick(day: Date) {
+    goToDate(day)
+    // Si el día pertenece a otro mes, actualizar la vista del mini calendario
+    if (!isSameMonth(day, viewMonth)) {
+      setViewMonth(day)
+    }
+  }
 
   return (
     <div className="px-3 py-3">
@@ -70,14 +81,17 @@ export function MiniCalendar() {
         {monthDays.map(day => {
           const isCurrentDay = isToday(day)
           const isInMonth = isSameMonth(day, viewMonth)
+          const isSelectedWeek = isSameWeek(day, currentWeekStart, { weekStartsOn: 1 })
 
           return (
             <button
               key={day.toISOString()}
+              onClick={() => handleDayClick(day)}
               className={`
-                text-center text-xs py-1 rounded-full transition-colors
-                ${!isInMonth ? 'text-muted-foreground/40' : 'text-foreground hover:bg-accent'}
+                text-center text-xs py-1 rounded-full transition-colors cursor-pointer
+                ${!isInMonth ? 'text-muted-foreground/40 hover:bg-accent/50' : 'text-foreground hover:bg-accent'}
                 ${isCurrentDay ? 'bg-primary text-primary-foreground font-bold hover:bg-primary/90' : ''}
+                ${isSelectedWeek && !isCurrentDay ? 'bg-accent' : ''}
               `}
             >
               {format(day, 'd')}

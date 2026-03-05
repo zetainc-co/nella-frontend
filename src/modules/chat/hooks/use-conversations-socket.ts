@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { chatWebSocket } from '../services/nella-api'
 import { useCurrentUserId } from './use-current-user-id'

@@ -80,7 +80,15 @@ export function AvailabilityModal({ open, onClose }: AvailabilityModalProps) {
     ])
       .then(([availRes, settingsRes, googleRes]) => {
         // Merge loaded availability with all 7 days (backend may return fewer)
-        const loadedDays = availRes.data ?? []
+        // Normalizar tiempos: backend devuelve "09:00:00", el frontend espera "09:00"
+        const loadedDays = (availRes.data ?? []).map(d => ({
+          ...d,
+          slots: d.slots.map(s => ({
+            ...s,
+            start: s.start.substring(0, 5),
+            end: s.end.substring(0, 5),
+          })),
+        }))
         const merged = ALL_DAYS.map(day => {
           const found = loadedDays.find(d => d.day === day)
           return found ?? DEFAULT_AVAILABILITY.find(d => d.day === day)!
@@ -164,7 +172,13 @@ export function AvailabilityModal({ open, onClose }: AvailabilityModalProps) {
       await Promise.all([
         calendarFetch('/calendar/availability', {
           method: 'PUT',
-          body: { availability: localAvailability },
+          body: {
+            availability: localAvailability.map(({ day, enabled, slots }) => ({
+              day,
+              enabled,
+              slots: slots.map(({ start, end }) => ({ start, end })),
+            })),
+          },
         }),
         calendarFetch('/calendar/settings', {
           method: 'PUT',

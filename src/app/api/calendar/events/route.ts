@@ -29,7 +29,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(data, { status: response.status })
     }
 
-    return NextResponse.json(unwrapBackend(data), { status: 200 })
+    const rawData = unwrapBackend(data)
+
+    // Normalizar: el backend puede devolver { items: [...] }, [...] directo, o { data: [...] }
+    let events: unknown[]
+    if (Array.isArray(rawData)) {
+      events = rawData
+    } else if (rawData && typeof rawData === 'object' && 'items' in rawData) {
+      events = (rawData as { items: unknown[] }).items ?? []
+    } else {
+      events = []
+    }
+
+    return NextResponse.json({ data: events }, { status: 200 })
   } catch (error) {
     console.error('[API/calendar/events GET] Error:', error)
     return NextResponse.json({ error: 'Error al obtener eventos' }, { status: 500 })
