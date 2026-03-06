@@ -50,7 +50,7 @@ export function EditAgentModal({
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Pencil className="h-5 w-5" style={{ color: '#9EFF00' }} />
+            <Pencil className="h-5 w-5" style={{ color: '#7C3AED' }} />
             <h2 className="text-lg font-semibold" style={{ color: '#f0f4ff' }}>
               Editar Miembro
             </h2>
@@ -161,8 +161,9 @@ export function EditAgentModal({
               disabled={isSaving}
               className="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50"
               style={{
-                background: '#9EFF00',
-                color: '#0a0a0a',
+                background: '#7C3AED',
+                color: '#ffffff',
+                boxShadow: '0 8px 20px -4px rgba(124,58,237,0.4)',
               }}
             >
               {isSaving ? 'Guardando...' : 'Guardar'}

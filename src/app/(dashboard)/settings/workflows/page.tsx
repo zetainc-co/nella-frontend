@@ -54,7 +54,7 @@ export default function PanelDeControlPage() {
           icon={<Activity className="h-5 w-5" />}
           label="Estado del Workflow"
           value={isLoading ? '--' : (workflow?.status === 'active' ? 'Activo' : 'Inactivo')}
-          valueColor={workflow?.status === 'active' ? 'text-green-500' : 'text-muted-foreground'}
+          valueColor={workflow?.status === 'active' ? 'text-[#8C28FA]' : 'text-muted-foreground'}
           trend={null}
         />
 
@@ -70,7 +70,7 @@ export default function PanelDeControlPage() {
           icon={<CheckCircle2 className="h-5 w-5" />}
           label="Credenciales"
           value={isLoading ? '--' : 'Validadas'}
-          valueColor="text-green-500"
+          valueColor="text-[#8C28FA]"
           trend={null}
         />
 
@@ -195,7 +195,7 @@ function MetricCard({ icon, label, value, valueColor, trend }: MetricCardProps) 
           </div>
         </div>
         {trend && (
-          <div className={`flex items-center gap-1 text-xs ${trend.positive ? 'text-green-500' : 'text-red-500'}`}>
+          <div className={`flex items-center gap-1 text-xs ${trend.positive ? 'text-[#8C28FA]' : 'text-red-500'}`}>
             <TrendingUp className="h-3 w-3" />
             <span>{trend.value}</span>
           </div>

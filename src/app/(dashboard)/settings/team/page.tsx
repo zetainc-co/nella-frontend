@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { UserPlus, Trash2, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import { useAuthStore } from "@/core/store/auth-store";
 import { useAgents, useDeleteAgent, useUpdateAgent } from "@/modules/team/hooks/useAgents";
 import { InviteMemberModal } from "@/modules/team/components/invite-member-modal";
 import { DeleteAgentModal } from "@/modules/team/components/delete-agent-modal";
@@ -24,6 +25,8 @@ export default function EquipoPage() {
   const [agentToDelete, setAgentToDelete] = useState<{ id: string; name: string } | null>(null);
   const [agentToEdit, setAgentToEdit] = useState<Agent | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const role = useAuthStore((s) => s.session?.role);
+  const isAdmin = role === "admin";
   const { data: agents = [], isLoading } = useAgents();
   const deleteAgent = useDeleteAgent();
   const updateAgent = useUpdateAgent();
@@ -108,7 +111,7 @@ export default function EquipoPage() {
                 style={{ background: "rgba(255,255,255,0.06)" }}
               >
                 <div
-                  className="absolute h-full rounded-full bg-[#9EFF00]"
+                  className="absolute h-full rounded-full bg-[#7C3AED]"
                   style={{ width: `${licensePercentage}%` }}
                 />
               </div>
@@ -126,9 +129,11 @@ export default function EquipoPage() {
         <SettingsCard
           title="Miembros del Equipo"
           action={
-            <SettingsCTAButton onClick={() => setIsInviteModalOpen(true)}>
-              <UserPlus className="size-4" /> Invitar Miembro
-            </SettingsCTAButton>
+            isAdmin ? (
+              <SettingsCTAButton onClick={() => setIsInviteModalOpen(true)}>
+                <UserPlus className="size-4" /> Invitar Miembro
+              </SettingsCTAButton>
+            ) : undefined
           }
         >
           {isLoading ? (
@@ -162,12 +167,14 @@ export default function EquipoPage() {
                     >
                       Estado
                     </th>
-                    <th
-                      className="pb-3 text-right text-xs font-medium"
-                      style={{ color: "rgba(240,244,255,0.4)" }}
-                    >
-                      Acciones
-                    </th>
+                    {isAdmin && (
+                      <th
+                        className="pb-3 text-right text-xs font-medium"
+                        style={{ color: "rgba(240,244,255,0.4)" }}
+                      >
+                        Acciones
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -184,8 +191,8 @@ export default function EquipoPage() {
                             style={{
                               width: 36,
                               height: 36,
-                              background: "#9EFF00",
-                              color: "#0a0a0a",
+                              background: "#7C3AED",
+                              color: "#ffffff",
                             }}
                           >
                             {getInitials(agent.full_name || agent.email)}
@@ -229,26 +236,28 @@ export default function EquipoPage() {
                         />
                       </td>
 
-                      {/* Acciones */}
-                      <td className="py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleEdit(agent)}
-                            className="rounded-lg p-2 transition-colors hover:bg-white/5"
-                            title="Editar agente"
-                          >
-                            <Pencil className="size-4" style={{ color: "rgba(240,244,255,0.6)" }} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(agent.id, agent.full_name || agent.email)}
-                            disabled={deleteAgent.isPending}
-                            className="rounded-lg p-2 transition-colors hover:bg-white/5 disabled:opacity-50"
-                            title="Eliminar agente"
-                          >
-                            <Trash2 className="size-4" style={{ color: "#ef4444" }} />
-                          </button>
-                        </div>
-                      </td>
+                      {/* Acciones (solo admin) */}
+                      {isAdmin && (
+                        <td className="py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleEdit(agent)}
+                              className="rounded-lg p-2 transition-colors hover:bg-white/5"
+                              title="Editar miembro"
+                            >
+                              <Pencil className="size-4" style={{ color: "rgba(240,244,255,0.6)" }} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(agent.id, agent.full_name || agent.email)}
+                              disabled={deleteAgent.isPending}
+                              className="rounded-lg p-2 transition-colors hover:bg-white/5 disabled:opacity-50"
+                              title="Eliminar miembro"
+                            >
+                              <Trash2 className="size-4" style={{ color: "#ef4444" }} />
+                            </button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

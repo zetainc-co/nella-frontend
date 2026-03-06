@@ -141,7 +141,7 @@ export function RegistrationStep1({
                 )}
                 style={
                   isSelected
-                    ? { background: '#9EFF00', boxShadow: '0 0 14px rgba(158,255,0,0.35)' }
+                    ? { background: '#8C28FA', boxShadow: '0 0 14px rgba(140,40,250,0.35)' }
                     : { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }
                 }
               >

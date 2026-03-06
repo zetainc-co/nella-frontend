@@ -7,7 +7,7 @@ import { useAuthStore } from '@/core/store/auth-store'
 import { PROJECT_COLORS, LAYER_CONFIG } from '@/modules/calendar/types/calendar-types'
 import type { ProjectName, CalendarLayer } from '@/modules/calendar/types/calendar-types'
 
-const ALL_PROJECTS: ProjectName[] = ['MundoStetic', 'TechCorp', 'NellaSales']
+const ALL_PROJECTS: ProjectName[] = ['MundoStetic', 'TechCorp', 'Solventum']
 const ALL_LAYERS: CalendarLayer[] = ['my-agenda', 'team-agenda', 'ai-appointments']
 
 interface CheckboxItemProps {
@@ -19,32 +19,42 @@ interface CheckboxItemProps {
 
 function CheckboxItem({ label, dotColor, checked, onChange }: CheckboxItemProps) {
   return (
-    <label className="flex items-center justify-between cursor-pointer py-1 group">
-      <div className="flex items-center gap-2">
+    <label className="flex items-center justify-between cursor-pointer py-2 group">
+      <div className="flex items-center gap-3">
         <button
           role="checkbox"
           aria-checked={checked}
           onClick={onChange}
-          className={`size-4 rounded flex items-center justify-center border transition-colors ${
-            checked ? 'border-transparent' : 'border-border bg-transparent'
-          }`}
-          style={checked ? { backgroundColor: dotColor } : {}}
+          className="size-5 rounded flex items-center justify-center border transition-all"
+          style={
+            checked
+              ? {
+                  backgroundColor: '#8C28FA',
+                  borderColor: 'transparent',
+                }
+              : {
+                  borderColor: 'rgba(255,255,255,0.2)',
+                  backgroundColor: 'transparent',
+                }
+          }
         >
           {checked && (
-            <svg className="size-2.5 text-white" fill="none" viewBox="0 0 12 12">
+            <svg className="size-3 text-white" fill="none" viewBox="0 0 12 12">
               <path
                 d="M2 6l3 3 5-5"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
           )}
         </button>
-        <span className="text-sm text-foreground">{label}</span>
+        <span className="text-sm font-medium" style={{ color: '#f0f4ff' }}>
+          {label}
+        </span>
       </div>
-      <div className="size-2.5 rounded-full" style={{ backgroundColor: dotColor }} />
+      <div className="size-3 rounded-full" style={{ backgroundColor: dotColor }} />
     </label>
   )
 }
@@ -57,13 +67,15 @@ export function ProjectFilters() {
   const isAdmin = user?.role === 'admin'
 
   return (
-    <div className="px-3 py-2 space-y-4">
+    <div className="px-4 py-4 space-y-5">
       <div>
-        <div className="flex items-center gap-1.5 mb-2">
-          <Filter className="size-3.5 text-muted-foreground" />
-          <span className="text-sm font-semibold text-foreground">Mis Proyectos</span>
+        <div className="flex items-center gap-2 mb-3">
+          <Filter className="size-4" style={{ color: 'rgba(240,244,255,0.5)' }} />
+          <span className="text-sm font-bold" style={{ color: '#f0f4ff' }}>
+            Mis Proyectos
+          </span>
         </div>
-        <div className="space-y-0.5">
+        <div className="space-y-1">
           {ALL_PROJECTS.map(project => (
             <CheckboxItem
               key={project}
@@ -78,11 +90,13 @@ export function ProjectFilters() {
 
       {isAdmin && (
         <div>
-          <div className="flex items-center gap-1.5 mb-2">
-            <Filter className="size-3.5 text-muted-foreground" />
-            <span className="text-sm font-semibold text-foreground">Filtros de Capas</span>
+          <div className="flex items-center gap-2 mb-3">
+            <Filter className="size-4" style={{ color: 'rgba(240,244,255,0.5)' }} />
+            <span className="text-sm font-bold" style={{ color: '#f0f4ff' }}>
+              Filtros de Capas
+            </span>
           </div>
-          <div className="space-y-0.5">
+          <div className="space-y-1">
             {ALL_LAYERS.map(layer => (
               <CheckboxItem
                 key={layer}

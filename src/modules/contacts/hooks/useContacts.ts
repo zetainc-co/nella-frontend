@@ -21,10 +21,11 @@ export function useContacts(query?: ContactsQuery) {
   const params = new URLSearchParams()
   if (query?.phone) params.set('phone', query.phone)
   if (query?.lead_status) params.set('lead_status', query.lead_status)
+  if (query?.project_id) params.set('project_id', query.project_id)
   const qs = params.toString()
 
   return useQuery<BackendContact[]>({
-    queryKey: [...queryKeys.contacts.all(), query],
+    queryKey: [...queryKeys.contacts.all(query?.project_id), query],
     queryFn: async () => {
       const res = await apiClient.get<{ items: BackendContact[] } | BackendContact[]>(
         `/api/contacts${qs ? `?${qs}` : ''}`,

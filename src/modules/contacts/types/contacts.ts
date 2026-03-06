@@ -19,6 +19,7 @@ export interface BackendContact {
 export interface ContactsQuery {
   phone?: string
   lead_status?: string
+  project_id?: string
 }
 
 export interface UpdateContactPayload {
@@ -41,4 +42,5 @@ export interface CreateContactPayload {
   handoff_active?: boolean
   referral_code?: string
   tags?: string[]
+  project_id?: string
 }

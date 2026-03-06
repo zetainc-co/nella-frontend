@@ -10,15 +10,27 @@ const STATUS_LABELS: Record<string, string> = {
   lost: 'Perdidos',
 }
 
-// Gradient from bright lime to darker green as funnel narrows
-const BAR_COLORS = ['#9EFF00', '#7acc00', '#5a9900', '#3d6600', '#2a4700']
+// Gradient from dark purple to light purple as funnel narrows
+const BAR_COLORS = ['#7437DA', '#8B4FE8', '#A26FF0', '#B98FF6', '#C7B7FC']
 
 interface ConversionFunnelProps {
   funnel: ProjectMetrics['funnel']
 }
 
 export function ConversionFunnel({ funnel }: ConversionFunnelProps) {
-  const maxCount = Math.max(...funnel.map(f => f.count), 1)
+  // Always show these 4 main stages
+  const FUNNEL_STAGES = ['new', 'qualified', 'negotiation', 'closed']
+
+  // Create a map of status -> count from the funnel data
+  const funnelMap = new Map(funnel.map(f => [f.status, f.count]))
+
+  // Build the display data with all 4 stages (0 if not present)
+  const displayData = FUNNEL_STAGES.map(status => ({
+    status,
+    count: funnelMap.get(status) || 0
+  }))
+
+  const maxCount = Math.max(...displayData.map(f => f.count), 1)
 
   return (
     <div
@@ -35,21 +47,30 @@ export function ConversionFunnel({ funnel }: ConversionFunnelProps) {
       </div>
 
       <div className="space-y-3">
-        {funnel.map((f, i) => {
-          const pct = Math.round((f.count / maxCount) * 100)
+        {displayData.map((f, i) => {
+          const pct = f.count > 0 ? Math.round((f.count / maxCount) * 100) : 0
           const color = BAR_COLORS[i % BAR_COLORS.length]
+          const barWidth = f.count > 0 ? `${pct}%` : '60px' // Minimum width for empty bars
+
           return (
             <div key={f.status} className="flex items-center gap-4">
-              <div className="w-24 text-sm font-medium text-right shrink-0" style={{ color: 'rgba(240,244,255,0.7)' }}>
+              <div className="w-28 text-sm font-medium text-right shrink-0" style={{ color: 'rgba(240,244,255,0.7)' }}>
                 {STATUS_LABELS[f.status] ?? f.status}
               </div>
               <div className="flex-1 relative h-12 rounded-lg overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
                 <div
-                  className="h-full rounded-lg flex items-center px-4 transition-all duration-700"
-                  style={{ width: `${pct}%`, background: color, minWidth: '60px' }}
-                >
-                  <span className="text-sm font-bold" style={{ color: '#000' }}>{f.count}</span>
-                </div>
+                  className="h-full rounded-lg transition-all duration-700"
+                  style={{
+                    width: barWidth,
+                    background: f.count > 0
+                      ? `linear-gradient(to right, ${color}, ${color}CC)`
+                      : 'linear-gradient(to right, rgba(116, 55, 218, 0.2), rgba(116, 55, 218, 0.1))',
+                    minWidth: '60px'
+                  }}
+                />
+              </div>
+              <div className="w-8 text-md font-bold text-right shrink-0 text-white">
+                {f.count}
               </div>
             </div>
           )

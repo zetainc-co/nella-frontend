@@ -43,7 +43,7 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <UserPlus className="h-5 w-5" style={{ color: '#9EFF00' }} />
+            <UserPlus className="h-5 w-5" style={{ color: '#8C28FA' }} />
             <h2 className="text-lg font-semibold" style={{ color: '#f0f4ff' }}>
               Invitar Miembro
             </h2>
@@ -154,8 +154,8 @@ export function InviteMemberModal({ isOpen, onClose }: InviteMemberModalProps) {
               disabled={createAgent.isPending}
               className="flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
               style={{
-                background: '#9EFF00',
-                color: '#0a0a0a',
+                background: '#8C28FA',
+                color: '#ffffff',
               }}
             >
               {createAgent.isPending ? 'Invitando...' : 'Invitar'}

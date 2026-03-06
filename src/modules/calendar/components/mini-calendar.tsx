@@ -50,34 +50,52 @@ export function MiniCalendar() {
   }
 
   return (
-    <div className="px-3 py-3">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-semibold text-foreground">{capitalizedLabel}</span>
+    <div className="px-4 py-4">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-base font-bold" style={{ color: '#f0f4ff' }}>{capitalizedLabel}</span>
         <div className="flex gap-1">
           <button
             onClick={() => setViewMonth(subMonths(viewMonth, 1))}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            className="p-1.5 rounded-lg transition-colors"
+            style={{ color: 'rgba(240,244,255,0.5)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+              e.currentTarget.style.color = '#f0f4ff'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.color = 'rgba(240,244,255,0.5)'
+            }}
           >
-            <ChevronLeft className="size-3.5" />
+            <ChevronLeft className="size-4" />
           </button>
           <button
             onClick={() => setViewMonth(addMonths(viewMonth, 1))}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            className="p-1.5 rounded-lg transition-colors"
+            style={{ color: 'rgba(240,244,255,0.5)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+              e.currentTarget.style.color = '#f0f4ff'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.color = 'rgba(240,244,255,0.5)'
+            }}
           >
-            <ChevronRight className="size-3.5" />
+            <ChevronRight className="size-4" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 mb-1">
+      <div className="grid grid-cols-7 mb-2">
         {DAY_NAMES.map((name, i) => (
-          <div key={i} className="text-center text-[10px] font-medium text-muted-foreground py-1">
+          <div key={i} className="text-center text-xs font-semibold py-2" style={{ color: 'rgba(240,244,255,0.4)' }}>
             {name}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-y-0.5">
+      <div className="grid grid-cols-7 gap-1">
         {monthDays.map(day => {
           const isCurrentDay = isToday(day)
           const isInMonth = isSameMonth(day, viewMonth)
@@ -87,12 +105,34 @@ export function MiniCalendar() {
             <button
               key={day.toISOString()}
               onClick={() => handleDayClick(day)}
-              className={`
-                text-center text-xs py-1 rounded-full transition-colors cursor-pointer
-                ${!isInMonth ? 'text-muted-foreground/40 hover:bg-accent/50' : 'text-foreground hover:bg-accent'}
-                ${isCurrentDay ? 'bg-primary text-primary-foreground font-bold hover:bg-primary/90' : ''}
-                ${isSelectedWeek && !isCurrentDay ? 'bg-accent' : ''}
-              `}
+              className="text-center text-sm py-2 rounded-lg transition-all cursor-pointer font-medium"
+              style={
+                isCurrentDay
+                  ? {
+                      background: '#8C28FA',
+                      color: '#ffffff',
+                      fontWeight: 'bold',
+                    }
+                  : !isInMonth
+                    ? {
+                        color: 'rgba(240,244,255,0.25)',
+                      }
+                    : {
+                        color: 'rgba(240,244,255,0.7)',
+                      }
+              }
+              onMouseEnter={(e) => {
+                if (!isCurrentDay) {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                  e.currentTarget.style.color = '#f0f4ff'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isCurrentDay) {
+                  e.currentTarget.style.background = isSelectedWeek ? 'rgba(255,255,255,0.03)' : 'transparent'
+                  e.currentTarget.style.color = !isInMonth ? 'rgba(240,244,255,0.25)' : 'rgba(240,244,255,0.7)'
+                }
+              }}
             >
               {format(day, 'd')}
             </button>

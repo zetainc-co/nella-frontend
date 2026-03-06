@@ -16,12 +16,12 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
         // Variantes personalizadas para probabilidad
-        high: "bg-[#3D4D28] text-[#97DC2A] border-transparent",
+        high: "bg-[#2d1b69] text-[#A78BFA] border-transparent",
         medium: "bg-orange-500/20 text-orange-400 border-transparent",
         low: "bg-zinc-500/20 text-zinc-400 border-transparent",
         // Variantes para estados de contacto (más grandes)
-        cliente: "bg-[#3D4D28] text-[#97DC2A] border border-[#97DC2A]/30 rounded-md",
-        lead: "bg-[#1e3a5f] text-[#60a5fa] border border-[#60a5fa]/30 rounded-md",
+        cliente: "bg-[#2d1b69] text-[#A78BFA] border border-[#7C3AED]/30 rounded-md",
+        lead: "bg-[#2d1b69] text-[#A78BFA] border border-[#7C3AED]/30 rounded-md",
         inactivo: "bg-zinc-800/50 text-zinc-400 border border-zinc-700 rounded-md",
       },
       size: {

@@ -22,13 +22,13 @@ export function KanbanColumn({ stage, title, leads, onLeadClick }: KanbanColumnP
         'w-full md:w-[280px] lg:w-[320px] 2xl:w-auto',
         'shrink-0 flex flex-col transition-all',
         'border-2 border-transparent',
-        isOver && 'border-[#8BD21D] border-dashed bg-[#8BD21D]/5'
+        isOver && 'border-[#8B5CF6] border-dashed bg-[#8B5CF6]/5'
       )}
     >
       {/* Header */}
       <div className={cn(
         "flex items-center justify-between px-4 py-3 bg-[#1A1A1A] rounded-t-lg transition-colors",
-        isOver && "bg-[#8BD21D]/10"
+        isOver && "bg-[#8B5CF6]/10"
       )}>
         <h2 className="font-semibold text-white text-base">{title}</h2>
         <span className="text-sm font-bold text-gray-100 bg-[#323237] px-2.5 py-0.5 rounded-full min-w-[28px] text-center">
@@ -39,7 +39,7 @@ export function KanbanColumn({ stage, title, leads, onLeadClick }: KanbanColumnP
       {/* Leads */}
       <div className={cn(
         "flex-1 space-y-3 overflow-y-auto custom-scrollbar bg-[#0d0d0d] rounded-b-lg p-4 transition-colors",
-        isOver && "bg-[#8BD21D]/5"
+        isOver && "bg-[#8B5CF6]/5"
       )}>
         {leadsInStage.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 text-gray-500">

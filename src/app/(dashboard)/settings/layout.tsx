@@ -29,10 +29,10 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-screen overflow-hidden">
       {/* ── Settings sidebar ── */}
       <aside
-        className="hidden md:flex flex-col shrink-0 overflow-y-auto"
+        className="hidden md:flex flex-col shrink-0 overflow-y-auto h-full animate-in fade-in slide-in-from-left-4 duration-500"
         style={{
           width: 280,
           background: "#1a1a1a",
@@ -41,7 +41,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       >
         {/* Header */}
         <div
-          className="px-5 py-5"
+          className="px-5 py-5 animate-in fade-in slide-in-from-top-2 duration-700"
           style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h2 className="text-[24px] font-bold" style={{ color: "#f0f4ff" }}>
@@ -57,7 +57,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
 
         {/* Nav */}
         <nav className="flex-1 px-4 py-4 space-y-1">
-          {settingsNav.map((item) => {
+          {settingsNav.map((item, index) => {
             const active =
               pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
@@ -66,9 +66,9 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-3 rounded-[8px] text-[15px] font-semibold transition-colors duration-150"
-                style={
-                  active
+                className="flex items-center gap-3 rounded-[8px] text-[15px] font-semibold transition-all duration-300 ease-out animate-in fade-in slide-in-from-left-3"
+                style={{
+                  ...(active
                     ? {
                         background: "rgba(255,255,255,0.04)",
                         border: "1px solid rgba(255,255,255,0.10)",
@@ -79,23 +79,27 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
                         border: "1px solid transparent",
                         color: "rgba(255,255,255,0.55)",
                         padding: "9px 12px",
-                      }
-                }
+                      }),
+                  animationDelay: `${index * 80}ms`,
+                  animationDuration: "500ms",
+                }}
                 onMouseEnter={(e) => {
                   if (!active) {
                     e.currentTarget.style.color = "rgba(255,255,255,0.85)";
                     e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                    e.currentTarget.style.transform = "translateX(2px)";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!active) {
                     e.currentTarget.style.color = "rgba(255,255,255,0.55)";
                     e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.transform = "translateX(0)";
                   }
                 }}
               >
                 <Icon
-                  className="size-[20px] shrink-0 stroke-2"
+                  className="size-[20px] shrink-0 stroke-2 transition-transform duration-300"
                   style={{
                     color: "rgba(255,255,255,0.80)",
                   }}
@@ -108,7 +112,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* ── Content ── */}
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto h-full">{children}</main>
     </div>
   );
 }

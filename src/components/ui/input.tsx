@@ -12,7 +12,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "h-10 w-full min-w-0 rounded-md border border-gray-700 bg-[#1a1a1a] px-3 py-2 text-sm text-white",
         "shadow-sm transition-colors outline-none",
         "file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium",
-        "focus:border-[#8BD21D] focus:ring-2 focus:ring-[#8BD21D]/20",
+        "focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20",
         "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
         "aria-invalid:border-destructive aria-invalid:ring-destructive/20",
         className

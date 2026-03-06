@@ -3,6 +3,7 @@
 
 import { format, parseISO, isAfter, startOfToday } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { Sparkles } from 'lucide-react'
 import { useCalendarStore } from '@/modules/calendar/stores/calendar-store'
 import { getProjectColors } from '@/modules/calendar/types/calendar-types'
 
@@ -20,28 +21,69 @@ export function UpcomingEvents() {
     .slice(0, 4)
 
   return (
-    <div className="px-3 py-2">
-      <span className="text-sm font-semibold text-foreground block mb-2">Próximos Eventos</span>
+    <div className="px-4 py-4">
+      <span className="text-sm font-bold block mb-3" style={{ color: '#f0f4ff' }}>
+        Próximos Eventos
+      </span>
 
       {upcoming.length === 0 ? (
-        <p className="text-xs text-muted-foreground">No hay eventos próximos</p>
+        <p className="text-xs" style={{ color: 'rgba(240,244,255,0.4)' }}>
+          No hay eventos próximos
+        </p>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {upcoming.map(event => {
             const colors = getProjectColors(event.project)
-            const parsedDate = parseISO(event.date)
-            const dayLabel = format(parsedDate, "d 'de' MMM", { locale: es })
 
             return (
               <div
                 key={event.id}
-                className="rounded-md p-2 text-sm"
-                style={{ backgroundColor: colors.bg, borderLeft: `3px solid ${colors.border}` }}
+                className="rounded-lg p-3 relative"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
               >
-                <p className="font-medium text-foreground text-xs truncate">{event.title}</p>
-                <p className="text-muted-foreground text-[11px] mt-0.5">
-                  {dayLabel} · {event.startTime} - {event.endTime}
+                {/* Project badge */}
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Sparkles className="size-3" style={{ color: colors.border }} />
+                  <span
+                    className="text-xs font-semibold"
+                    style={{ color: colors.border }}
+                  >
+                    {event.project}
+                  </span>
+                </div>
+
+                {/* Event title */}
+                <h4
+                  className="text-sm font-bold mb-1 pr-4"
+                  style={{ color: '#f0f4ff' }}
+                >
+                  {event.title}
+                </h4>
+
+                {/* Time */}
+                <p
+                  className="text-xs mb-1"
+                  style={{ color: 'rgba(240,244,255,0.5)' }}
+                >
+                  {event.startTime} - {event.endTime}
                 </p>
+
+                {/* Client name */}
+                <p
+                  className="text-xs"
+                  style={{ color: 'rgba(240,244,255,0.35)' }}
+                >
+                  {event.client}
+                </p>
+
+                {/* Color dot */}
+                <div
+                  className="absolute top-3 right-3 size-2.5 rounded-full"
+                  style={{ backgroundColor: colors.border }}
+                />
               </div>
             )
           })}

@@ -31,10 +31,8 @@ export function RegistrationWizard() {
       style={{ maxHeight: 'calc(100vh - 48px)' }}
     >
       {/* Branding — inside card, top */}
-      <div className="text-center space-y-1.5 mb-7">
-        <h1 className="text-3xl font-bold tracking-tight text-white">
-          Nella<span style={{ color: '#9EFF00' }}>Sales</span>
-        </h1>
+      <div className="text-center space-y-3 mb-7">
+        <img src="/logo.png" alt="NellaUp" className="h-10 mx-auto" />
         <p className="text-sm" style={{ color: 'rgba(240,244,255,0.5)' }}>
           Bienvenido a tu CRM con IA
         </p>
@@ -57,7 +55,7 @@ export function RegistrationWizard() {
           >
             <div
               className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${(currentStep / 4) * 100}%`, background: '#9EFF00' }}
+              style={{ width: `${(currentStep / 4) * 100}%`, background: '#8C28FA' }}
             />
           </div>
         </div>
@@ -153,7 +151,7 @@ export function RegistrationWizard() {
           <Link
             href="/login"
             className="font-medium hover:underline transition-colors"
-            style={{ color: '#9EFF00' }}
+            style={{ color: '#8C28FA' }}
           >
             Inicia sesión aquí
           </Link>

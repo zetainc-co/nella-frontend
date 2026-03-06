@@ -1,11 +1,10 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useProjects } from "@/modules/dashboard/hooks/useProjects";
+import { useProjectStore } from "@/core/store/project-store";
 import { ProjectEmptyState } from "@/modules/dashboard/components/project-empty-state";
 import { CreateProjectModal } from "@/modules/dashboard/components/create-project-modal";
-import { ProjectSelector } from "@/modules/dashboard/components/project-selector";
 import { MetricsDashboard } from "@/modules/dashboard/components/metrics-dashboard";
 
 function DashboardSkeleton() {
@@ -30,21 +29,14 @@ function DashboardSkeleton() {
 }
 
 function DashboardContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [modalOpen, setModalOpen] = useState(false);
-
   const { data: projects, isLoading } = useProjects();
-
-  const urlProjectId = searchParams.get("project");
-  const activeProjectId = urlProjectId ?? projects?.[0]?.id ?? null;
-
-  function handleSelectProject(id: string) {
-    router.push(`/dashboard?project=${id}`);
-  }
+  const activeProjectId = useProjectStore((s) => s.selectedProjectId);
+  const setSelectedProjectId = useProjectStore((s) => s.setSelectedProjectId);
 
   function handleProjectCreated(id: string) {
-    router.push(`/dashboard?project=${id}`);
+    setSelectedProjectId(id);
+    setModalOpen(false);
   }
 
   if (isLoading) {
@@ -54,19 +46,13 @@ function DashboardContent() {
   const hasProjects = projects && projects.length > 0;
 
   return (
-    <div className="flex flex-1 flex-col gap-6 pt-3 min-h-screen ">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-2">
-        {hasProjects && activeProjectId && (
-          <ProjectSelector
-            projects={projects}
-            activeProjectId={activeProjectId}
-            onSelect={handleSelectProject}
-            onCreateClick={() => setModalOpen(true)}
-          />
-        )}
+    <div className="flex flex-1 flex-col gap-6 p-6 min-h-screen">
+      <div className="flex flex-col">
+        <h1 className="text-3xl font-extrabold text-white">Dashboard</h1>
+        <p className="text-sm text-gray-400">
+          Resumen general de tu pipeline de ventas
+        </p>
       </div>
-
       {/* Content */}
       {!hasProjects ? (
         <ProjectEmptyState onCreateClick={() => setModalOpen(true)} />

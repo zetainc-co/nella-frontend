@@ -14,7 +14,7 @@ const QUERY_KEY = ['agents']
 export function useAgents() {
   return useQuery({
     queryKey: QUERY_KEY,
-    queryFn: () => teamService.listAgents(),
+    queryFn: () => teamService.listUsers(),
     staleTime: 1000 * 60, // 1 minuto
   })
 }

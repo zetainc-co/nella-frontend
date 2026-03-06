@@ -52,9 +52,10 @@
   --color-auth-bg: #09101a;
   --color-auth-card: #141926;
   --color-nella-lime: #9EFF00;
+  --color-nella-purple: #8C28FA;
 
   --shadow-auth-card: 0 8px 40px -8px rgba(0, 0, 0, 0.6);
-  --shadow-primary-glow: 0 0 24px rgba(158, 255, 0, 0.35);
+  --shadow-primary-glow: 0 0 24px rgba(140, 40, 250, 0.35);
 }
 
 :root {
@@ -139,8 +140,8 @@
   --card-foreground: #f0f4ff;
   --popover: #2a2a2a;
   --popover-foreground: #f0f4ff;
-  --primary: #9EFF00;
-  --primary-foreground: #0a1015;
+  --primary: #8B5CF6;
+  --primary-foreground: #ffffff;
   --secondary: #2e2e2e;
   --secondary-foreground: #f0f4ff;
   --muted: #2e2e2e;
@@ -149,7 +150,7 @@
   --accent-foreground: #f0f4ff;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.05);
-  --ring: rgba(158, 255, 0, 0.4);
+  --ring: rgba(139, 92, 246, 0.4);
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 }
@@ -288,17 +289,17 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(158, 255, 0, 0.2) !important;
+  background: rgba(124, 58, 237, 0.35) !important;
   border-radius: 4px !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(158, 255, 0, 0.4) !important;
+  background: rgba(124, 58, 237, 0.6) !important;
 }
 
 .custom-scrollbar {
   scrollbar-width: thin !important;
-  scrollbar-color: rgba(158, 255, 0, 0.2) rgba(255, 255, 255, 0.03) !important;
+  scrollbar-color: rgba(124, 58, 237, 0.35) rgba(255, 255, 255, 0.03) !important;
 }
 
 /* ============================================
@@ -316,17 +317,17 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(158, 255, 0, 0.18);
+  background: rgba(124, 58, 237, 0.3);
   border-radius: 4px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: rgba(158, 255, 0, 0.38);
+  background: rgba(124, 58, 237, 0.55);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(158, 255, 0, 0.18) rgba(255, 255, 255, 0.03);
+  scrollbar-color: rgba(124, 58, 237, 0.3) rgba(255, 255, 255, 0.03);
 }
 
 /* ============================================
@@ -349,7 +350,7 @@
   }
 
   .auth-card:hover {
-    box-shadow: 0 8px 60px -8px rgba(158, 255, 0, 0.08), 0 8px 40px -8px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 8px 60px -8px rgba(140, 40, 250, 0.1), 0 8px 40px -8px rgba(0, 0, 0, 0.7);
   }
 
   .auth-input {
@@ -366,19 +367,19 @@
 
   .auth-input:focus {
     background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(158, 255, 0, 0.45);
-    box-shadow: 0 0 0 3px rgba(158, 255, 0, 0.08);
+    border-color: rgba(139, 92, 246, 0.45);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
   }
 
   .btn-primary {
     @apply h-11 w-full rounded-xl px-4 py-2 text-sm font-bold transition-all duration-200;
-    background: #9EFF00;
-    color: #0a1015;
+    background: #8B5CF6;
+    color: #ffffff;
   }
 
   .btn-primary:hover {
-    background: #b3ff26;
-    box-shadow: 0 0 24px rgba(158, 255, 0, 0.4);
+    background: #7c3aed;
+    box-shadow: 0 0 24px rgba(139, 92, 246, 0.4);
     transform: translateY(-1px);
   }
 
@@ -393,17 +394,17 @@
     box-shadow: none;
   }
 
-  /* Dark glass login button — matches reference design */
   .btn-login {
     @apply h-11 w-full rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #f0f4ff;
+    background: #8C28FA;
+    border: 1px solid rgba(140, 40, 250, 0.6);
+    color: #ffffff;
+    box-shadow: 0 8px 20px -4px rgba(140, 40, 250, 0.35);
   }
 
   .btn-login:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.13);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: #7C1EE8;
+    box-shadow: 0 8px 28px -4px rgba(140, 40, 250, 0.5);
   }
 
   .btn-login:disabled {

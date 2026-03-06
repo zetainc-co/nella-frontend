@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
 import { apiClient } from '@/core/api/api-client'
+import { useProjectStore } from '@/core/store/project-store'
 import type { BackendContact } from '@/modules/contacts/types/contacts'
 import { mapLeadStatusToStage, mapStageToBadge, STATUS_TO_STAGE, STAGE_TO_STATUS } from '@/modules/kanban/hooks/use-kanban-constants'
 import type { Lead, LeadStage, KanbanStore } from '@/modules/kanban/types/kanban-types'
@@ -43,7 +44,13 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
     }
 
     try {
-      const raw = await apiClient.get<{ items: BackendContact[] } | BackendContact[]>('/api/contacts')
+      const selectedProjectId = useProjectStore.getState().selectedProjectId
+
+      const endpoint = selectedProjectId
+        ? `/api/contacts?project_id=${selectedProjectId}`
+        : '/api/contacts'
+
+      const raw = await apiClient.get<{ items: BackendContact[] } | BackendContact[]>(endpoint)
       const contacts: BackendContact[] = Array.isArray(raw) ? raw : ((raw as { items: BackendContact[] })?.items ?? [])
       const leads = contacts.map(transformContactToLead)
       set({ leads, isLoading: false, error: null })

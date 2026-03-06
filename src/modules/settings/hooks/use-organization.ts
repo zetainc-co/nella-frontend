@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/core/store/auth-store'
 import { apiClient } from '@/core/api/api-client'
@@ -13,25 +13,46 @@ export interface OrganizationData {
   industry: string
   phone: string
   address: string
+  email: string
+  country: string
+  description: string
+}
+
+export interface UpdateOrganizationDto {
+  name?: string
+  nit?: string
+  industry?: string
+  phone?: string
+  address?: string
+  email?: string
+  country?: string
+  description?: string
 }
 
 interface TenantResponse {
   id: string
   slug: string
   name: string
+  email?: string
   phone?: string
+  nit?: string
+  address?: string
   industry?: string
   country?: string
+  description?: string
   company_size?: string
 }
 
 function mapTenantToOrg(tenant: TenantResponse): OrganizationData {
   return {
-    name: tenant.name,
-    phone: tenant.phone ?? mockOrganization.phone,
-    industry: tenant.industry ?? mockOrganization.industry,
-    nit: mockOrganization.nit,
-    address: mockOrganization.address,
+    name: tenant.name ?? '',
+    phone: tenant.phone ?? '',
+    industry: tenant.industry ?? '',
+    nit: tenant.nit ?? '',
+    address: tenant.address ?? '',
+    email: tenant.email ?? '',
+    country: tenant.country ?? '',
+    description: tenant.description ?? '',
   }
 }
 
@@ -58,11 +79,35 @@ export function useOrganization() {
         return mapTenantToOrg(tenant)
       } catch {
         toast.warning('No se pudieron cargar los datos de la empresa')
-        return mockOrganization
+        return mapTenantToOrg({} as TenantResponse)
       }
     },
     enabled: !!tenantSlug,
     staleTime: 60_000,
     retry: false,
+  })
+}
+
+export function useUpdateOrganization() {
+  const queryClient = useQueryClient()
+  const tenantSlug = useAuthStore((s) => s.session?.tenantSlug)
+
+  return useMutation({
+    mutationFn: (dto: UpdateOrganizationDto) =>
+      apiClient.patch<TenantResponse>('/api/tenants/organization', dto),
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        queryKeys.settings.organization(tenantSlug ?? ''),
+        mapTenantToOrg(data),
+      )
+      toast.success('Organizacion actualizada exitosamente')
+    },
+    onError: (error: Error & { status?: number }) => {
+      if (error.status === 403) {
+        toast.error('No tienes permisos de administrador para editar la organizacion')
+      } else {
+        toast.error(error.message || 'Error al actualizar la organizacion')
+      }
+    },
   })
 }

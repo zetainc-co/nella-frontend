@@ -21,7 +21,7 @@ interface NewEventModalProps {
   onEventCreated?: () => void
 }
 
-const PROJECT_OPTIONS: ProjectName[] = ['MundoStetic', 'TechCorp', 'NellaSales']
+const PROJECT_OPTIONS: ProjectName[] = ['MundoStetic', 'TechCorp', 'Solventum']
 const STAGE_OPTIONS = ['new', 'contacted', 'proposal', 'closed'] as const
 const STAGE_LABELS: Record<string, string> = {
   new: 'Nuevo',
@@ -50,7 +50,7 @@ export function NewEventModal({ open, onClose, initialDate, initialTime, onEvent
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [title, setTitle] = useState('')
-  const [project, setProject] = useState<ProjectName>('NellaSales')
+  const [project, setProject] = useState<ProjectName>('Solventum')
   const [client, setClient] = useState('')
   const [date, setDate] = useState(() => initialDate ?? getTodayISO())
   const [startTime, setStartTime] = useState(() => initialTime ?? '09:00')

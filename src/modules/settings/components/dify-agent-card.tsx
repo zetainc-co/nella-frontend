@@ -18,9 +18,9 @@ import { SettingsGhostButton } from "@/modules/settings/components/settings-ui";
 type ModalStep = "input" | "validating" | "found" | "connecting";
 
 const DIFY_COLORS = {
-  text: "#9EFF00",
-  background: "rgba(158,255,0,0.08)",
-  border: "rgba(158,255,0,0.2)",
+  text: "#A78BFA",
+  background: "rgba(167,139,250,0.08)",
+  border: "rgba(167,139,250,0.2)",
 };
 
 const IMAGE_SIZE = 130;
@@ -61,7 +61,7 @@ function AgentMiniCard({
           style={{
             width: 22,
             height: 22,
-            background: "#16a34a",
+            background: "#8C28FA",
             border: "2px solid rgba(20,20,20,0.9)",
           }}
         >
@@ -73,9 +73,9 @@ function AgentMiniCard({
       <span
         className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium mt-2"
         style={{
-          background: "rgba(158,255,0,0.08)",
-          border: "1px solid rgba(158,255,0,0.25)",
-          color: "#9EFF00",
+          background: "rgba(167,139,250,0.08)",
+          border: "1px solid rgba(167,139,250,0.25)",
+          color: "#A78BFA",
         }}
       >
         <Zap className="size-3 shrink-0" />
@@ -290,7 +290,7 @@ export function DifyAgentCard() {
                 onClick={handleValidate}
                 disabled={!appKey.trim()}
                 className="px-5 py-2 text-sm font-semibold rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: "#9EFF00", color: "#0a1015" }}
+                style={{ background: "#8C28FA", color: "#ffffff" }}
               >
                 Buscar agente
               </button>
@@ -307,7 +307,7 @@ export function DifyAgentCard() {
               <button
                 onClick={handleConnect}
                 className="px-5 py-2 text-sm font-semibold rounded-lg transition-all"
-                style={{ background: "#9EFF00", color: "#0a1015" }}
+                style={{ background: "#8C28FA", color: "#ffffff" }}
               >
                 Conectar agente
               </button>
@@ -335,10 +335,10 @@ export function DifyAgentCard() {
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.1)",
                   color: "#f0f4ff",
-                  caretColor: "#9EFF00",
+                  caretColor: "#A78BFA",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(158,255,0,0.4)";
+                  e.currentTarget.style.borderColor = "rgba(167,139,250,0.4)";
                   e.currentTarget.style.background = "rgba(255,255,255,0.07)";
                 }}
                 onBlur={(e) => {
@@ -355,7 +355,7 @@ export function DifyAgentCard() {
           <div className="flex flex-col items-center justify-center py-10 gap-4">
             <Loader2
               className="size-8 animate-spin"
-              style={{ color: "#9EFF00" }}
+              style={{ color: "#A78BFA" }}
             />
             <p className="text-sm" style={{ color: "rgba(240,244,255,0.5)" }}>
               Espera un momento...
@@ -388,7 +388,7 @@ export function DifyAgentCard() {
                 style={{
                   width: 24,
                   height: 24,
-                  background: "#16a34a",
+                  background: "#8C28FA",
                   border: "2px solid #1C1C1D",
                 }}
               >
@@ -405,9 +405,9 @@ export function DifyAgentCard() {
                 <span
                   className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
                   style={{
-                    background: "rgba(158,255,0,0.1)",
-                    border: "1px solid rgba(158,255,0,0.2)",
-                    color: "#9EFF00",
+                    background: "rgba(167,139,250,0.1)",
+                    border: "1px solid rgba(167,139,250,0.2)",
+                    color: "#A78BFA",
                   }}
                 >
                   <Zap className="size-2.5" />
@@ -428,7 +428,7 @@ export function DifyAgentCard() {
               <div className="flex items-center gap-2 pt-1">
                 <Loader2
                   className="size-4 animate-spin"
-                  style={{ color: "#9EFF00" }}
+                  style={{ color: "#A78BFA" }}
                 />
                 <span className="text-sm" style={{ color: "rgba(240,244,255,0.5)" }}>
                   Conectando...

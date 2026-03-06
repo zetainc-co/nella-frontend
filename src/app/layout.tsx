@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full dark" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-foreground h-full overflow-hidden`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased image.pngtext-foreground h-full overflow-hidden`}
         suppressHydrationWarning
       >
         <QueryProvider>

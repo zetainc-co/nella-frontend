@@ -40,7 +40,7 @@ function SelectTrigger({
         "flex w-fit items-center justify-between gap-2 rounded-md border border-gray-800 bg-[#1a1a1a] px-3 py-2 text-sm text-white whitespace-nowrap shadow-sm transition-colors outline-none",
         "data-[placeholder]:text-gray-500",
         "[&_svg:not([class*='text-'])]:text-gray-500",
-        "focus:border-[#8BD21D] focus:ring-2 focus:ring-[#8BD21D]/20",
+        "focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "aria-invalid:border-destructive aria-invalid:ring-destructive/20",
         "data-[size=default]:h-10 data-[size=sm]:h-8",
@@ -72,7 +72,7 @@ function SelectContent({
         className={cn(
           "bg-[#1a1a1a] text-white border-gray-800",
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          "relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md",
+          "relative z-[10000] max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md",
           position === "popper" &&
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
           className
