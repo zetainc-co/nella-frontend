@@ -17,8 +17,6 @@ interface RegistrationStep4Props {
   onBack: () => void
 }
 
-const OTP_CODE_DEV = '000000'
-
 export function RegistrationStep4({ initialData, onNext, onBack }: RegistrationStep4Props) {
   const [otpSent, setOtpSent] = useState(false)
   const [otpVerified, setOtpVerified] = useState(false)
@@ -72,15 +70,30 @@ export function RegistrationStep4({ initialData, onNext, onBack }: RegistrationS
 
   const verifyOtp = async (code: string) => {
     setIsVerifying(true)
-    await new Promise(resolve => setTimeout(resolve, 800))
-    if (code === OTP_CODE_DEV) {
-      setOtpVerified(true)
-    } else {
-      setOtpError('Código incorrecto. Código de desarrollo: 000000')
+    setOtpError(null)
+
+    try {
+      const response = await fetch('/api/auth/verify-whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: whatsappNumber, code }),
+      })
+
+      if (response.ok) {
+        setOtpVerified(true)
+      } else {
+        const data = await response.json().catch(() => ({}))
+        setOtpError(data.message ?? 'Código incorrecto. Intenta nuevamente.')
+        setOtpCode(['', '', '', '', '', ''])
+        setTimeout(() => inputRefs.current[0]?.focus(), 100)
+      }
+    } catch {
+      setOtpError('Error de conexión. Intenta nuevamente.')
       setOtpCode(['', '', '', '', '', ''])
       setTimeout(() => inputRefs.current[0]?.focus(), 100)
+    } finally {
+      setIsVerifying(false)
     }
-    setIsVerifying(false)
   }
 
   const onSubmit = handleSubmit((data) => {
@@ -151,11 +164,6 @@ export function RegistrationStep4({ initialData, onNext, onBack }: RegistrationS
             </div>
           )}
           {otpError && <p className="text-sm text-center text-destructive">{otpError}</p>}
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950">
-            <p className="text-xs text-blue-900 dark:text-blue-100 text-center">
-              Código de desarrollo: <span className="font-mono font-bold">000000</span>
-            </p>
-          </div>
         </div>
       )}
 

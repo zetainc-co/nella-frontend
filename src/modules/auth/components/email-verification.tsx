@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Loader2, Mail, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Loader2, Mail, AlertCircle } from 'lucide-react'
 
 interface EmailVerificationProps {
   email: string
@@ -12,7 +12,6 @@ interface EmailVerificationProps {
   onResendCode: () => void
 }
 
-const CORRECT_CODE = '000000'
 const MAX_ATTEMPTS = 5
 const TIMER_DURATION = 10 * 60 // 10 minutos en segundos
 
@@ -104,13 +103,20 @@ export function EmailVerification({
     setIsVerifying(true)
     setError(null)
 
-    // Simular delay de verificación
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    try {
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: codeToVerify }),
+      })
 
-    if (codeToVerify === CORRECT_CODE) {
-      setIsVerifying(false)
-      onVerified()
-    } else {
+      if (response.ok) {
+        setIsVerifying(false)
+        onVerified()
+        return
+      }
+
+      const data = await response.json().catch(() => ({}))
       const newAttempts = attempts + 1
       setAttempts(newAttempts)
 
@@ -118,11 +124,12 @@ export function EmailVerification({
         setError('Has excedido el número máximo de intentos. Por favor, solicita un nuevo código.')
       } else {
         setError(
-          `Código incorrecto. Te quedan ${MAX_ATTEMPTS - newAttempts} intento(s).`
+          data.message ?? `Código incorrecto. Te quedan ${MAX_ATTEMPTS - newAttempts} intento(s).`
         )
       }
-
-      // Limpiar código
+    } catch {
+      setError('Error de conexión. Intenta nuevamente.')
+    } finally {
       setCode(['', '', '', '', '', ''])
       inputRefs.current[0]?.focus()
       setIsVerifying(false)
@@ -233,16 +240,6 @@ export function EmailVerification({
         </p>
       </div>
 
-      {/* Info */}
-      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
-        <div className="flex gap-3">
-          <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
-          <div className="space-y-1 text-sm text-blue-900 dark:text-blue-100">
-            <p className="font-medium">Tip para desarrollo:</p>
-            <p>El código de verificación es: <span className="font-mono font-bold">000000</span></p>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
