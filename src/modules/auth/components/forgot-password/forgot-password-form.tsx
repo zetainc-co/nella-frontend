@@ -71,10 +71,8 @@ export function ForgotPasswordForm() {
   if (step === 'email') {
     return (
       <div className="auth-card p-8">
-        <div className="text-center space-y-1.5 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            Nella<span style={{ color: '#9EFF00' }}>Sales</span>
-          </h1>
+        <div className="text-center space-y-3 mb-8">
+          <img src="/logo.png" alt="NellaUp" className="h-10 mx-auto" />
           <p className="text-sm" style={{ color: 'rgba(240,244,255,0.5)' }}>
             Recupera tu contraseña
           </p>
@@ -139,10 +137,8 @@ export function ForgotPasswordForm() {
 
   return (
     <div className="auth-card p-8">
-      <div className="text-center space-y-1.5 mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-white">
-          Nella<span style={{ color: '#9EFF00' }}>Sales</span>
-        </h1>
+      <div className="text-center space-y-3 mb-8">
+        <img src="/logo.png" alt="NellaUp" className="h-10 mx-auto" />
         <p className="text-sm" style={{ color: 'rgba(240,244,255,0.5)' }}>
           Ingresa el código de verificación
         </p>
@@ -151,8 +147,8 @@ export function ForgotPasswordForm() {
       <div
         className="rounded-lg px-4 py-3 mb-6 text-xs"
         style={{
-          background: 'rgba(158,255,0,0.08)',
-          border: '1px solid rgba(158,255,0,0.2)',
+          background: 'rgba(140,40,250,0.08)',
+          border: '1px solid rgba(140,40,250,0.2)',
           color: 'rgba(240,244,255,0.7)',
         }}
       >

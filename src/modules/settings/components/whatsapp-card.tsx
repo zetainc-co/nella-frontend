@@ -135,10 +135,10 @@ export function WhatsappCard() {
             </div>
             <div>
               <h3 className="text-lg font-bold" style={{ color: "#f0f4ff" }}>
-                WhatsApp Business API
+                WhatsApp API
               </h3>
               <p className="text-sm mt-0.5" style={{ color: "rgba(240,244,255,0.4)" }}>
-                Conecta tu cuenta de WhatsApp Business para gestionar conversaciones
+                Conecta tu cuenta de WhatsApp para gestionar conversaciones
               </p>
             </div>
           </div>

@@ -56,10 +56,8 @@ export function LoginForm({ tenantSlug }: LoginFormProps) {
   return (
     <div className="auth-card p-8">
       {/* Branding — inside card */}
-      <div className="text-center space-y-1.5 mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-white">
-          Nella<span style={{ color: '#9EFF00' }}>Sales</span>
-        </h1>
+      <div className="text-center space-y-3 mb-8">
+        <img src="/logo.png" alt="NellaUp" className="h-10 mx-auto" />
         <p className="text-sm" style={{ color: 'rgba(240,244,255,0.5)' }}>
           Inicia sesión en tu cuenta
         </p>
@@ -154,7 +152,7 @@ export function LoginForm({ tenantSlug }: LoginFormProps) {
             <Link
               href="/register"
               className="font-medium hover:underline transition-colors"
-              style={{ color: '#9EFF00' }}
+              style={{ color: '#8C28FA' }}
             >
               Regístrate aquí
             </Link>
