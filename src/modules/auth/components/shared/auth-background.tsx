@@ -22,7 +22,7 @@ export function AuthBackground({ children, className }: AuthBackgroundProps) {
       className={cn('auth-scope relative min-h-screen overflow-hidden', className)}
       style={{ backgroundColor: '#151515' }}
     >
-      {/* Teal orb — top-right, atmósfera primaria */}
+      {/* Purple orb — top-right */}
       <div
         aria-hidden
         style={{
@@ -33,7 +33,7 @@ export function AuthBackground({ children, className }: AuthBackgroundProps) {
           height: '720px',
           borderRadius: '50%',
           background:
-            'radial-gradient(circle at 50% 50%, rgba(0,205,190,0.30) 0%, rgba(0,175,162,0.12) 38%, rgba(0,140,130,0.04) 60%, transparent 75%)',
+            'radial-gradient(circle at 50% 50%, rgba(140,40,250,0.28) 0%, rgba(124,58,237,0.12) 38%, rgba(100,40,200,0.04) 60%, transparent 75%)',
           filter: 'blur(65px)',
           animation: 'orb-breathe 7s ease-in-out infinite',
           pointerEvents: 'none',
@@ -41,7 +41,7 @@ export function AuthBackground({ children, className }: AuthBackgroundProps) {
         }}
       />
 
-      {/* Purple orb — bottom-left, atmósfera secundaria */}
+      {/* Purple orb — bottom-left */}
       <div
         aria-hidden
         style={{
@@ -52,7 +52,7 @@ export function AuthBackground({ children, className }: AuthBackgroundProps) {
           height: '640px',
           borderRadius: '50%',
           background:
-            'radial-gradient(circle at 50% 50%, rgba(65,60,220,0.20) 0%, rgba(45,40,175,0.08) 42%, transparent 70%)',
+            'radial-gradient(circle at 50% 50%, rgba(124,58,237,0.22) 0%, rgba(100,40,200,0.08) 42%, transparent 70%)',
           filter: 'blur(80px)',
           animation: 'orb-breathe-slow 9s ease-in-out infinite',
           pointerEvents: 'none',
