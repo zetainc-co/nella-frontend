@@ -25,7 +25,7 @@ export function useContacts(query?: ContactsQuery) {
   const qs = params.toString()
 
   return useQuery<BackendContact[]>({
-    queryKey: [...queryKeys.contacts.all(), query],
+    queryKey: [...queryKeys.contacts.all(query?.project_id), query],
     queryFn: async () => {
       const res = await apiClient.get<{ items: BackendContact[] } | BackendContact[]>(
         `/api/contacts${qs ? `?${qs}` : ''}`,

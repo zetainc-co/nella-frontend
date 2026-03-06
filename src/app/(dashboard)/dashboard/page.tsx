@@ -1,7 +1,8 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { useProjects } from "@/modules/dashboard/hooks/useProjects";
+import { useProjectStore } from "@/core/store/project-store";
 import { ProjectEmptyState } from "@/modules/dashboard/components/project-empty-state";
 import { CreateProjectModal } from "@/modules/dashboard/components/create-project-modal";
 import { MetricsDashboard } from "@/modules/dashboard/components/metrics-dashboard";
@@ -30,22 +31,11 @@ function DashboardSkeleton() {
 function DashboardContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const { data: projects, isLoading } = useProjects();
-
-  // Get selected project from localStorage (same as layout)
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedId = localStorage.getItem('nella-selected-project');
-      setActiveProjectId(storedId || projects?.[0]?.id || null);
-    }
-  }, [projects]);
+  const activeProjectId = useProjectStore((s) => s.selectedProjectId);
+  const setSelectedProjectId = useProjectStore((s) => s.setSelectedProjectId);
 
   function handleProjectCreated(id: string) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('nella-selected-project', id);
-      setActiveProjectId(id);
-    }
+    setSelectedProjectId(id);
     setModalOpen(false);
   }
 

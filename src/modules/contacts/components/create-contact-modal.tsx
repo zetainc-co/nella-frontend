@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Modal, ModalSection } from "@/components/shared/modal/modal"
 import type { CreateContactModalProps } from "@/modules/contacts/types/contact-types"
 import { useCreateContact, useUpdateContact } from "@/modules/contacts/hooks/useContacts"
+import { useProjectStore } from "@/core/store/project-store"
 
 const EMPTY_FORM = {
     name: "", email: "", phone: "", channel: "",
@@ -78,10 +79,7 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
             setTags([])
         }
 
-        // Get selected project from localStorage
-        const selectedProjectId = typeof window !== 'undefined'
-            ? localStorage.getItem('nella-selected-project')
-            : null
+        const selectedProjectId = useProjectStore.getState().selectedProjectId
 
         if (isEditMode) {
             updateContact.mutate(

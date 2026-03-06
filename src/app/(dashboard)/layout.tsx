@@ -18,9 +18,11 @@ import {
 import { useLogout } from "@/shared/hooks/useLogout";
 import { ProtectedRoute } from "@/core/routes/ProtectedRoute";
 import { useAuthStore } from "@/core/store/auth-store";
+import { useProjectStore } from "@/core/store/project-store";
 import { useProjects } from "@/modules/dashboard/hooks/useProjects";
 import type { Project } from "@/modules/dashboard/types/dashboard-types";
 import { CreateProjectModal } from "@/modules/dashboard/components/create-project-modal";
+import { ProjectLoader } from "@/shared/components/project-loader/project-loader";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -200,12 +202,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { user } = useAuthStore();
   const pathname = usePathname();
   const { data: projects } = useProjects();
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('nella-selected-project') || null;
-    }
-    return null;
-  });
+  const selectedProjectId = useProjectStore((s) => s.selectedProjectId);
+  const setSelectedProjectId = useProjectStore((s) => s.setSelectedProjectId);
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -217,11 +215,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
+  // Auto-select first project if none selected
   useEffect(() => {
-    if (selectedProjectId && typeof window !== 'undefined') {
-      localStorage.setItem('nella-selected-project', selectedProjectId);
+    if (!selectedProjectId && projects && projects.length > 0) {
+      setSelectedProjectId(projects[0].id);
     }
-  }, [selectedProjectId]);
+  }, [selectedProjectId, projects, setSelectedProjectId]);
 
   const currentProject = projects?.find((p: Project) => p.id === selectedProjectId) ?? projects?.[0];
 
@@ -463,6 +462,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
           <main className="flex-1 overflow-auto">{children}</main>
         </div>
+
+        {/* Project transition loader */}
+        <ProjectLoader />
 
         {/* Create Project Modal */}
         <CreateProjectModal

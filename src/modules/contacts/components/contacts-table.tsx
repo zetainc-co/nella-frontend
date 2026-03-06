@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ContactDetailModal } from "./contact-detail-modal"
 import type { ContactDetail } from "@/modules/contacts/types/contact-types"
 import { useContacts, useContactsSSE } from "@/modules/contacts/hooks/useContacts"
+import { useProjectStore } from "@/core/store/project-store"
 import type { BackendContact } from "@/modules/contacts/types/contacts"
 import { STATUS_TO_STAGE, mapLeadStatusToStage, STAGE_BADGE } from "@/modules/kanban/hooks/use-kanban-constants"
 import type { LeadStage } from "@/modules/kanban/types/kanban-types"
@@ -77,10 +78,7 @@ export function ContactsTable() {
     const [currentPage, setCurrentPage] = useState(1)
     const [selectedContact, setSelectedContact] = useState<ContactDetail | null>(null)
 
-    // Get selected project from localStorage
-    const selectedProjectId = typeof window !== 'undefined'
-        ? localStorage.getItem('nella-selected-project')
-        : null
+    const selectedProjectId = useProjectStore((s) => s.selectedProjectId)
 
     const { data: backendContacts = [], isLoading } = useContacts(
         selectedProjectId ? { project_id: selectedProjectId } : undefined
