@@ -51,8 +51,8 @@ export function useContactsSSE() {
       queryClient.invalidateQueries({ queryKey: queryKeys.contacts.all() })
     })
 
-    socket.on('connect_error', (err) => {
-      console.debug('contacts socket connect_error:', err.message)
+    socket.on('connect_error', () => {
+      // silently handle connection errors
     })
 
     return () => {

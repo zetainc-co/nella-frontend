@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LATAM_COUNTRIES } from "@/lib/countries-latam";
+import { LATAM_COUNTRIES } from "@shared/data/countries-latam";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,12 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface CountryPhoneSelectorProps {
-  value: string; // E.164 completo: "+573001234567"
-  onChange: (e164: string) => void;
-  error?: string;
-  label?: string; // Label personalizable
-}
+import type { CountryPhoneSelectorProps } from '@/modules/auth/types/auth-types'
 
 export function CountryPhoneSelector({
   value,

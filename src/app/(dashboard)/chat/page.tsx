@@ -1,5 +1,10 @@
 'use client'
-import { InboxChat } from '@/modules/chat/components/inbox-chat'
+import dynamic from 'next/dynamic'
+
+const InboxChat = dynamic(
+  () => import('@/modules/chat/components/inbox-chat').then(m => ({ default: m.InboxChat })),
+  { ssr: false }
+)
 
 export default function ChatPage() {
   return (

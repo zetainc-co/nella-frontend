@@ -46,3 +46,73 @@ export interface DashboardData {
   salesTeam: SalesTeamMember[]
   aiSavings: AiSavings
 }
+
+// ── Component Props ─────────────────────────────────────────
+
+export interface KpiCardProps {
+  title: string
+  value: string
+  icon: import('lucide-react').LucideIcon
+  loading?: boolean
+  accent?: string
+}
+
+export interface ProjectSelectorProps {
+  projects: Project[]
+  activeProjectId: string
+  onSelect: (id: string) => void
+  onCreateClick: () => void
+}
+
+export interface ProjectEmptyStateProps {
+  onCreateClick: () => void
+}
+
+export interface FeatureIconProps {
+  icon: import('lucide-react').LucideIcon
+  label: string
+}
+
+export interface MetricCardProps {
+  title: string
+  value: string | number
+  unit?: string
+  change: string
+  icon: import('lucide-react').LucideIcon
+  iconColor?: string
+  glowColor?: string
+}
+
+export interface AiSavingsCardProps {
+  aiSavings: AiSavings
+  isLoading?: boolean
+}
+
+export interface ConversionFunnelProps {
+  funnel: ProjectMetrics['funnel']
+}
+
+export interface SalesTeamTableProps {
+  salesTeam: SalesTeamMember[]
+  isLoading?: boolean
+}
+
+export interface TrafficSourcesProps {
+  sources: ProjectMetrics['trafficSources']
+  totalLeads: number
+}
+
+export interface LeadsLineChartProps {
+  revenueMonth: ProjectMetrics['revenueMonth']
+  projectId: string
+}
+
+export interface CreateProjectModalProps {
+  open: boolean
+  onClose: () => void
+  onCreated: (projectId: string) => void
+}
+
+export interface MetricsDashboardProps {
+  projectId: string
+}

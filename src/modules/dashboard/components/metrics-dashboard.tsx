@@ -1,17 +1,14 @@
 "use client";
 
 import { Users, DollarSign, TrendingUp, Target } from "lucide-react";
-import { MetricCard } from "@/components/dashboard/metric-card";
+import { MetricCard } from "./metric-card";
 import { LeadsLineChart } from "./leads-line-chart";
 import { ConversionFunnel } from "./conversion-funnel";
 import { TrafficSources } from "./traffic-sources";
 import { SalesTeamTable } from "./sales-team-table";
 import { AiSavingsCard } from "./ai-savings-card";
 import { useDashboard } from "@/modules/dashboard/hooks/useDashboard";
-
-interface MetricsDashboardProps {
-  projectId: string;
-}
+import type { MetricsDashboardProps } from '@/modules/dashboard/types/dashboard-types';
 
 export function MetricsDashboard({ projectId }: MetricsDashboardProps) {
   const { data: dashboard, isLoading } = useDashboard(projectId);

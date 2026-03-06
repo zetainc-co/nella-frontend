@@ -1,12 +1,4 @@
-import type { LucideIcon } from "lucide-react";
-
-interface KpiCardProps {
-  title: string;
-  value: string;
-  icon: LucideIcon;
-  loading?: boolean;
-  accent?: string; // hex color for icon bg tint
-}
+import type { KpiCardProps } from '@/modules/dashboard/types/dashboard-types'
 
 export function KpiCard({
   title,

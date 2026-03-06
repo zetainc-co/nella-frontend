@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { useAuthStore } from '@/core/store/auth-store'
 import { apiClient } from '@/core/api/api-client'
 import { queryKeys } from '@/core/api/query-keys'
-import { mockOrganization } from '@/lib/mock-data/settings'
+
 
 export interface OrganizationData {
   name: string

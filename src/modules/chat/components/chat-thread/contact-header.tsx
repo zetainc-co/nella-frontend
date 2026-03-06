@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { User, MoreVertical, Loader2 } from 'lucide-react'
 import type { ContactHeaderProps } from '../../types'
-import { getInitials } from '@/utils/get-initials'
+import { getInitials } from '@shared/utils/get-initials'
 import { useAIToggle, useCurrentUserId } from '../../hooks'
 import { ContactProfileDrawer } from './contact-profile-drawer'
 

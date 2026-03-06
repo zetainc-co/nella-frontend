@@ -1,4 +1,11 @@
-import { KanbanBoard } from '@/modules/kanban/components/kanban-board'
+'use client'
+
+import dynamic from 'next/dynamic'
+
+const KanbanBoard = dynamic(
+  () => import('@/modules/kanban/components/kanban-board').then(m => ({ default: m.KanbanBoard })),
+  { ssr: false }
+)
 
 export default function KanbanPage() {
   return (

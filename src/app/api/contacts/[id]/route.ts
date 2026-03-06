@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { backendHeaders, unwrapBackend } from '@/lib/backend-fetch'
-
+import { backendHeaders, unwrapBackend } from '@/core/api/backend-proxy'
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'
 
 export async function GET(

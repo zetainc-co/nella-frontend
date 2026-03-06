@@ -8,9 +8,9 @@ import {
   saveRegistrationProgress,
   loadRegistrationProgress,
   clearRegistrationProgress,
-} from '@/lib/registration-storage'
+} from '@/modules/auth/services/registration-storage'
 
-type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 // Steps 1-4, Summary (5), EmailVerification (6)
+type WizardStep = 1 | 2 | 3 | 4 | 5 // Steps 1-3, Summary (4), EmailVerification (5)
 
 export function useRegistrationWizard() {
   const router = useRouter()
@@ -33,8 +33,8 @@ export function useRegistrationWizard() {
 
   // Auto-guardar progreso cuando cambia
   useEffect(() => {
-    if (currentStep < 6) {
-      // No guardar en step 6 (verificación)
+    if (currentStep < 5) {
+      // No guardar en step 5 (verificación)
       saveRegistrationProgress(currentStep, completedSteps, formData)
     }
   }, [currentStep, completedSteps, formData])
@@ -56,7 +56,7 @@ export function useRegistrationWizard() {
       updateStepData(currentStep, data)
     }
 
-    if (currentStep < 6) {
+    if (currentStep < 5) {
       setCurrentStep((currentStep + 1) as WizardStep)
     }
   }
@@ -95,7 +95,6 @@ export function useRegistrationWizard() {
         description: formData.description,
         priceRange: formData.priceRange,
         idealCustomer: formData.idealCustomer,
-        whatsappNumber: formData.whatsappNumber,
       }
 
       const response = await fetch('/api/auth/register', {
@@ -130,7 +129,6 @@ export function useRegistrationWizard() {
   }
 
   // completeRegistration ya no es necesaria — el backend activa el tenant directamente
-  // Se mantiene por compatibilidad pero no se usa en el flujo principal
   const completeRegistration = () => {
     clearRegistrationProgress()
     router.push('/dashboard')
@@ -138,7 +136,7 @@ export function useRegistrationWizard() {
 
   // Reenviar código (simulado)
   const resendVerificationCode = () => {
-    console.log('Código de verificación reenviado a:', formData.email)
+    // TODO: implement actual verification code resend
   }
 
   return {

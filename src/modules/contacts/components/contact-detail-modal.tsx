@@ -10,7 +10,7 @@ import {
     PhoneCall,
 } from "lucide-react"
 import { useState } from "react"
-import { Modal } from "@/components/shared/modal/modal"
+import { Modal } from "@shared/components/modal/modal"
 import { Button } from "@/components/ui/button"
 import { ScoreRing } from "./score-ring"
 import { InfoCard } from "./info-card"

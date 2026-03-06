@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import { Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
-import { Modal } from '@/components/shared/modal/modal'
+import { Modal } from '@shared/components/modal/modal'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

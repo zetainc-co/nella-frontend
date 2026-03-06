@@ -1,7 +1,6 @@
 // src/app/api/calendar/booking-links/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { getBackendUrl, extractAuthHeaders } from '@/lib/backend-proxy'
-import { unwrapBackend } from '@/lib/backend-fetch'
+import { getBackendUrl, extractAuthHeaders, unwrapBackend } from '@/core/api/backend-proxy'
 
 export async function PATCH(
   request: NextRequest,

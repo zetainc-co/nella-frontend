@@ -1,38 +1,24 @@
 // src/components/auth/registration-step-4.tsx
 'use client'
 
-import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { step4Schema } from '@/lib/registration-validations'
-import { RegistrationFormData } from '@/modules/auth/types/auth-types'
+import { registrationStep4Schema } from '@/modules/auth/hooks/auth-validations'
+import type { RegistrationStepProps } from '@/modules/auth/types/auth-types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { CountryPhoneSelector } from '@/modules/auth/components/country-phone-selector'
 import { ChevronLeft, ChevronRight, Loader2, CheckCircle2, MessageSquare } from 'lucide-react'
+import { useOtpVerification } from '@/modules/auth/hooks/useOtpVerification'
 
-interface RegistrationStep4Props {
-  initialData: Partial<RegistrationFormData>
-  onNext: (data: Partial<RegistrationFormData>) => void
-  onBack: () => void
-}
-
-export function RegistrationStep4({ initialData, onNext, onBack }: RegistrationStep4Props) {
-  const [otpSent, setOtpSent] = useState(false)
-  const [otpVerified, setOtpVerified] = useState(false)
-  const [isSending, setIsSending] = useState(false)
-  const [isVerifying, setIsVerifying] = useState(false)
-  const [otpCode, setOtpCode] = useState(['', '', '', '', '', ''])
-  const [otpError, setOtpError] = useState<string | null>(null)
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([])
-
+export function RegistrationStep4({ initialData, onNext, onBack }: RegistrationStepProps) {
   const {
     handleSubmit,
     watch,
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(step4Schema),
+    resolver: zodResolver(registrationStep4Schema),
     defaultValues: {
       whatsappNumber: initialData.whatsappNumber || '',
     },
@@ -40,61 +26,18 @@ export function RegistrationStep4({ initialData, onNext, onBack }: RegistrationS
 
   const whatsappNumber = watch('whatsappNumber')
 
-  const handleSendOtp = async () => {
-    if (!whatsappNumber) return
-    setIsSending(true)
-    // Mock: simular envío de OTP via WhatsApp
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    setOtpSent(true)
-    setIsSending(false)
-    setTimeout(() => inputRefs.current[0]?.focus(), 100)
-  }
-
-  const handleOtpChange = (index: number, value: string) => {
-    if (value && !/^\d$/.test(value)) return
-    const newCode = [...otpCode]
-    newCode[index] = value
-    setOtpCode(newCode)
-    setOtpError(null)
-    if (value && index < 5) inputRefs.current[index + 1]?.focus()
-    if (newCode.every(d => d !== '') && newCode.join('').length === 6) {
-      verifyOtp(newCode.join(''))
-    }
-  }
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus()
-    }
-  }
-
-  const verifyOtp = async (code: string) => {
-    setIsVerifying(true)
-    setOtpError(null)
-
-    try {
-      const response = await fetch('/api/auth/verify-whatsapp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: whatsappNumber, code }),
-      })
-
-      if (response.ok) {
-        setOtpVerified(true)
-      } else {
-        const data = await response.json().catch(() => ({}))
-        setOtpError(data.message ?? 'Código incorrecto. Intenta nuevamente.')
-        setOtpCode(['', '', '', '', '', ''])
-        setTimeout(() => inputRefs.current[0]?.focus(), 100)
-      }
-    } catch {
-      setOtpError('Error de conexión. Intenta nuevamente.')
-      setOtpCode(['', '', '', '', '', ''])
-      setTimeout(() => inputRefs.current[0]?.focus(), 100)
-    } finally {
-      setIsVerifying(false)
-    }
-  }
+  const {
+    otpSent,
+    otpVerified,
+    isSending,
+    isVerifying,
+    otpCode,
+    otpError,
+    inputRefs,
+    handleSendOtp,
+    handleOtpChange,
+    handleOtpKeyDown,
+  } = useOtpVerification(whatsappNumber)
 
   const onSubmit = handleSubmit((data) => {
     onNext(data)
@@ -144,7 +87,7 @@ export function RegistrationStep4({ initialData, onNext, onBack }: RegistrationS
           <div className="flex justify-center gap-2">
             {otpCode.map((digit, index) => (
               <Input
-                key={index}
+                key={`otp-${index}`}
                 ref={el => { inputRefs.current[index] = el }}
                 type="text"
                 inputMode="numeric"

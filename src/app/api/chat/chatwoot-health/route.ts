@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-
-const CHATWOOT_URL = process.env.CHATWOOT_URL ?? 'http://localhost:4000'
+const CHATWOOT_URL = process.env.CHATWOOT_URL || 'http://localhost:3001'
 
 // GET /api/chat/chatwoot-health
 // Proxy health check server-side para evitar CORS desde el browser

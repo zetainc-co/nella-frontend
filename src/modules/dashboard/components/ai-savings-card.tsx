@@ -1,12 +1,7 @@
 'use client';
 
 import { Sparkles } from 'lucide-react';
-import type { AiSavings } from '@/modules/dashboard/types/dashboard-types';
-
-interface AiSavingsCardProps {
-  aiSavings: AiSavings;
-  isLoading?: boolean;
-}
+import type { AiSavingsCardProps } from '@/modules/dashboard/types/dashboard-types';
 
 export function AiSavingsCard({ aiSavings, isLoading }: AiSavingsCardProps) {
   if (isLoading) {

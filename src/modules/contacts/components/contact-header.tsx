@@ -1,7 +1,8 @@
 import { Pencil } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import type { ContactDetail } from "@/modules/contacts/types/contact-types"
+import { getInitials } from "@shared/utils"
+import type { ContactHeaderProps } from "@/modules/contacts/types/contact-types"
 
 const stageVariants: Record<string, "cliente" | "lead" | "inactivo"> = {
     "Cliente": "cliente",
@@ -9,19 +10,11 @@ const stageVariants: Record<string, "cliente" | "lead" | "inactivo"> = {
     "Inactivo": "inactivo",
 }
 
-function getInitials(name: string | null | undefined) {
-    if (!name || typeof name !== 'string' || name.trim() === '') return '?'
-    const trimmedName = name.trim()
-    const parts = trimmedName.split(' ').filter(Boolean)
-    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-    return trimmedName.substring(0, 2).toUpperCase()
-}
-
-export function ContactHeader({ contact, onEdit }: { contact: ContactDetail; onEdit?: () => void }) {
+export function ContactHeader({ contact, onEdit }: ContactHeaderProps) {
     return (
         <div className="flex items-start gap-4">
             <div className="w-16 h-16 rounded-full bg-[#2a2a2e] border border-gray-700 flex items-center justify-center text-white text-lg font-bold shrink-0">
-                {getInitials(contact.name)}
+                {getInitials(contact.name || '?')}
             </div>
             <div className="flex-1 min-w-0 pr-10">
                 <div className="flex items-center justify-between">

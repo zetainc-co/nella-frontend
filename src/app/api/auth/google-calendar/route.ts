@@ -1,6 +1,6 @@
 // src/app/api/auth/google-calendar/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { getBackendUrl, extractAuthHeaders } from '@/lib/backend-proxy'
+import { getBackendUrl, extractAuthHeaders } from '@/core/api/backend-proxy'
 
 export async function DELETE(request: NextRequest) {
   try {

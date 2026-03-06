@@ -2,8 +2,8 @@
 import { memo, useState } from 'react'
 import { MoreVertical } from 'lucide-react'
 import type { ConversationItemProps } from '../../types'
-import { formatRelativeTime } from '@/utils/format-relative-time'
-import { getInitials } from '@/utils/get-initials'
+import { formatRelativeTime } from '@shared/utils/format-relative-time'
+import { getInitials } from '@shared/utils/get-initials'
 import { ConversationContextMenu } from './conversation-context-menu'
 
 function ConversationItemComponent({

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { backendHeaders, unwrapBackend } from '@/lib/backend-fetch';
-
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
+import { backendHeaders, unwrapBackend } from '@/core/api/backend-proxy';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'
 
 export async function PATCH(request: NextRequest) {
   try {

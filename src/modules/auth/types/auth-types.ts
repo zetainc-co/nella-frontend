@@ -82,11 +82,24 @@ export type CompanySize = '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' |
 // OAuth Types
 export type OAuthProvider = 'google' | 'apple'
 
-// Auth State
+// Auth State (used by Zustand store)
 export interface AuthState {
   user: User | null
   session: Session | null
   isAuthenticated: boolean
+  isLoading: boolean
+  tenantSubdomain: string | null
+  setUser: (user: User | null) => void
+  setSession: (session: Session | null) => void
+  setLoading: (isLoading: boolean) => void
+  setTenantSubdomain: (subdomain: string | null) => void
+  logout: () => void
+  updateUser: (updates: Partial<User>) => void
+  getAccessToken: () => string | null
+}
+
+export interface AuthValidationResult {
+  isValid: boolean
   isLoading: boolean
 }
 
@@ -95,23 +108,6 @@ export interface RegistrationProgress {
   currentStep: number
   completedSteps: number[]
   formData: Partial<RegistrationFormData>
-}
-
-// Project & Metrics Types
-export interface Project {
-  id: string
-  name: string
-  owner_id: string
-  created_at: string
-  updated_at: string
-}
-
-export interface ProjectMetrics {
-  totalLeads: number
-  activeLeads: number
-  revenueMonth: number
-  trafficSources: { source: string; count: number }[]
-  funnel: { status: string; count: number }[]
 }
 
 // Country & Industry Types (used in registration)
@@ -126,4 +122,42 @@ export interface Country {
 export interface Industry {
   value: string
   label: string
+}
+
+// Component Props
+export interface RegistrationStepProps {
+  initialData: Partial<RegistrationFormData>
+  onNext: (data: Partial<RegistrationFormData>) => void
+  onBack?: () => void
+}
+
+export interface RegistrationSummaryProps {
+  formData: Partial<RegistrationFormData>
+  onConfirm: () => void
+  onBack: () => void
+  onEdit: (step: number) => void
+  isCreatingWorkflow?: boolean
+  workflowError?: string | null
+}
+
+export interface EmailVerificationProps {
+  email: string
+  onVerified: () => void
+  onResendCode: () => void
+}
+
+export interface CountryPhoneSelectorProps {
+  value: string
+  onChange: (e164: string) => void
+  error?: string
+  label?: string
+}
+
+export interface CreatePasswordFormProps {
+  token: string
+  email: string
+}
+
+export interface LoginFormProps {
+  tenantSlug?: string
 }

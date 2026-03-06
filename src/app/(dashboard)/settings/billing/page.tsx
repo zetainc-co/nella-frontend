@@ -1,12 +1,21 @@
 "use client";
 
-import { mockBilling } from "@/lib/mock-data/settings";
 import {
   SettingsPageHeader,
   SettingsCard,
   SettingsGhostButton,
   SettingsLimeBadge,
 } from "@/modules/settings/components/settings-ui";
+
+// TODO: Replace with real billing API hook when available
+const billingPlaceholder = {
+  plan: "—",
+  price: 0,
+  currency: "COP",
+  licenses: { used: 0, total: 0 },
+  nextBilling: new Date().toISOString(),
+  paymentMethod: { type: "—", last4: "····", expiresAt: "—" },
+};
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("es-CO", {
@@ -24,6 +33,7 @@ const formatDate = (dateString: string) => {
 };
 
 export default function FacturacionPage() {
+  const mockBilling = billingPlaceholder;
   return (
     <div className="p-6 md:p-6 space-y-6 max-w-5xl mx-auto">
       <SettingsPageHeader

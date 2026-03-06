@@ -305,9 +305,9 @@ export function ContactProfileDrawer({
               <div className="space-y-2">
                 <h4 className="text-xs text-[#f0f4ff]/60">Etiquetas</h4>
                 <div className="flex flex-wrap gap-2">
-                  {contact.tags.map((tag, index) => (
+                  {contact.tags.map((tag) => (
                     <span
-                      key={index}
+                      key={tag}
                       className="px-3 py-1 bg-white/[0.05] border border-white/[0.1] text-[#f0f4ff]/80 text-xs rounded-md"
                     >
                       {tag}

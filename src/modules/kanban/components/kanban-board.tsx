@@ -12,7 +12,8 @@ import {
   useKanbanData,
   useKanbanSSE,
   useKanbanDragDrop,
-  useKanbanConstants
+  useKanbanConstants,
+  useKanbanLeads,
 } from '@/modules/kanban/hooks'
 import { useKanbanStore } from '@/modules/kanban/stores/kanban-store'
 import { LeadCard } from './lead-card'
@@ -32,7 +33,8 @@ export function KanbanBoard() {
     })
   )
 
-  const isLoading = useKanbanSSE()
+  useKanbanSSE()
+  const { isLoading } = useKanbanLeads()
   const { filteredLeads, getStageCount, getLeadsForStage } = useKanbanData()
   const { activeLead, handleDragStart, handleDragEnd } = useKanbanDragDrop()
   const { KANBAN_COLUMNS } = useKanbanConstants()

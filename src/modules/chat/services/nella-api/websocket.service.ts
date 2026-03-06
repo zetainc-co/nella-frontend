@@ -17,9 +17,7 @@ class ChatWebSocketService {
   private baseUrl: string
 
   constructor() {
-    // URL del backend - ajustar según environment
-    this.baseUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
+    this.baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
   }
 
   /**
@@ -27,7 +25,6 @@ class ChatWebSocketService {
    */
   connect() {
     if (this.socket?.connected) {
-      console.log('[WebSocket] Already connected')
       return this.socket
     }
 
@@ -41,11 +38,11 @@ class ChatWebSocketService {
     })
 
     this.socket.on('connect', () => {
-      console.log('[WebSocket] Connected:', this.socket?.id)
+      // connected
     })
 
-    this.socket.on('disconnect', (reason) => {
-      console.log('[WebSocket] Disconnected:', reason)
+    this.socket.on('disconnect', () => {
+      // disconnected
     })
 
     this.socket.on('connect_error', (error) => {
@@ -62,7 +59,6 @@ class ChatWebSocketService {
     if (this.socket) {
       this.socket.disconnect()
       this.socket = null
-      console.log('[WebSocket] Disconnected')
     }
   }
 
@@ -76,7 +72,6 @@ class ChatWebSocketService {
     }
 
     this.socket.emit('join_conversation', { conversationId, userId })
-    console.log('[WebSocket] Joined conversation:', conversationId)
   }
 
   /**
@@ -86,7 +81,6 @@ class ChatWebSocketService {
     if (!this.socket) return
 
     this.socket.emit('leave_conversation', { conversationId })
-    console.log('[WebSocket] Left conversation:', conversationId)
   }
 
   /**

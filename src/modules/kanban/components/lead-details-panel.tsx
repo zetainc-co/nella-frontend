@@ -9,29 +9,20 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useKanbanStore } from '@/modules/kanban/stores/kanban-store'
+import { useKanbanLeads } from '@/modules/kanban/hooks/use-kanban-leads'
 import type { LeadDetailsPanelProps } from '@/modules/kanban/types/kanban-types'
 import { Phone, Mail, Sparkles, User } from 'lucide-react'
-
-const stageLabels = {
-  new: 'Nuevo',
-  contacted: 'Calificado',
-  proposal: 'Negociación',
-  closed: 'Cerrado'
-}
+import { getInitials } from '@shared/utils'
+import { useKanbanConstants } from '@/modules/kanban/hooks'
 
 export function LeadDetailsPanel({ open, onClose }: LeadDetailsPanelProps) {
-  const { selectedLeadId, leads } = useKanbanStore()
+  const selectedLeadId = useKanbanStore(s => s.selectedLeadId)
+  const { data: leads = [] } = useKanbanLeads()
+  const { STAGE_LABELS } = useKanbanConstants()
 
   const lead = leads.find(l => l.id === selectedLeadId)
 
   if (!lead) return null
-
-  const getInitials = (name: string | null) => {
-    if (!name) return '?'
-    const parts = name.split(' ')
-    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-    return name.substring(0, 2).toUpperCase()
-  }
 
   return (
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -44,7 +35,7 @@ export function LeadDetailsPanel({ open, onClose }: LeadDetailsPanelProps) {
               className="w-12 h-12 rounded-full flex items-center justify-center text-black text-sm font-bold shrink-0"
               style={{ backgroundColor: '#8BD21D' }}
             >
-              {getInitials(lead.name)}
+              {getInitials(lead.name || '?')}
             </div>
             <div className="flex-1 min-w-0">
               <SheetTitle className="text-lg text-foreground truncate">
@@ -53,7 +44,7 @@ export function LeadDetailsPanel({ open, onClose }: LeadDetailsPanelProps) {
               <p className="text-sm text-muted-foreground">{lead.phone}</p>
             </div>
             <span className="px-3 py-1 bg-[#8BD21D]/10 text-[#8BD21D] text-xs font-medium rounded-full shrink-0">
-              {stageLabels[lead.stage]}
+              {STAGE_LABELS[lead.stage]}
             </span>
           </div>
         </SheetHeader>
@@ -126,7 +117,7 @@ export function LeadDetailsPanel({ open, onClose }: LeadDetailsPanelProps) {
           <Button
             variant="outline"
             className="w-full justify-start hover:bg-[#8BD21D]/10 hover:text-[#8BD21D] hover:border-[#8BD21D]/30"
-            onClick={() => console.log('Ver perfil:', lead.id)}
+            onClick={() => {}}
           >
             <User className="w-4 h-4 mr-2" />
             Ver perfil completo

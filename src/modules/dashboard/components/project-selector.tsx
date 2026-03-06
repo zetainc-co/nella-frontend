@@ -2,14 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronDown, Plus } from 'lucide-react'
-import type { Project } from '@/modules/dashboard/types/dashboard-types'
-
-interface ProjectSelectorProps {
-  projects: Project[]
-  activeProjectId: string
-  onSelect: (id: string) => void
-  onCreateClick: () => void
-}
+import type { ProjectSelectorProps } from '@/modules/dashboard/types/dashboard-types'
 
 export function ProjectSelector({ projects, activeProjectId, onSelect, onCreateClick }: ProjectSelectorProps) {
   const [open, setOpen] = useState(false)

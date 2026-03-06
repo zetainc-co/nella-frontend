@@ -34,3 +34,8 @@ export interface CreateContactModalProps {
   onOpenChange: (open: boolean) => void
   contact?: ContactDetail | null
 }
+
+export interface ContactHeaderProps {
+  contact: ContactDetail
+  onEdit?: () => void
+}
