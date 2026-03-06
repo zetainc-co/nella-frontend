@@ -32,7 +32,7 @@ export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetai
             header={<ContactHeader contact={contact} onEdit={() => setShowEditModal(true)} />}
             footer={
                 <div className="flex gap-3 w-full">
-                    <Button className="flex-1 bg-[#8BD21D] hover:bg-[#7bc018] text-black font-semibold">
+                    <Button className="flex-1 bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-semibold">
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Iniciar Conversación
                     </Button>
@@ -58,7 +58,7 @@ export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetai
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-sm text-gray-400">Score IA</span>
                                 <span className={`text-sm font-semibold ${
-                                    contact.score >= 70 ? "text-green-400" :
+                                    contact.score >= 70 ? "text-[#A78BFA]" :
                                     contact.score >= 40 ? "text-yellow-400" : "text-red-400"
                                 }`}>
                                     {contact.scoreLabel}
@@ -121,7 +121,7 @@ export function ContactDetailModal({ open, onOpenChange, contact }: ContactDetai
                             <Tag className="w-4 h-4 text-gray-400" />
                             Etiquetas
                         </h4>
-                        <button className="text-sm text-[#8BD21D] hover:text-[#a0e632] transition-colors">
+                        <button className="text-sm text-[#A78BFA] hover:text-[#C4B5FD] transition-colors">
                             + Agregar Etiqueta
                         </button>
                     </div>

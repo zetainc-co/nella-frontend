@@ -7,13 +7,13 @@ import { UpcomingEvents } from './upcoming-events'
 export function CalendarSidebar() {
   return (
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar divide-y divide-border">
-      <div>
+      <div className="m-4 border border-border rounded-lg">
         <MiniCalendar />
       </div>
-      <div>
+      <div className="m-4 border border-border rounded-lg">
         <ProjectFilters />
       </div>
-      <div>
+      <div className="m-4 border border-border rounded-lg">
         <UpcomingEvents />
       </div>
     </div>

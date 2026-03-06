@@ -43,7 +43,16 @@ export const useKanbanStore = create<KanbanStore>((set, get) => ({
     }
 
     try {
-      const raw = await apiClient.get<{ items: BackendContact[] } | BackendContact[]>('/api/contacts')
+      // Get selected project from localStorage
+      const selectedProjectId = typeof window !== 'undefined'
+        ? localStorage.getItem('nella-selected-project')
+        : null
+
+      const endpoint = selectedProjectId
+        ? `/api/contacts?project_id=${selectedProjectId}`
+        : '/api/contacts'
+
+      const raw = await apiClient.get<{ items: BackendContact[] } | BackendContact[]>(endpoint)
       const contacts: BackendContact[] = Array.isArray(raw) ? raw : ((raw as { items: BackendContact[] })?.items ?? [])
       const leads = contacts.map(transformContactToLead)
       set({ leads, isLoading: false, error: null })

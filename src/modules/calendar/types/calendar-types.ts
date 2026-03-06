@@ -1,6 +1,6 @@
 // src/types/calendar-types.ts
 
-export type ProjectName = 'MundoStetic' | 'TechCorp' | 'NellaSales'
+export type ProjectName = 'MundoStetic' | 'TechCorp' | 'Solventum'
 export type CalendarLayer = 'my-agenda' | 'team-agenda' | 'ai-appointments'
 export type ConfirmationStatus = 'confirmed' | 'pending' | 'cancelled'
 export type DayKey = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab' | 'dom'
@@ -101,7 +101,7 @@ export interface NewEventFormData {
 const KNOWN_PROJECT_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   MundoStetic: { bg: 'rgba(59,130,246,0.15)', text: '#3b82f6', border: '#3b82f6' },
   TechCorp:    { bg: 'rgba(249,115,22,0.15)', text: '#f97316', border: '#f97316' },
-  NellaSales:  { bg: 'rgba(132,204,22,0.15)', text: '#84cc16', border: '#84cc16' },
+  Solventum:   { bg: 'rgba(168,85,247,0.15)', text: '#a855f7', border: '#a855f7' },
 }
 
 const DEFAULT_PROJECT_COLORS = {
@@ -119,11 +119,11 @@ export function getProjectColors(project: string): { bg: string; text: string; b
 export const PROJECT_COLORS: Record<ProjectName, { bg: string; text: string; border: string }> = {
   MundoStetic: KNOWN_PROJECT_COLORS.MundoStetic,
   TechCorp:    KNOWN_PROJECT_COLORS.TechCorp,
-  NellaSales:  KNOWN_PROJECT_COLORS.NellaSales,
+  Solventum:   KNOWN_PROJECT_COLORS.Solventum,
 }
 
 export const LAYER_CONFIG: Record<CalendarLayer, { dot: string; label: string }> = {
-  'my-agenda':        { dot: '#22c55e', label: 'Mi Agenda' },
+  'my-agenda':        { dot: '#a855f7', label: 'Mi Agenda' },
   'team-agenda':      { dot: '#3b82f6', label: 'Agenda del Equipo' },
   'ai-appointments':  { dot: '#a855f7', label: 'Citas IA' },
 }

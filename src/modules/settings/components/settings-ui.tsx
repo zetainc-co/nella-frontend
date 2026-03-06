@@ -113,9 +113,9 @@ export function SettingsCTAButton({
   return (
     <button
       onClick={onClick}
-      className={`bg-[#9EFF00] text-black text-sm font-bold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 hover:brightness-110 transition-all ${className}`}
+      className={`bg-[#7C3AED] text-white text-sm font-bold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 hover:brightness-110 transition-all ${className}`}
       style={{
-        boxShadow: "0 8px 20px -4px rgba(158,255,0,0.35)",
+        boxShadow: "0 8px 20px -4px rgba(124,58,237,0.4)",
       }}
     >
       {children}
@@ -200,11 +200,11 @@ export function SettingsLimeBadge({
     <span
       className="text-xs font-semibold px-3 py-1 rounded-full inline-flex items-center"
       style={{
-        background: isLime ? "rgba(158,255,0,0.1)" : "transparent",
+        background: isLime ? "rgba(124,58,237,0.15)" : "transparent",
         border: isLime
-          ? "1px solid rgba(158,255,0,0.2)"
+          ? "1px solid rgba(124,58,237,0.35)"
           : "1px solid rgba(255,255,255,0.12)",
-        color: isLime ? "#9EFF00" : "rgba(240,244,255,0.5)",
+        color: isLime ? "#A78BFA" : "rgba(240,244,255,0.5)",
       }}
     >
       {children}
@@ -215,9 +215,9 @@ export function SettingsLimeBadge({
 /* ── Status Dot ── */
 const statusConfig = {
   active: {
-    dotColor: "#22c55e",
+    dotColor: "#8C28FA",
     label: "Activo",
-    textColor: "#22c55e",
+    textColor: "#8C28FA",
   },
   pending: {
     dotColor: "#eab308",

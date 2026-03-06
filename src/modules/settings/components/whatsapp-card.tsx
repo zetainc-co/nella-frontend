@@ -301,8 +301,8 @@ function ConnectedDetails({ config }: { config: WhatsappConfigData }) {
   return (
     <div className="space-y-2.5">
       <div className="flex items-center gap-2">
-        <CheckCircle2 className="size-4 text-green-500" />
-        <span className="text-sm font-medium text-green-500">Conectado</span>
+        <CheckCircle2 className="size-4 text-[#8C28FA]" />
+        <span className="text-sm font-medium text-[#8C28FA]">Conectado</span>
       </div>
 
       {config.verified_name && (

@@ -376,13 +376,13 @@ export default function GestionPage() {
                   key={log.id}
                   className={`flex items-start gap-3 p-3 rounded border ${
                     log.type === 'success'
-                      ? 'border-green-500/20 bg-green-500/5'
+                      ? 'border-[#8C28FA]/20 bg-[#8C28FA]/5'
                       : log.type === 'error'
                       ? 'border-red-500/20 bg-red-500/5'
                       : 'border-yellow-500/20 bg-yellow-500/5'
                   }`}
                 >
-                  {log.type === 'success' && <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />}
+                  {log.type === 'success' && <CheckCircle2 className="h-5 w-5 text-[#8C28FA] flex-shrink-0" />}
                   {log.type === 'error' && <XCircle className="h-5 w-5 text-red-500 flex-shrink-0" />}
                   {log.type === 'warning' && <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0" />}
 
@@ -395,7 +395,7 @@ export default function GestionPage() {
                       </div>
                     </div>
                     <p className={`text-sm ${
-                      log.type === 'success' ? 'text-green-400' :
+                      log.type === 'success' ? 'text-[#A78BFA]' :
                       log.type === 'error' ? 'text-red-400' : 'text-yellow-400'
                     }`}>
                       {log.message}

@@ -9,10 +9,12 @@ const stageVariants: Record<string, "cliente" | "lead" | "inactivo"> = {
     "Inactivo": "inactivo",
 }
 
-function getInitials(name: string) {
-    const parts = name.split(" ")
+function getInitials(name: string | null | undefined) {
+    if (!name || typeof name !== 'string' || name.trim() === '') return '?'
+    const trimmedName = name.trim()
+    const parts = trimmedName.split(' ').filter(Boolean)
     if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-    return name.substring(0, 2).toUpperCase()
+    return trimmedName.substring(0, 2).toUpperCase()
 }
 
 export function ContactHeader({ contact, onEdit }: { contact: ContactDetail; onEdit?: () => void }) {

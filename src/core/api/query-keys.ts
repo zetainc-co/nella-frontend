@@ -9,6 +9,7 @@ export const queryKeys = {
   dashboard: {
     metrics: (projectId: string, period: string) =>
       ['dashboard', 'metrics', projectId, period] as const,
+    data: (projectId: string) => ['dashboard', projectId] as const,
     projects: () => ['projects'] as const,
   },
   kanban: {

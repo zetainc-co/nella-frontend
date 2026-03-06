@@ -17,6 +17,10 @@ import {
 } from "lucide-react";
 import { useLogout } from "@/shared/hooks/useLogout";
 import { ProtectedRoute } from "@/core/routes/ProtectedRoute";
+import { useAuthStore } from "@/core/store/auth-store";
+import { useProjects } from "@/modules/dashboard/hooks/useProjects";
+import type { Project } from "@/modules/dashboard/types/dashboard-types";
+import { CreateProjectModal } from "@/modules/dashboard/components/create-project-modal";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -191,11 +195,35 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [projectMenuOpen, setProjectMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const { logout } = useLogout();
+  const { user } = useAuthStore();
   const pathname = usePathname();
-  const isSettings = pathname.startsWith("/settings");
+  const { data: projects } = useProjects();
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('nella-selected-project') || null;
+    }
+    return null;
+  });
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   useEffect(() => setMobileOpen(false), [pathname]);
+
+  useEffect(() => {
+    if (selectedProjectId && typeof window !== 'undefined') {
+      localStorage.setItem('nella-selected-project', selectedProjectId);
+    }
+  }, [selectedProjectId]);
+
+  const currentProject = projects?.find((p: Project) => p.id === selectedProjectId) ?? projects?.[0];
 
   useEffect(() => {
     if (pathname.startsWith('/settings')) {
@@ -217,19 +245,31 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         className="flex h-screen overflow-hidden"
         style={{ background: '#151515', position: 'relative' }}
       >
-        {/* Background orbs */}
+        {/* Background orbs - decorative gradient lights (can be removed if not desired) */}
+        {/* Orb 1 - Top Right */}
         <div aria-hidden style={{
-          position: 'fixed', top: '-18%', right: '-8%',
-          width: '720px', height: '720px', borderRadius: '50%',
-          background: 'radial-gradient(circle at 50% 50%, rgba(0,205,190,0.22) 0%, rgba(0,175,162,0.09) 38%, rgba(0,140,130,0.03) 60%, transparent 75%)',
-          filter: 'blur(65px)', animation: 'orb-breathe 7s ease-in-out infinite',
+          position: 'fixed', top: '-15%', right: '-5%',
+          width: '600px', height: '600px', borderRadius: '50%',
+          background: 'radial-gradient(circle at 50% 50%, rgba(140,40,250,0.15) 0%, rgba(140,40,250,0.08) 40%, transparent 70%)',
+          filter: 'blur(80px)', animation: 'orb-breathe 7s ease-in-out infinite',
           pointerEvents: 'none', zIndex: 0,
         }} />
+
+        {/* Orb 2 - Bottom Left */}
         <div aria-hidden style={{
-          position: 'fixed', bottom: '-18%', left: `${SIDEBAR_W}px`,
-          width: '600px', height: '600px', borderRadius: '50%',
-          background: 'radial-gradient(circle at 50% 50%, rgba(65,60,220,0.15) 0%, rgba(45,40,175,0.06) 42%, transparent 70%)',
-          filter: 'blur(80px)', animation: 'orb-breathe-slow 9s ease-in-out infinite',
+          position: 'fixed', bottom: '-20%', left: `${SIDEBAR_W}px`,
+          width: '700px', height: '700px', borderRadius: '50%',
+          background: 'radial-gradient(circle at 50% 50%, rgba(132,56,238,0.12) 0%, rgba(132,56,238,0.06) 45%, transparent 75%)',
+          filter: 'blur(90px)', animation: 'orb-breathe-slow 9s ease-in-out infinite',
+          pointerEvents: 'none', zIndex: 0,
+        }} />
+
+        {/* Orb 3 - Center/Top Left */}
+        <div aria-hidden style={{
+          position: 'fixed', top: '30%', left: '20%',
+          width: '500px', height: '500px', borderRadius: '50%',
+          background: 'radial-gradient(circle at 50% 50%, rgba(168,85,247,0.10) 0%, rgba(168,85,247,0.05) 50%, transparent 80%)',
+          filter: 'blur(70px)', animation: 'orb-breathe 8s ease-in-out infinite 2s',
           pointerEvents: 'none', zIndex: 0,
         }} />
 
@@ -241,7 +281,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             background: "#1a1a1a",
             borderRight: "1px solid rgba(255,255,255,0.08)",
             position: "relative",
-            zIndex: 10,
+            zIndex: 5,
           }}
         >
           <MainSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
@@ -250,7 +290,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Mobile overlay */}
         {mobileOpen && (
           <div
-            className="fixed inset-0 z-40 md:hidden"
+            className="fixed inset-0 z-10 md:hidden"
             style={{ background: 'rgba(0,0,0,0.65)' }}
             onClick={() => setMobileOpen(false)}
           />
@@ -258,9 +298,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Mobile sidebar drawer */}
         <aside
-          className="fixed top-0 left-0 z-50 h-full md:hidden flex flex-col transition-transform duration-200"
+          className="fixed top-0 left-0 z-10 h-full md:hidden flex flex-col transition-transform duration-200"
           style={{
-            width: SIDEBAR_W, background: '#0d0d0d',
+            width: 260, background: '#0d0d0d',
             borderRight: '1px solid rgba(255,255,255,0.06)',
             transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
           }}
@@ -269,7 +309,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </aside>
 
         {/* Main content */}
-        <div className="flex flex-col flex-1 overflow-hidden" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="flex flex-col flex-1 overflow-hidden" style={{ position: 'relative' }}>
           <div className="flex md:hidden items-center px-4 h-14 shrink-0" style={{
             background: '#0d0d0d',
             borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -289,10 +329,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             </span>
           </div>
           {/* Header */}
-          <header className="shrink-0 h-16 flex items-center justify-end gap-4 px-6 hidden md:flex" style={{
-            background: '#1a1a1a',
-            borderBottom: '1px solid rgba(255,255,255,0.08)'
-          }}>
+          {!pathname.startsWith('/settings') && !pathname.startsWith('/calendar') && (
+          <header className="shrink-0 h-16 hidden md:flex items-center justify-end gap-4 px-6" >
             {/* Project Selector */}
             <div className="relative">
               <button
@@ -310,7 +348,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
                 }}
               >
-                <span>Lara Project</span>
+                <span>{currentProject?.name || 'Seleccionar proyecto'}</span>
                 <ChevronDown className="size-4" />
               </button>
 
@@ -319,7 +357,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 <>
                   {/* Backdrop */}
                   <div
-                    className="fixed inset-0 z-40"
+                    className="fixed inset-0 z-10"
                     onClick={() => setProjectMenuOpen(false)}
                   />
 
@@ -336,26 +374,46 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                       TUS PROYECTOS
                     </div>
 
-                    {/* Current Project */}
-                    <button
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors"
-                      style={{ color: '#f0f4ff' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                      }}
-                    >
-                      <div className="size-2 rounded-full" style={{ background: '#8C28FA' }} />
-                      <span className="font-medium">Lara Project</span>
-                    </button>
+                    {/* Projects List */}
+                    {projects && projects.length > 0 ? (
+                      projects.map((project: Project) => (
+                        <button
+                          key={project.id}
+                          onClick={() => {
+                            setSelectedProjectId(project.id);
+                            setProjectMenuOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors"
+                          style={{ color: '#f0f4ff' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          {project.id === currentProject?.id && (
+                            <div className="size-2 rounded-full" style={{ background: '#8C28FA' }} />
+                          )}
+                          {project.id !== currentProject?.id && <div className="size-2" />}
+                          <span className="font-medium">{project.name}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                        No hay proyectos
+                      </div>
+                    )}
 
                     {/* Divider */}
                     <div className="my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
 
                     {/* Create New Project */}
                     <button
+                      onClick={() => {
+                        setProjectMenuOpen(false);
+                        setCreateModalOpen(true);
+                      }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors"
                       style={{ color: 'rgba(255,255,255,0.7)' }}
                       onMouseEnter={(e) => {
@@ -384,10 +442,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 {/* User Info */}
                 <div className="text-right">
                   <div className="text-sm font-medium" style={{ color: '#f0f4ff' }}>
-                    Usuario del Sistema
-                  </div>
-                  <div className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    usuario@ejemplo.com
+                    {user?.fullName || 'Usuario'}
                   </div>
                 </div>
 
@@ -399,54 +454,25 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     color: '#1a1a1a'
                   }}
                 >
-                  U
+                  {user?.fullName ? getInitials(user.fullName) : 'U'}
                 </div>
               </button>
-
-              {/* Dropdown Menu */}
-              {userMenuOpen && (
-                <>
-                  {/* Backdrop */}
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setUserMenuOpen(false)}
-                  />
-
-                  {/* Menu */}
-                  <div
-                    className="absolute right-0 top-full mt-2 w-48 rounded-lg shadow-xl z-50"
-                    style={{
-                      background: '#1a1a1a',
-                      border: '1px solid rgba(255,255,255,0.08)'
-                    }}
-                  >
-                    <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        logout();
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors rounded-lg"
-                      style={{ color: 'rgba(255,255,255,0.7)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(239,68,68,0.1)';
-                        e.currentTarget.style.color = '#ef4444';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
-                      }}
-                    >
-                      <LogOut className="size-4" />
-                      <span>Cerrar sesión</span>
-                    </button>
-                  </div>
-                </>
-              )}
             </div>
           </header>
+          )}
 
           <main className="flex-1 overflow-auto">{children}</main>
         </div>
+
+        {/* Create Project Modal */}
+        <CreateProjectModal
+          open={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          onCreated={(projectId) => {
+            setSelectedProjectId(projectId);
+            setCreateModalOpen(false);
+          }}
+        />
       </div>
     </ProtectedRoute>
   );

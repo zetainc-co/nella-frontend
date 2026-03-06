@@ -21,13 +21,14 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
     if (!isDragging) onClick()
   }
 
-  const getInitials = (name: string | null) => {
-    if (!name) return '?'
-    const parts = name.split(' ')
+  const getInitials = (name: string | null | undefined) => {
+    if (!name || typeof name !== 'string' || name.trim() === '') return '?'
+    const trimmedName = name.trim()
+    const parts = trimmedName.split(' ').filter(Boolean)
     if (parts.length >= 2) {
       return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
     }
-    return name.substring(0, 2).toUpperCase()
+    return trimmedName.substring(0, 2).toUpperCase()
   }
 
   const getProbabilityLabel = () => {
@@ -53,8 +54,8 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
       className={cn(
         'bg-[#1a1a1a] border-2 rounded-lg p-4 cursor-grab transition-all relative',
         'border-gray-800 hover:border-gray-700',
-        isDragging && 'opacity-40 shadow-2xl scale-105 cursor-grabbing border-[#8BD21D] ring-2 ring-[#8BD21D]/30',
-        !isDragging && 'hover:shadow-lg hover:shadow-[#8BD21D]/10'
+        isDragging && 'opacity-40 shadow-2xl scale-105 cursor-grabbing border-[#8B5CF6] ring-2 ring-[#8B5CF6]/30',
+        !isDragging && 'hover:shadow-lg hover:shadow-[#8B5CF6]/10'
       )}
     >
       <h3 className="font-semibold text-gray-200 text-base mb-1">
@@ -73,8 +74,8 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
         </Badge>
 
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-black text-xs font-bold"
-          style={{ backgroundColor: '#8BD21D' }}
+          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+          style={{ backgroundColor: '#8B5CF6' }}
         >
           {getInitials(lead.name)}
         </div>

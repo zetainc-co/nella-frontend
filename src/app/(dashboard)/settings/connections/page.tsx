@@ -118,8 +118,8 @@ export default function ConexionesPage() {
               <div className="mt-4 space-y-3">
                 {connection.connected ? (
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="size-4 text-green-500" />
-                    <span className="text-sm font-medium text-green-500">
+                    <CheckCircle2 className="size-4 text-[#8C28FA]" />
+                    <span className="text-sm font-medium text-[#8C28FA]">
                       Conectado
                     </span>
                   </div>

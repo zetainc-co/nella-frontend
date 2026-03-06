@@ -21,6 +21,7 @@ export function useContacts(query?: ContactsQuery) {
   const params = new URLSearchParams()
   if (query?.phone) params.set('phone', query.phone)
   if (query?.lead_status) params.set('lead_status', query.lead_status)
+  if (query?.project_id) params.set('project_id', query.project_id)
   const qs = params.toString()
 
   return useQuery<BackendContact[]>({

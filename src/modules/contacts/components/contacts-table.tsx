@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Filter, Download, MoreVertical, Phone, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Filter, Download, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ContactDetailModal } from "./contact-detail-modal"
@@ -77,17 +77,26 @@ export function ContactsTable() {
     const [currentPage, setCurrentPage] = useState(1)
     const [selectedContact, setSelectedContact] = useState<ContactDetail | null>(null)
 
-    const { data: backendContacts = [], isLoading } = useContacts()
+    // Get selected project from localStorage
+    const selectedProjectId = typeof window !== 'undefined'
+        ? localStorage.getItem('nella-selected-project')
+        : null
+
+    const { data: backendContacts = [], isLoading } = useContacts(
+        selectedProjectId ? { project_id: selectedProjectId } : undefined
+    )
     useContactsSSE()
 
     const contacts = useMemo(() => backendContacts.map(mapBackendContact), [backendContacts])
 
-    const getInitials = (name: string) => {
-        const parts = name.split(' ')
+    const getInitials = (name: string | null | undefined) => {
+        if (!name || typeof name !== 'string' || name.trim() === '') return '?'
+        const trimmedName = name.trim()
+        const parts = trimmedName.split(' ').filter(Boolean)
         if (parts.length >= 2) {
             return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
         }
-        return name.substring(0, 2).toUpperCase()
+        return trimmedName.substring(0, 2).toUpperCase()
     }
 
     const filteredContacts = useMemo(() => {
@@ -153,7 +162,7 @@ export function ContactsTable() {
                         placeholder="Buscar por nombre, email, empresa o teléfono..."
                         value={searchTerm}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        className="w-full bg-[#1a1a1a] border border-gray-700 rounded-md pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#8BD21D] focus:ring-2 focus:ring-[#8BD21D]/20 transition-colors"
+                        className="w-full bg-[#1a1a1a] border border-gray-700 rounded-md pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20 transition-colors"
                     />
                 </div>
             </div>
@@ -168,7 +177,7 @@ export function ContactsTable() {
                             onClick={() => handleStageChange(stage)}
                             className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
                                 selectedStage === stage
-                                    ? "bg-[#1a2a10] text-[#8BD21D] border border-[#8BD21D]/40"
+                                    ? "bg-[#2d1b69] text-[#A78BFA] border border-[#7C3AED]/40"
                                     : "bg-[#1a1a1a] text-gray-300 hover:text-white border border-gray-700"
                             }`}
                         >
@@ -212,7 +221,7 @@ export function ContactsTable() {
                             onClick={() => setSelectedContact(contact)}
                             className="bg-gradient-to-b from-[#1a1a1e] to-[#18191C] border border-gray-800 rounded-lg p-5 hover:border-gray-700 transition-colors cursor-pointer"
                         >
-                            <div className="grid grid-cols-[2fr_1fr_1fr_auto_auto_auto] items-center gap-4">
+                            <div className="grid grid-cols-[1.5fr_1.5fr_1fr_auto_auto] items-center gap-6">
                                 {/* Avatar y nombre */}
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 bg-[#3a3a3a]">
@@ -223,14 +232,10 @@ export function ContactsTable() {
                                     </h3>
                                 </div>
 
-                                {/* Empresa y rol */}
-                                <div>
-                                    <p className="text-sm text-white font-medium">
-                                        {contact.company}
-                                    </p>
-                                    <p className="text-xs text-gray-400 mt-0.5">
-                                        {contact.role}
-                                    </p>
+                                {/* Email */}
+                                <div className="flex items-center gap-2 text-gray-300">
+                                    <Mail className="w-4 h-4 text-gray-400 shrink-0" />
+                                    <span className="text-sm truncate">{contact.email || '-'}</span>
                                 </div>
 
                                 {/* Teléfono */}
@@ -240,10 +245,11 @@ export function ContactsTable() {
                                 </div>
 
                                 {/* Badge de estado */}
-                                <div className="flex justify-center min-w-[100px]">
+                                <div className="flex justify-center">
                                     <Badge
                                         variant={stageVariants[contact.stage as keyof typeof stageVariants]}
                                         size="lg"
+                                        className="w-[110px] justify-center"
                                     >
                                         {stageLabels[contact.stage as keyof typeof stageLabels]}
                                     </Badge>
@@ -253,14 +259,6 @@ export function ContactsTable() {
                                 <div className="text-sm text-gray-400 min-w-[80px] text-right">
                                     {contact.time}
                                 </div>
-
-                                {/* Menú de opciones */}
-                                <button
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="p-2 hover:bg-[#2a2a2a] rounded-md transition-colors"
-                                >
-                                    <MoreVertical className="w-5 h-5 text-gray-400" />
-                                </button>
                             </div>
                         </div>
                     ))
@@ -292,7 +290,7 @@ export function ContactsTable() {
                             <span className="font-bold text-white">{stageCounts["Negociación"]}</span>
                         </span>
                         <span className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-[#8BD21D]" />
+                            <span className="w-2 h-2 rounded-full bg-[#7C3AED]" />
                             <span className="text-gray-400">Leads:</span>
                             <span className="font-bold text-white">{stageCounts.Lead}</span>
                         </span>
@@ -314,7 +312,7 @@ export function ContactsTable() {
                                     onClick={() => setCurrentPage(page)}
                                     className={`w-8 h-8 rounded-md text-sm font-medium transition-colors ${
                                         currentPage === page
-                                            ? "bg-[#8BD21D] text-black"
+                                            ? "bg-[#7C3AED] text-white"
                                             : "text-gray-400 hover:bg-[#2a2a2a] hover:text-white"
                                     }`}
                                 >

@@ -18,7 +18,7 @@ export default function ContactsPage() {
                 </div>
                 <button
                     onClick={() => setShowCreateModal(true)}
-                    className="flex items-center gap-2 bg-[#8BD21D] hover:bg-[#7bc018] text-black font-semibold px-6 py-3 rounded-lg transition-colors"
+                    className="flex items-center gap-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-semibold px-6 py-3 rounded-lg transition-colors"
                 >
                     <Plus className="w-5 h-5" />
                     Nuevo Contacto

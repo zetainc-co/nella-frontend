@@ -2,27 +2,23 @@
 
 import {
     Select,
-    SelectContent,
     SelectItem,
-    SelectTrigger,
     SelectValue,
+    SelectTrigger,
+    SelectContent,
 } from "@/components/ui/select"
 import { useState } from "react"
+import { useEffect } from "react"
+import { User, Tag, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { Modal, ModalSection } from "@/components/shared/modal/modal"
-import { User, Building2, Globe, MessageSquare, Tag, X } from "lucide-react"
 import type { CreateContactModalProps } from "@/modules/contacts/types/contact-types"
 import { useCreateContact, useUpdateContact } from "@/modules/contacts/hooks/useContacts"
-import { useEffect } from "react"
 
 const EMPTY_FORM = {
-    name: "", email: "", phone: "", company: "",
-    role: "", location: "", stage: "Lead", channel: "WhatsApp",
-    channelDetails: "", linkedin: "", instagram: "", website: "",
-    notes: "",
+    name: "", email: "", phone: "", channel: "",
 }
 
 export function CreateContactModal({ open, onOpenChange, contact }: CreateContactModalProps) {
@@ -41,16 +37,7 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
                 name: contact.name || "",
                 email: contact.email || "",
                 phone: contact.phone || "",
-                company: contact.company || "",
-                role: contact.role || "",
-                location: contact.location || "",
-                stage: contact.lead_status || "Lead",
-                channel: contact.channel || "WhatsApp",
-                channelDetails: contact.channelDetail || "",
-                linkedin: "",
-                instagram: "",
-                website: "",
-                notes: contact.ai_summary || "",
+                channel: contact.channel || "",
             })
             setTags(contact.tags || [])
         } else if (open && !contact) {
@@ -91,6 +78,11 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
             setTags([])
         }
 
+        // Get selected project from localStorage
+        const selectedProjectId = typeof window !== 'undefined'
+            ? localStorage.getItem('nella-selected-project')
+            : null
+
         if (isEditMode) {
             updateContact.mutate(
                 {
@@ -98,9 +90,7 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
                     payload: {
                         name: form.name || undefined,
                         email: form.email || undefined,
-                        lead_status: form.stage || undefined,
-                        tags: tags,
-                        ai_summary: form.notes || undefined,
+                        tags: tags.length > 0 ? tags : undefined,
                     },
                 },
                 { onSuccess }
@@ -111,8 +101,8 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
                     phone: form.phone,
                     name: form.name || undefined,
                     email: form.email || undefined,
-                    lead_status: form.stage || undefined,
                     tags: tags.length > 0 ? tags : undefined,
+                    project_id: selectedProjectId || undefined,
                 },
                 { onSuccess }
             )
@@ -137,7 +127,7 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
                     <Button
                         onClick={handleSubmit}
                         disabled={isPending || !form.phone}
-                        className="bg-[#8BD21D] hover:bg-[#7bc018] text-black font-semibold disabled:opacity-50"
+                        className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-semibold disabled:opacity-50"
                     >
                         {isPending
                             ? (isEditMode ? "Guardando..." : "Creando...")
@@ -199,54 +189,6 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-gray-300">
-                                Empresa <span className="text-red-500">*</span>
-                            </Label>
-                            <Input
-                                placeholder="Ej: TechCorp SA"
-                                value={form.company}
-                                onChange={(e) => updateField("company", e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label className="text-gray-300">Cargo</Label>
-                            <Input
-                                placeholder="Ej: Director de Ventas"
-                                value={form.role}
-                                onChange={(e) => updateField("role", e.target.value)}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="text-gray-300">Ubicación</Label>
-                            <Input
-                                placeholder="Ej: Bogotá, Colombia"
-                                value={form.location}
-                                onChange={(e) => updateField("location", e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </ModalSection>
-
-                {/* Clasificación */}
-                <ModalSection icon={<Building2 className="w-4 h-4" />} title="Clasificación">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label className="text-gray-300">Estado</Label>
-                            <Select value={form.stage} onValueChange={(v) => updateField("stage", v)}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Lead">Lead</SelectItem>
-                                    <SelectItem value="Cliente">Cliente</SelectItem>
-                                    <SelectItem value="Inactivo">Inactivo</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
                             <Label className="text-gray-300">Canal de Contacto</Label>
                             <Select value={form.channel} onValueChange={(v) => updateField("channel", v)}>
                                 <SelectTrigger className="w-full">
@@ -262,61 +204,6 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
                             </Select>
                         </div>
                     </div>
-
-                    <div className="space-y-2">
-                        <Label className="text-gray-300">Detalles del Canal</Label>
-                        <Input
-                            placeholder="Ej: Campaña Instagram Feb 2026"
-                            value={form.channelDetails}
-                            onChange={(e) => updateField("channelDetails", e.target.value)}
-                        />
-                    </div>
-                </ModalSection>
-
-                {/* Redes Sociales */}
-                <ModalSection icon={<Globe className="w-4 h-4" />} title="Redes Sociales">
-                    <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                            <Label className="text-gray-300 text-xs">
-                                <Building2 className="w-3 h-3" /> LinkedIn
-                            </Label>
-                            <Input
-                                placeholder="URL de LinkedIn"
-                                value={form.linkedin}
-                                onChange={(e) => updateField("linkedin", e.target.value)}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="text-gray-300 text-xs">
-                                <Globe className="w-3 h-3" /> Instagram
-                            </Label>
-                            <Input
-                                placeholder="@usuario"
-                                value={form.instagram}
-                                onChange={(e) => updateField("instagram", e.target.value)}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="text-gray-300 text-xs">
-                                <Globe className="w-3 h-3" /> Sitio Web
-                            </Label>
-                            <Input
-                                placeholder="https://ejemplo.com"
-                                value={form.website}
-                                onChange={(e) => updateField("website", e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </ModalSection>
-
-                {/* Notas */}
-                <ModalSection icon={<MessageSquare className="w-4 h-4" />} title="Notas">
-                    <Textarea
-                        placeholder="Información adicional sobre el contacto..."
-                        value={form.notes}
-                        onChange={(e) => updateField("notes", e.target.value)}
-                        className="min-h-[100px] bg-[#1a1a1a] border-gray-700 text-white placeholder:text-gray-500 focus:border-[#8BD21D] focus:ring-2 focus:ring-[#8BD21D]/20 resize-none"
-                    />
                 </ModalSection>
 
                 {/* Etiquetas */}
@@ -326,7 +213,7 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
                             {tags.map(tag => (
                                 <span
                                     key={tag}
-                                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#3D4D28] text-[#97DC2A] text-xs font-medium border border-[#97DC2A]/30"
+                                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#2d1b69] text-[#A78BFA] text-xs font-medium border border-[#7C3AED]/30"
                                 >
                                     {tag}
                                     <button
@@ -351,7 +238,7 @@ export function CreateContactModal({ open, onOpenChange, contact }: CreateContac
                             type="button"
                             variant="outline"
                             onClick={addTag}
-                            className="bg-transparent border-[#8BD21D]/40 text-[#8BD21D] hover:bg-[#8BD21D]/10 shrink-0"
+                            className="bg-transparent border-[#7C3AED]/40 text-[#A78BFA] hover:bg-[#7C3AED]/10 shrink-0"
                         >
                             Agregar
                         </Button>

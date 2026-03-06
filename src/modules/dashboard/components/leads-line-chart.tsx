@@ -5,22 +5,50 @@ import {
   AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
+import { useRevenueHistory } from '@/modules/dashboard/hooks/useRevenueHistory'
 
 interface LeadsLineChartProps {
   revenueMonth: ProjectMetrics['revenueMonth']
+  projectId: string
 }
 
-function generateMonthlyData(revenueMonth: number) {
-  const weights = [0.2, 0.25, 0.3, 0.25]
-  const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']
-  return weeks.map((week, i) => ({
-    week,
-    revenue: Math.round(revenueMonth * weights[i]),
-  }))
-}
+export function LeadsLineChart({ revenueMonth, projectId }: LeadsLineChartProps) {
+  const { data: historyData, isLoading, error } = useRevenueHistory(projectId)
 
-export function LeadsLineChart({ revenueMonth }: LeadsLineChartProps) {
-  const data = useMemo(() => generateMonthlyData(revenueMonth), [revenueMonth])
+  console.log('[LeadsLineChart] projectId:', projectId)
+  console.log('[LeadsLineChart] historyData:', historyData)
+  console.log('[LeadsLineChart] isLoading:', isLoading)
+  console.log('[LeadsLineChart] error:', error)
+
+  const data = useMemo(() => {
+    if (!historyData?.history || historyData.history.length === 0) {
+      console.log('[LeadsLineChart] No history data, using fallback')
+      // Fallback to empty weeks if no history
+      const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']
+      return weeks.map((week) => ({
+        week,
+        leads: 0,
+      }))
+    }
+
+    console.log('[LeadsLineChart] Mapping history data:', historyData.history)
+    // Use real data from backend with formatted dates
+    const mapped = historyData.history.map((item) => {
+      // Format date to show "DD MMM" (e.g., "23 Feb")
+      const date = new Date(item.date)
+      const day = date.getDate()
+      const month = date.toLocaleDateString('es', { month: 'short' })
+
+      return {
+        week: `${day} ${month}`,
+        leads: item.leads,
+      }
+    })
+    console.log('[LeadsLineChart] Mapped data for chart:', mapped)
+    return mapped
+  }, [historyData])
+
+  console.log('[LeadsLineChart] Final data passed to AreaChart:', data)
 
   return (
     <div
@@ -32,20 +60,23 @@ export function LeadsLineChart({ revenueMonth }: LeadsLineChartProps) {
       }}
     >
       <div className="mb-6">
-        <h3 className="text-lg font-semibold" style={{ color: '#f0f4ff' }}>Tendencia de Ingresos vs Leads</h3>
+        <h3 className="text-lg font-semibold" style={{ color: '#f0f4ff' }}>
+          Tendencia de Leads
+          {isLoading && <span className="ml-2 text-xs">(Cargando...)</span>}
+          {error && <span className="ml-2 text-xs text-red-400">(Error al cargar)</span>}
+        </h3>
         <p className="text-xs mt-0.5" style={{ color: 'rgba(240,244,255,0.45)' }}>
-          Evolución mensual del rendimiento —{' '}
-          <span style={{ color: '#9EFF00' }} className="font-semibold">${revenueMonth.toLocaleString()}</span>
+          Evolución semanal de nuevos contactos
         </p>
       </div>
 
-      <div className="flex-1 min-h-[280px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+      <div className="flex-1 w-full" style={{ height: '300px' }}>
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart data={data} margin={{ top: 20, right: 20, left: 10, bottom: 20 }}>
             <defs>
-              <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#9EFF00" stopOpacity={0.35} />
-                <stop offset="95%" stopColor="#1a2a00" stopOpacity={0.05} />
+              <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#9B7FED" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="#7437DA" stopOpacity={0.05} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -62,32 +93,34 @@ export function LeadsLineChart({ revenueMonth }: LeadsLineChartProps) {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v: number) => `$${v / 1000}K`}
+              domain={[0, 'dataMax + 1']}
+              allowDecimals={false}
               dx={-10}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#1a1a1a',
-                border: '1px solid rgba(158,255,0,0.2)',
-                borderRadius: '8px',
-                color: '#f0f4ff',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
+                backgroundColor: 'rgba(30, 30, 35, 0.98)',
+                border: '2px solid #9B7FED',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                color: '#ffffff',
+                boxShadow: '0 8px 32px rgba(155, 127, 237, 0.3)',
               }}
-              itemStyle={{ color: '#9EFF00' }}
+              itemStyle={{ color: '#9B7FED', fontWeight: '700' }}
               formatter={(value) => {
                 const n = typeof value === 'number' ? value : 0
-                return [`$${n.toLocaleString()}`, 'Revenue']
+                return [`${n} leads`, 'Total']
               }}
             />
             <Area
               type="monotone"
-              dataKey="revenue"
-              stroke="#9EFF00"
-              strokeWidth={2}
+              dataKey="leads"
+              stroke="#9B7FED"
+              strokeWidth={3}
               fillOpacity={1}
-              fill="url(#colorRevenue)"
-              dot={{ fill: '#9EFF00', strokeWidth: 0, r: 4 }}
-              activeDot={{ r: 6, fill: '#9EFF00', strokeWidth: 0 }}
+              fill="url(#colorLeads)"
+              dot={{ fill: '#9B7FED', strokeWidth: 0, r: 5 }}
+              activeDot={{ r: 7, fill: '#C7B7FC', strokeWidth: 2, stroke: '#9B7FED' }}
             />
           </AreaChart>
         </ResponsiveContainer>
