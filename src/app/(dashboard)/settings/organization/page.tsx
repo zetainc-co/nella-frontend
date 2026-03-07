@@ -22,7 +22,7 @@ import {
 } from "@/modules/settings/hooks/use-organization";
 import type { UpdateOrganizationDto } from "@/modules/settings/hooks/use-organization";
 import { useAuthStore } from "@/core/store/auth-store";
-import { INDUSTRIES } from "@/lib/countries-latam";
+import { INDUSTRIES } from "@shared/data/countries-latam";
 import { Loader2 } from "lucide-react";
 
 const inputStyle = {

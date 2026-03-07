@@ -33,13 +33,12 @@ export function useAssignAgent(conversationId: string) {
         })
       }
     },
-    onSuccess: (data, agentId) => {
+    onSuccess: (_data, agentId) => {
       const message =
         agentId === null
           ? 'Conversación desasignada exitosamente'
           : 'Agente asignado exitosamente'
 
-      console.log(`✅ ${message}:`, data)
       toast.success(message)
 
       // Refetch conversations para actualizar UI

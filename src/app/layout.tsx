@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/lib/theme-context";
-import { QueryProvider } from "@/providers/query-provider";
+import { QueryProvider } from "@/core/providers/query-provider";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -32,10 +31,8 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <QueryProvider>
-          <ThemeProvider>
-            {children}
-            <Toaster richColors position="top-right" />
-          </ThemeProvider>
+          {children}
+          <Toaster richColors position="top-right" />
         </QueryProvider>
       </body>
     </html>

@@ -3,22 +3,16 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { step3Schema } from '@/lib/registration-validations'
-import { RegistrationFormData } from '@/modules/auth/types/auth-types'
+import { registrationStep3Schema } from '@/modules/auth/hooks/auth-validations'
+import type { RegistrationStepProps } from '@/modules/auth/types/auth-types'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-
-interface RegistrationStep3Props {
-  initialData: Partial<RegistrationFormData>
-  onNext: (data: Partial<RegistrationFormData>) => void
-  onBack: () => void
-}
 
 export function RegistrationStep3({
   initialData,
   onNext,
   onBack,
-}: RegistrationStep3Props) {
+}: RegistrationStepProps) {
   const {
     register,
     handleSubmit,
@@ -26,7 +20,7 @@ export function RegistrationStep3({
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(step3Schema),
+    resolver: zodResolver(registrationStep3Schema),
     defaultValues: {
       offeringType: initialData.offeringType as 'product' | 'service' | undefined,
       description: initialData.description || '',

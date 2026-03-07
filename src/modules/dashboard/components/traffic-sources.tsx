@@ -1,15 +1,9 @@
 'use client'
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
-import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
+import type { TrafficSourcesProps } from '@/modules/dashboard/types/dashboard-types'
 
-// Purple palette matching the funnel
 const COLORS = ['#9B7FED', '#7437DA', '#5E2DB8', '#8B4FE8', '#C7B7FC']
-
-interface TrafficSourcesProps {
-  sources: ProjectMetrics['trafficSources']
-  totalLeads: number
-}
 
 export function TrafficSources({ sources, totalLeads }: TrafficSourcesProps) {
   const hasData = sources.length > 0

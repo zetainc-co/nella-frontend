@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { CheckCheck } from 'lucide-react'
 import type { MessageBubbleProps } from '../../types'
-import { formatMessageTime } from '@/utils/format-message-time'
+import { formatMessageTime } from '@shared/utils/format-message-time'
 
 export const MessageBubble = memo(function MessageBubble({
   message,

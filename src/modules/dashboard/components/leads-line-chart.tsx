@@ -4,25 +4,14 @@ import { useMemo } from 'react'
 import {
   AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
+import type { LeadsLineChartProps } from '@/modules/dashboard/types/dashboard-types'
 import { useRevenueHistory } from '@/modules/dashboard/hooks/useRevenueHistory'
-
-interface LeadsLineChartProps {
-  revenueMonth: ProjectMetrics['revenueMonth']
-  projectId: string
-}
 
 export function LeadsLineChart({ revenueMonth, projectId }: LeadsLineChartProps) {
   const { data: historyData, isLoading, error } = useRevenueHistory(projectId)
 
-  console.log('[LeadsLineChart] projectId:', projectId)
-  console.log('[LeadsLineChart] historyData:', historyData)
-  console.log('[LeadsLineChart] isLoading:', isLoading)
-  console.log('[LeadsLineChart] error:', error)
-
   const data = useMemo(() => {
     if (!historyData?.history || historyData.history.length === 0) {
-      console.log('[LeadsLineChart] No history data, using fallback')
       // Fallback to empty weeks if no history
       const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']
       return weeks.map((week) => ({
@@ -31,7 +20,6 @@ export function LeadsLineChart({ revenueMonth, projectId }: LeadsLineChartProps)
       }))
     }
 
-    console.log('[LeadsLineChart] Mapping history data:', historyData.history)
     // Use real data from backend with formatted dates
     const mapped = historyData.history.map((item) => {
       // Format date to show "DD MMM" (e.g., "23 Feb")
@@ -44,11 +32,8 @@ export function LeadsLineChart({ revenueMonth, projectId }: LeadsLineChartProps)
         leads: item.leads,
       }
     })
-    console.log('[LeadsLineChart] Mapped data for chart:', mapped)
     return mapped
   }, [historyData])
-
-  console.log('[LeadsLineChart] Final data passed to AreaChart:', data)
 
   return (
     <div

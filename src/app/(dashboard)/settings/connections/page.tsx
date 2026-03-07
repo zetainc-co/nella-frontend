@@ -1,10 +1,10 @@
 "use client";
 
-import { mockConnections } from "@/lib/mock-data/settings";
 import {
   SettingsPageHeader,
   SettingsGhostButton,
 } from "@/modules/settings/components/settings-ui";
+
 import { DifyAgentCard } from "@/modules/settings/components/dify-agent-card";
 import { WhatsappCard } from "@/modules/settings/components/whatsapp-card";
 import {
@@ -51,7 +51,7 @@ export default function ConexionesPage() {
       <div className="space-y-4">
         <DifyAgentCard />
         <WhatsappCard />
-        {mockConnections.map((connection) => {
+        {([] as Array<{ id: string; name: string; description: string; icon: string; connected: boolean }>).map((connection) => {
           const Icon = iconMap[connection.icon as keyof typeof iconMap];
           const connectionColors =
             colorMap[connection.icon as keyof typeof colorMap];

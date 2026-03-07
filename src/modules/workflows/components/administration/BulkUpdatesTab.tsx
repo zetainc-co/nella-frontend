@@ -23,44 +23,46 @@ export function BulkUpdatesTab() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [executionResults, setExecutionResults] = useState<any>(null);
 
-  // Mock data de workflows activos
-  const mockWorkflows = [
-    {
-      id: "1",
-      organization: "Organización Alpha",
-      name: "WhatsApp Bot Alpha",
-      status: "active",
-      version: "v1.2.0",
-    },
-    {
-      id: "2",
-      organization: "Organización Beta",
-      name: "WhatsApp Bot Beta",
-      status: "active",
-      version: "v1.2.0",
-    },
-    {
-      id: "3",
-      organization: "Organización Gamma",
-      name: "WhatsApp Bot Gamma",
-      status: "active",
-      version: "v1.1.5",
-    },
-    {
-      id: "4",
-      organization: "Organización Delta",
-      name: "WhatsApp Bot Delta",
-      status: "active",
-      version: "v1.2.0",
-    },
-    {
-      id: "5",
-      organization: "Organización Epsilon",
-      name: "WhatsApp Bot Epsilon",
-      status: "active",
-      version: "v1.1.5",
-    },
-  ];
+  // TODO: Replace with real workflows API hook when available
+  const mockWorkflows = process.env.NODE_ENV === "development"
+    ? [
+        {
+          id: "1",
+          organization: "Organización Alpha",
+          name: "WhatsApp Bot Alpha",
+          status: "active",
+          version: "v1.2.0",
+        },
+        {
+          id: "2",
+          organization: "Organización Beta",
+          name: "WhatsApp Bot Beta",
+          status: "active",
+          version: "v1.2.0",
+        },
+        {
+          id: "3",
+          organization: "Organización Gamma",
+          name: "WhatsApp Bot Gamma",
+          status: "active",
+          version: "v1.1.5",
+        },
+        {
+          id: "4",
+          organization: "Organización Delta",
+          name: "WhatsApp Bot Delta",
+          status: "active",
+          version: "v1.2.0",
+        },
+        {
+          id: "5",
+          organization: "Organización Epsilon",
+          name: "WhatsApp Bot Epsilon",
+          status: "active",
+          version: "v1.1.5",
+        },
+      ]
+    : [] as Array<{ id: string; organization: string; name: string; status: string; version: string }>;
 
   const selectedWorkflows = mockWorkflows.filter(
     (wf) => scope === "all" || (scope === "version" && wf.version === "v1.1.5"),

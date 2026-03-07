@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils'
 import { useDraggable } from '@dnd-kit/core'
 import { Badge } from '@/components/ui/badge'
+import { getInitials } from '@shared/utils'
 import type { LeadCardProps } from '@/modules/kanban/types/kanban-types'
 
 export function LeadCard({ lead, onClick }: LeadCardProps) {
@@ -19,16 +20,6 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
 
   const handleClick = () => {
     if (!isDragging) onClick()
-  }
-
-  const getInitials = (name: string | null | undefined) => {
-    if (!name || typeof name !== 'string' || name.trim() === '') return '?'
-    const trimmedName = name.trim()
-    const parts = trimmedName.split(' ').filter(Boolean)
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-    }
-    return trimmedName.substring(0, 2).toUpperCase()
   }
 
   const getProbabilityLabel = () => {
@@ -77,7 +68,7 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
           className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
           style={{ backgroundColor: '#8B5CF6' }}
         >
-          {getInitials(lead.name)}
+          {getInitials(lead.name || '?')}
         </div>
       </div>
     </div>

@@ -19,8 +19,6 @@ export function useConversationsSocket(currentConversationId: string | null) {
 
     // Escuchar nuevos mensajes
     const handleNewMessage = (data: any) => {
-      console.log('💬 New message:', data.message.id)
-
       // Invalidar mensajes de esa conversación
       queryClient.invalidateQueries({
         queryKey: ['messages', data.conversationId],
@@ -31,37 +29,25 @@ export function useConversationsSocket(currentConversationId: string | null) {
     }
 
     // Escuchar actualizaciones de conversación
-    const handleConversationUpdate = (data: any) => {
-      console.log('🔄 Conversation updated:', data.conversationId)
-
+    const handleConversationUpdate = (_data: any) => {
       // Invalidar conversaciones
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
     }
 
     // Escuchar cambios de estado
-    const handleStatusChanged = (data: any) => {
-      console.log(
-        `🔔 Conversation ${data.conversationId} status changed to ${data.status}`
-      )
-
+    const handleStatusChanged = (_data: any) => {
       // Invalidar conversaciones
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
     }
 
     // Escuchar asignaciones de agente
-    const handleAgentAssigned = (data: any) => {
-      console.log(
-        `👤 Agent ${data.agentId} assigned to conversation ${data.conversationId}`
-      )
-
+    const handleAgentAssigned = (_data: any) => {
       // Invalidar conversaciones
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
     }
 
     // Escuchar cambios de labels
-    const handleLabelsUpdated = (data: any) => {
-      console.log(`🏷️  Labels updated for conversation ${data.conversationId}`)
-
+    const handleLabelsUpdated = (_data: any) => {
       // Invalidar conversaciones
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
     }

@@ -4,24 +4,17 @@
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useEffect } from 'react'
-import { step2Schema } from '@/lib/registration-validations'
-import { calculatePasswordStrength } from '@/lib/registration-validations'
-import { RegistrationFormData } from '@/modules/auth/types/auth-types'
+import { registrationStep2Schema, calculatePasswordStrength } from '@/modules/auth/hooks/auth-validations'
+import type { RegistrationStepProps } from '@/modules/auth/types/auth-types'
 import { Button } from '@/components/ui/button'
 import { CountryPhoneSelector } from '@/modules/auth/components/country-phone-selector'
 import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react'
-
-interface RegistrationStep2Props {
-  initialData: Partial<RegistrationFormData>
-  onNext: (data: Partial<RegistrationFormData>) => void
-  onBack: () => void
-}
 
 export function RegistrationStep2({
   initialData,
   onNext,
   onBack,
-}: RegistrationStep2Props) {
+}: RegistrationStepProps) {
   const [passwordStrength, setPasswordStrength] = useState(0)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -33,7 +26,7 @@ export function RegistrationStep2({
     control,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(step2Schema),
+    resolver: zodResolver(registrationStep2Schema),
     defaultValues: {
       fullName: initialData.fullName || '',
       email: initialData.email || '',

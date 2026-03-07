@@ -4,10 +4,9 @@
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { step1Schema } from '@/lib/registration-validations'
-import { LATAM_COUNTRIES, INDUSTRIES, COMPANY_SIZES } from '@/lib/countries-latam'
-import type { RegistrationFormData } from '@/modules/auth/types/auth-types'
-import type { CompanySize } from '@/modules/auth/types/auth-types'
+import { registrationStep1Schema } from '@/modules/auth/hooks/auth-validations'
+import { LATAM_COUNTRIES, INDUSTRIES, COMPANY_SIZES } from '@shared/data/countries-latam'
+import type { RegistrationStepProps, CompanySize } from '@/modules/auth/types/auth-types'
 import {
   Select,
   SelectContent,
@@ -20,15 +19,10 @@ import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-interface RegistrationStep1Props {
-  initialData: Partial<RegistrationFormData>
-  onNext: (data: Partial<RegistrationFormData>) => void
-}
-
 export function RegistrationStep1({
   initialData,
   onNext,
-}: RegistrationStep1Props) {
+}: RegistrationStepProps) {
   const {
     register,
     handleSubmit,
@@ -36,7 +30,7 @@ export function RegistrationStep1({
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(step1Schema),
+    resolver: zodResolver(registrationStep1Schema),
     defaultValues: {
       companyName: initialData.companyName || '',
       industry: initialData.industry || '',

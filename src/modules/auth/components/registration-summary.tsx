@@ -1,13 +1,13 @@
 // src/components/auth/registration-summary.tsx
 "use client";
 
-import { RegistrationFormData } from "@/modules/auth/types/auth-types";
-import { generateSlug } from "@/lib/registration-storage";
+import type { RegistrationSummaryProps } from "@/modules/auth/types/auth-types";
+import { generateSlug } from "@/modules/auth/services/registration-storage";
 import {
   LATAM_COUNTRIES,
   INDUSTRIES,
   COMPANY_SIZES,
-} from "@/lib/countries-latam";
+} from "@shared/data/countries-latam";
 import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
@@ -16,15 +16,6 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-
-interface RegistrationSummaryProps {
-  formData: Partial<RegistrationFormData>;
-  onConfirm: () => void;
-  onBack: () => void;
-  onEdit: (step: number) => void;
-  isCreatingWorkflow?: boolean;
-  workflowError?: string | null;
-}
 
 export function RegistrationSummary({
   formData,
@@ -171,33 +162,6 @@ export function RegistrationSummary({
               <span className="font-medium">{formData.priceRange}</span>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Sección: WhatsApp */}
-      <div className="space-y-3 rounded-lg border bg-card p-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">WhatsApp Business</h3>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => onEdit(4)}
-            className="gap-1"
-          >
-            <Edit2 className="h-3 w-3" />
-            Editar
-          </Button>
-        </div>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Número:</span>
-            <span className="font-medium">{formData.whatsappNumber}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
-            <span className="text-muted-foreground">Número verificado</span>
-          </div>
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { BookingLayout } from '@/components/booking/booking-layout'
+import { BookingLayout } from '@/modules/calendar/components/booking/booking-layout'
 
 interface BookingPageProps {
   params: Promise<{ token: string }>

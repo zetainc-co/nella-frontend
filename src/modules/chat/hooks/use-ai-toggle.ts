@@ -20,8 +20,7 @@ export function useAIToggle({ conversationId, currentMode }: UseAIToggleProps) {
         assigned_agent_id: agentId,
         metadata: { agent_mode: 'human' },
       }),
-    onSuccess: (data) => {
-      console.log('✅ IA detenida exitosamente:', data)
+    onSuccess: () => {
       toast.success('IA detenida. Un agente humano tomará el control.')
       // Invalidar queries para actualizar la UI
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
@@ -39,8 +38,7 @@ export function useAIToggle({ conversationId, currentMode }: UseAIToggleProps) {
         assigned_agent_id: null, // Desasignar agente humano
         metadata: { agent_mode: 'ai' },
       }),
-    onSuccess: (data) => {
-      console.log('✅ IA activada exitosamente:', data)
+    onSuccess: () => {
       toast.success('IA activada. El bot continuará la conversación.')
       // Invalidar queries para actualizar la UI
       queryClient.invalidateQueries({ queryKey: ['conversations'] })

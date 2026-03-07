@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Trash2, Copy, CheckCircle2, Circle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Modal } from '@/components/shared/modal/modal'
+import { Modal } from '@shared/components/modal/modal'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { calendarFetch } from '@/modules/calendar/services/calendar-api'
@@ -196,7 +196,6 @@ export function AvailabilityModal({ open, onClose }: AvailabilityModalProps) {
   }
 
   function handleConnectGoogle() {
-    console.log('[Google Calendar] click. session:', session)
     if (!session?.accessToken) {
       console.warn('[Google Calendar] No hay accessToken en el store de auth')
       toast.error('Sin sesión activa', {
@@ -206,7 +205,6 @@ export function AvailabilityModal({ open, onClose }: AvailabilityModalProps) {
     }
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
     const url = `${backendUrl}/auth/google-calendar?token=${session.accessToken}`
-    console.log('[Google Calendar] Redirigiendo a:', url)
     window.location.href = url
   }
 

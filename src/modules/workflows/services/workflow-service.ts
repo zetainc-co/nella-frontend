@@ -77,8 +77,6 @@ class WorkflowService {
 
     await workflowStorage.save(workflowConfig)
 
-    console.log(`[MOCK] Workflow creado en N8n: ${n8nWorkflowId}`)
-
     return workflowConfig
   }
 
@@ -117,8 +115,6 @@ class WorkflowService {
 
     await workflowStorage.update(workflowId, updated)
 
-    console.log(`[MOCK] Workflow actualizado en N8n: ${workflow.n8n_workflow_id}`)
-
     return updated
   }
 
@@ -153,8 +149,6 @@ class WorkflowService {
     }
 
     await workflowStorage.update(workflowId, updated)
-
-    console.log(`[MOCK] Credenciales actualizadas en N8n`)
   }
 
   async validateCredential(
@@ -171,9 +165,7 @@ class WorkflowService {
 
     const isValid = validators[type]?.(token) || false
 
-    if (isValid) {
-      console.log(`[MOCK] ${type} token validado exitosamente`)
-    } else {
+    if (!isValid && process.env.NODE_ENV === 'development') {
       console.error(`[MOCK] ${type} token inválido`)
     }
 
@@ -200,8 +192,6 @@ class WorkflowService {
     }
 
     await workflowStorage.update(workflowId, updated)
-
-    console.log(`[MOCK] Workflow ${status === 'active' ? 'activado' : 'desactivado'} en N8n`)
   }
 
   private async simulateNetworkDelay(ms: number = 500): Promise<void> {

@@ -1,151 +1,32 @@
 // src/components/auth/email-verification.tsx
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Loader2, Mail, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Loader2, Mail, AlertCircle } from 'lucide-react'
+import { useEmailVerification } from '@/modules/auth/hooks/useEmailVerification'
 
-interface EmailVerificationProps {
-  email: string
-  onVerified: () => void
-  onResendCode: () => void
-}
-
-const CORRECT_CODE = '000000'
-const MAX_ATTEMPTS = 5
-const TIMER_DURATION = 10 * 60 // 10 minutos en segundos
+import type { EmailVerificationProps } from '@/modules/auth/types/auth-types'
 
 export function EmailVerification({
   email,
   onVerified,
   onResendCode,
 }: EmailVerificationProps) {
-  const [code, setCode] = useState(['', '', '', '', '', ''])
-  const [attempts, setAttempts] = useState(0)
-  const [isVerifying, setIsVerifying] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [timeLeft, setTimeLeft] = useState(TIMER_DURATION)
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([])
-
-  // Timer countdown
-  useEffect(() => {
-    if (timeLeft <= 0) return
-
-    const interval = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(interval)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [timeLeft])
-
-  // Auto-focus primer input
-  useEffect(() => {
-    inputRefs.current[0]?.focus()
-  }, [])
-
-  const handleChange = (index: number, value: string) => {
-    // Solo permitir dígitos
-    if (value && !/^\d$/.test(value)) return
-
-    const newCode = [...code]
-    newCode[index] = value
-
-    setCode(newCode)
-    setError(null)
-
-    // Auto-focus siguiente input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus()
-    }
-
-    // Auto-verificar cuando se completan los 6 dígitos
-    if (newCode.every(digit => digit !== '') && newCode.join('').length === 6) {
-      handleVerify(newCode.join(''))
-    }
-  }
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Backspace: borrar y volver al input anterior
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus()
-    }
-
-    // Arrow keys: navegar entre inputs
-    if (e.key === 'ArrowLeft' && index > 0) {
-      inputRefs.current[index - 1]?.focus()
-    }
-    if (e.key === 'ArrowRight' && index < 5) {
-      inputRefs.current[index + 1]?.focus()
-    }
-  }
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault()
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
-
-    if (pastedData.length === 6) {
-      const newCode = pastedData.split('')
-      setCode(newCode)
-      inputRefs.current[5]?.focus()
-
-      // Auto-verificar
-      handleVerify(pastedData)
-    }
-  }
-
-  const handleVerify = async (codeToVerify: string) => {
-    setIsVerifying(true)
-    setError(null)
-
-    // Simular delay de verificación
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    if (codeToVerify === CORRECT_CODE) {
-      setIsVerifying(false)
-      onVerified()
-    } else {
-      const newAttempts = attempts + 1
-      setAttempts(newAttempts)
-
-      if (newAttempts >= MAX_ATTEMPTS) {
-        setError('Has excedido el número máximo de intentos. Por favor, solicita un nuevo código.')
-      } else {
-        setError(
-          `Código incorrecto. Te quedan ${MAX_ATTEMPTS - newAttempts} intento(s).`
-        )
-      }
-
-      // Limpiar código
-      setCode(['', '', '', '', '', ''])
-      inputRefs.current[0]?.focus()
-      setIsVerifying(false)
-    }
-  }
-
-  const handleResend = () => {
-    setCode(['', '', '', '', '', ''])
-    setAttempts(0)
-    setError(null)
-    setTimeLeft(TIMER_DURATION)
-    inputRefs.current[0]?.focus()
-    onResendCode()
-  }
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
-
-  const isExpired = timeLeft <= 0
-  const isMaxAttempts = attempts >= MAX_ATTEMPTS
+  const {
+    code,
+    isVerifying,
+    error,
+    timeLeft,
+    inputRefs,
+    isExpired,
+    isMaxAttempts,
+    handleChange,
+    handleKeyDown,
+    handlePaste,
+    handleResend,
+    formatTime,
+  } = useEmailVerification(email, onVerified, onResendCode)
 
   return (
     <div className="space-y-6">
@@ -166,7 +47,7 @@ export function EmailVerification({
         <div className="flex justify-center gap-2">
           {code.map((digit, index) => (
             <Input
-              key={index}
+              key={`otp-${index}`}
               ref={el => { inputRefs.current[index] = el }}
               type="text"
               inputMode="numeric"
@@ -233,16 +114,6 @@ export function EmailVerification({
         </p>
       </div>
 
-      {/* Info */}
-      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
-        <div className="flex gap-3">
-          <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
-          <div className="space-y-1 text-sm text-blue-900 dark:text-blue-100">
-            <p className="font-medium">Tip para desarrollo:</p>
-            <p>El código de verificación es: <span className="font-mono font-bold">000000</span></p>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

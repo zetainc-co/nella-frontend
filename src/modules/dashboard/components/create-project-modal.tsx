@@ -1,75 +1,23 @@
 'use client'
 
-import { useState } from 'react'
-import type { FormEvent } from 'react'
 import { Plus, Trash2, Rocket, X } from 'lucide-react'
-import { useCreateProject } from '@/modules/dashboard/hooks/useProjects'
-import { toast } from 'sonner'
-
-interface CreateProjectModalProps {
-  open: boolean
-  onClose: () => void
-  onCreated: (projectId: string) => void
-}
+import { useCreateProjectForm } from '@/modules/dashboard/hooks/useCreateProjectForm'
+import type { CreateProjectModalProps } from '@/modules/dashboard/types/dashboard-types'
 
 export function CreateProjectModal({ open, onClose, onCreated }: CreateProjectModalProps) {
-  const [name, setName] = useState('')
-  const [nameError, setNameError] = useState('')
-  const [emails, setEmails] = useState<string[]>([''])
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { mutateAsync: createProject } = useCreateProject()
-
-  function resetAndClose() {
-    setName('')
-    setNameError('')
-    setEmails([''])
-    onClose()
-  }
-
-  function addEmailField() {
-    if (emails.length < 5) setEmails([...emails, ''])
-  }
-
-  function updateEmail(index: number, value: string) {
-    setEmails(emails.map((e, i) => (i === index ? value : e)))
-  }
-
-  function removeEmail(index: number) {
-    if (emails.length === 1) { setEmails(['']); return }
-    setEmails(emails.filter((_, i) => i !== index))
-  }
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setNameError('')
-    if (!name.trim()) { setNameError('El nombre es requerido'); return }
-
-    setIsSubmitting(true)
-    try {
-      const project = await createProject(name.trim())
-
-      // Send invites if any valid email entered
-      const validEmails = emails.map(e => e.trim()).filter(Boolean)
-      if (validEmails.length > 0) {
-        // TODO: POST /api/projects/:id/invite when endpoint is ready
-        await new Promise(r => setTimeout(r, 200))
-        toast.success('¡Invitaciones enviadas!', {
-          description: `Se notificará a ${validEmails.length} vendedor${validEmails.length > 1 ? 'es' : ''}.`,
-        })
-      }
-
-      onCreated(project.id)
-      resetAndClose()
-    } catch {
-      setNameError('Error al crear el proyecto. Intenta de nuevo.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  async function handleSkip() {
-    resetAndClose()
-  }
+  const {
+    name,
+    setName,
+    nameError,
+    emailEntries,
+    isSubmitting,
+    resetAndClose,
+    addEmailField,
+    updateEmail,
+    removeEmail,
+    handleSubmit,
+    handleSkip,
+  } = useCreateProjectForm(onClose, onCreated)
 
   if (!open) return null
 
@@ -144,19 +92,19 @@ export function CreateProjectModal({ open, onClose, onCreated }: CreateProjectMo
           </div>
 
           <div className="space-y-2">
-            {emails.map((email, index) => (
-              <div key={index} className="flex gap-2 items-center">
+            {emailEntries.map((entry) => (
+              <div key={entry.id} className="flex gap-2 items-center">
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => updateEmail(index, e.target.value)}
+                  value={entry.value}
+                  onChange={(e) => updateEmail(entry.id, e.target.value)}
                   placeholder="correo@ejemplo.com"
                   className="auth-input flex-1"
                 />
-                {emails.length > 1 && (
+                {emailEntries.length > 1 && (
                   <button
                     type="button"
-                    onClick={() => removeEmail(index)}
+                    onClick={() => removeEmail(entry.id)}
                     className="p-2 shrink-0 transition-colors"
                     style={{ color: 'rgba(240,244,255,0.3)' }}
                     onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
@@ -168,7 +116,7 @@ export function CreateProjectModal({ open, onClose, onCreated }: CreateProjectMo
               </div>
             ))}
 
-            {emails.length < 5 && (
+            {emailEntries.length < 5 && (
               <button
                 type="button"
                 onClick={addEmailField}

@@ -1,21 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { User, Session } from '@/modules/auth/types/auth-types'
-
-interface AuthState {
-  user: User | null
-  session: Session | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  tenantSubdomain: string | null
-  setUser: (user: User | null) => void
-  setSession: (session: Session | null) => void
-  setLoading: (isLoading: boolean) => void
-  setTenantSubdomain: (subdomain: string | null) => void
-  logout: () => void
-  updateUser: (updates: Partial<User>) => void
-  getAccessToken: () => string | null
-}
+import type { AuthState } from '@/modules/auth/types/auth-types'
 
 export const useAuthStore = create<AuthState>()(
   persist(

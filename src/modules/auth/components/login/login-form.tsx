@@ -17,13 +17,10 @@ import {
 } from '@/components/ui/form'
 import { Separator } from '@/components/ui/separator'
 import { SocialAuthButtons } from './social-auth-buttons'
-import { loginSchema, type LoginFormData } from '@/lib/auth/auth-validations'
+import { loginSchema, type LoginFormData } from '@/modules/auth/hooks/auth-validations'
 import { useLogin } from '@/modules/auth/hooks/useLogin'
 import { toast } from 'sonner'
-
-interface LoginFormProps {
-  tenantSlug?: string
-}
+import type { LoginFormProps } from '@/modules/auth/types/auth-types'
 
 export function LoginForm({ tenantSlug }: LoginFormProps) {
   const loginMutation = useLogin()

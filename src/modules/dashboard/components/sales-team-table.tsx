@@ -1,11 +1,6 @@
 'use client';
 
-import type { SalesTeamMember } from '@/modules/dashboard/types/dashboard-types';
-
-interface SalesTeamTableProps {
-  salesTeam: SalesTeamMember[];
-  isLoading?: boolean;
-}
+import type { SalesTeamTableProps } from '@/modules/dashboard/types/dashboard-types';
 
 export function SalesTeamTable({ salesTeam, isLoading }: SalesTeamTableProps) {
   if (isLoading) {

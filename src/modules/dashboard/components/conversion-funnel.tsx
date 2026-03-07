@@ -1,6 +1,6 @@
 'use client'
 
-import type { ProjectMetrics } from '@/modules/dashboard/types/dashboard-types'
+import type { ConversionFunnelProps } from '@/modules/dashboard/types/dashboard-types'
 
 const STATUS_LABELS: Record<string, string> = {
   new: 'Nuevos',
@@ -10,12 +10,7 @@ const STATUS_LABELS: Record<string, string> = {
   lost: 'Perdidos',
 }
 
-// Gradient from dark purple to light purple as funnel narrows
 const BAR_COLORS = ['#7437DA', '#8B4FE8', '#A26FF0', '#B98FF6', '#C7B7FC']
-
-interface ConversionFunnelProps {
-  funnel: ProjectMetrics['funnel']
-}
 
 export function ConversionFunnel({ funnel }: ConversionFunnelProps) {
   // Always show these 4 main stages

@@ -55,53 +55,55 @@ export default function GestionPage() {
     // En producción: redirigir al panel después de eliminar
   }
 
-  // Simular carga de logs
+  // TODO: Replace with real logs API call when available
   const handleLoadLogs = async () => {
     setShowLogs(true)
-    // Mock de logs de ejecución
-    const mockLogs = [
-      {
-        id: '1',
-        timestamp: '2026-02-16 14:30:25',
-        type: 'success',
-        message: 'Workflow ejecutado exitosamente',
-        duration: '2.3s',
-        triggers: 3
-      },
-      {
-        id: '2',
-        timestamp: '2026-02-16 13:15:10',
-        type: 'success',
-        message: 'Workflow ejecutado exitosamente',
-        duration: '1.8s',
-        triggers: 5
-      },
-      {
-        id: '3',
-        timestamp: '2026-02-16 12:00:05',
-        type: 'error',
-        message: 'Error: Timeout al conectar con WhatsApp API',
-        duration: '5.0s',
-        triggers: 1
-      },
-      {
-        id: '4',
-        timestamp: '2026-02-16 10:45:30',
-        type: 'success',
-        message: 'Workflow ejecutado exitosamente',
-        duration: '2.1s',
-        triggers: 2
-      },
-      {
-        id: '5',
-        timestamp: '2026-02-16 09:30:15',
-        type: 'warning',
-        message: 'Advertencia: Rate limit próximo al límite',
-        duration: '3.2s',
-        triggers: 8
-      }
-    ]
-    setLogs(mockLogs)
+    if (process.env.NODE_ENV === 'development') {
+      // Mock de logs de ejecución (dev only)
+      const mockLogs = [
+        {
+          id: '1',
+          timestamp: '2026-02-16 14:30:25',
+          type: 'success',
+          message: 'Workflow ejecutado exitosamente',
+          duration: '2.3s',
+          triggers: 3
+        },
+        {
+          id: '2',
+          timestamp: '2026-02-16 13:15:10',
+          type: 'success',
+          message: 'Workflow ejecutado exitosamente',
+          duration: '1.8s',
+          triggers: 5
+        },
+        {
+          id: '3',
+          timestamp: '2026-02-16 12:00:05',
+          type: 'error',
+          message: 'Error: Timeout al conectar con WhatsApp API',
+          duration: '5.0s',
+          triggers: 1
+        },
+        {
+          id: '4',
+          timestamp: '2026-02-16 10:45:30',
+          type: 'success',
+          message: 'Workflow ejecutado exitosamente',
+          duration: '2.1s',
+          triggers: 2
+        },
+        {
+          id: '5',
+          timestamp: '2026-02-16 09:30:15',
+          type: 'warning',
+          message: 'Advertencia: Rate limit próximo al límite',
+          duration: '3.2s',
+          triggers: 8
+        }
+      ]
+      setLogs(mockLogs)
+    }
   }
 
   if (isLoading) {

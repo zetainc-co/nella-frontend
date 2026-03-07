@@ -1,12 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
-interface ProjectState {
-  selectedProjectId: string | null
-  isTransitioning: boolean
-  setSelectedProjectId: (id: string | null) => void
-  setTransitioning: (value: boolean) => void
-}
+import { ProjectState } from '@/core/types/project.store.types'
 
 export const useProjectStore = create<ProjectState>()(
   persist(

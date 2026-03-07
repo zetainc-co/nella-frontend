@@ -1,113 +1,28 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { createPasswordSchema, calculatePasswordStrength, CreatePasswordFormData } from '@/lib/validations/create-password-schema';
 import { ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { useCreatePassword } from '@/modules/auth/hooks/useCreatePassword';
 
-interface CreatePasswordFormProps {
-  token: string;
-  email: string;
-}
+import type { CreatePasswordFormProps } from '@/modules/auth/types/auth-types'
 
 export function CreatePasswordForm({ token, email }: CreatePasswordFormProps) {
-  const router = useRouter();
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [tokenExpired, setTokenExpired] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<CreatePasswordFormData>({
-    resolver: zodResolver(createPasswordSchema),
-  });
+    form,
+    passwordStrength,
+    isSubmitting,
+    error,
+    tokenExpired,
+    showPassword,
+    showConfirmPassword,
+    password,
+    onSubmit,
+    handleResendActivation,
+    toggleShowPassword,
+    toggleShowConfirmPassword,
+  } = useCreatePassword(token, email)
 
-  const password = watch('password');
-
-  // Calculate password strength
-  useEffect(() => {
-    if (password) {
-      setPasswordStrength(calculatePasswordStrength(password));
-    } else {
-      setPasswordStrength(0);
-    }
-  }, [password]);
-
-  const onSubmit = async (data: CreatePasswordFormData) => {
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/auth/set-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token,
-          password: data.password,
-          confirmPassword: data.confirmPassword,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 410) {
-          setTokenExpired(true);
-          setError('El link de activación expiró');
-        } else if (response.status === 409) {
-          router.push('/login?message=account-already-activated');
-        } else {
-          setError(result.message || 'Error al crear la contraseña');
-        }
-        return;
-      }
-
-      // Success - redirect to tenant login
-      const { tenantSlug } = result.data;
-      if (!tenantSlug) {
-        setError('Error al obtener información del tenant');
-        return;
-      }
-
-      // Build tenant-specific login URL
-      const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost';
-      const port = appDomain === 'localhost' ? ':3001' : '';
-      const protocol = appDomain === 'localhost' ? 'http' : 'https';
-      const loginUrl = `${protocol}://${tenantSlug}.${appDomain}${port}/login?email=${encodeURIComponent(email)}&message=account-activated`;
-
-      // Redirect to tenant login
-      window.location.href = loginUrl;
-    } catch (err) {
-      setError('Error de conexión. Intenta nuevamente');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleResendActivation = async () => {
-    try {
-      const response = await fetch('/api/auth/resend-activation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (response.ok) {
-        router.push(`/login?message=activation-resent&email=${encodeURIComponent(email)}`);
-      }
-    } catch (err) {
-      setError('Error al reenviar el email');
-    }
-  };
+  const { register, handleSubmit, formState: { errors } } = form
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -157,7 +72,7 @@ export function CreatePasswordForm({ token, email }: CreatePasswordFormProps) {
             />
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={toggleShowPassword}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               tabIndex={-1}
             >
@@ -216,7 +131,7 @@ export function CreatePasswordForm({ token, email }: CreatePasswordFormProps) {
             />
             <button
               type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              onClick={toggleShowConfirmPassword}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               tabIndex={-1}
             >

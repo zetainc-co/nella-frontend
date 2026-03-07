@@ -1,5 +1,4 @@
 // src/types/kanban-types.ts
-import type { BackendContact } from '@/modules/contacts/types/contacts'
 
 export type LeadStage = 'new' | 'contacted' | 'proposal' | 'closed'
 
@@ -52,21 +51,12 @@ export interface LeadModalProps {
 }
 
 export interface KanbanStore {
-  // Estado
-  leads: Lead[]
+  // UI State
   filters: KanbanFilters
   selectedLeadId: number | null
-  isLoading: boolean
-  error: string | null
 
-  // Acciones
-  fetchContacts: () => Promise<void>
-  upsertContact: (contact: BackendContact) => void
+  // Actions
   moveLeadToStage: (leadId: number, newStage: LeadStage) => void
   setSearchQuery: (query: string) => void
   setSelectedLead: (leadId: number | null) => void
-
-  // Selectores
-  getFilteredLeads: () => Lead[]
-  getLeadsByStage: (stage: LeadStage) => Lead[]
 }

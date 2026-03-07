@@ -4,7 +4,7 @@
 import { format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Calendar, Clock, MapPin, Video, FileText, User, Building2, CheckCircle2, XCircle, AlertCircle, ExternalLink } from 'lucide-react'
-import { Modal } from '@/components/shared/modal/modal'
+import { Modal } from '@shared/components/modal/modal'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { CalendarEvent } from '@/modules/calendar/types/calendar-types'
